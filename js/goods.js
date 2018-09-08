@@ -1,6 +1,6 @@
 'use strict';
 
-/* 
+/*
  * Текст задания:
  * https://up.htmlacademy.ru/javascript/15/tasks/13
  */
@@ -116,25 +116,20 @@ var CONTENTS = [
   'виллабаджо'
 ];
 
-var NUTRITION_CONTENTS = {
-  min: 1,
-  max: CONTENTS.length
-}
-
 var GOODS_TEMPLATE_ID = 'card';
 var GOODS_HTML_TAG_CLASS = 'catalog__cards';
 
 var TROLLEY_TEMPLATE_ID = 'card-order';
 var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
 
-var Commodity = function(
-  name,
-  picture,
-  amount,
-  price,
-  weight,
-  rating,
-  nutritionFacts
+var Commodity = function (
+    name,
+    picture,
+    amount,
+    price,
+    weight,
+    rating,
+    nutritionFacts
   ) {
   
   this.name = name;
@@ -146,32 +141,12 @@ var Commodity = function(
   this.nutritionFacts = nutritionFacts;
 };
 
-var Rating = function(
-  value,
-  number
-  ) {
-
-  this.value = null;
-  this.number = null;
-};
-
-var NutritionFacts = function(
-  sugar,
-  energy,
-  contents
-  ) {
-
-  this.sugar = sugar;
-  this.energy = enegy;
-  this.contents = contents;
-};
-
 
 /*
  * Main logic
  */
 
-(function() {
+(function () {
   var goods = generateGoods(GOODS_COUNT);
   var domGoods = createDomOfGoodsFromTemplate(goods, GOODS_TEMPLATE_ID);
   removeCssClass('catalog__cards', 'catalog__cards--load');
@@ -235,14 +210,14 @@ function getWeight() {
 }
 
 function getRating() {
-  var rating = new Object();
+  var rating = {};
   rating.value = getRatingValue();
   rating.number = getRatingNumber();
   return rating;
 }
 
-function getNutritionFacts()  {
-  var nutritionFacts = new Object();
+function getNutritionFacts() {
+  var nutritionFacts = {};
   nutritionFacts.sugar = getSugar();
   nutritionFacts.energy = getEnergy();
   nutritionFacts.contents = getContents();
@@ -266,11 +241,11 @@ function getContents() {
 }
 
 function getRatingValue() {
-  return randomInRangeUpTo(RATING_VALUE_MIN, RATING_VALUE_MAX)
+  return randomInRangeUpTo(RATING_VALUE_MIN, RATING_VALUE_MAX);
 }
 
 function getRatingNumber() {
-  return randomInRangeUpTo(RATING_NUMBER_MIN, RATING_NUMBER_MAX)
+  return randomInRangeUpTo(RATING_NUMBER_MIN, RATING_NUMBER_MAX);
 }
 
 
@@ -283,7 +258,7 @@ function createDomOfGoodsFromTemplate(goods, templateHtmlId) {
   for (var i = 0; i < goods.length; i++) {
     var domElement = createDomOfCommodityFromTemplate(goods[i], templateHtmlId);
     domElements.push(domElement);
-  };
+  }
   return domElements;
 }
 
@@ -307,81 +282,83 @@ function setCommodityName(dom, data) {
 }
 
 function setCommodityImage(dom, data, htmlAltProperty) {
-    var element = dom.querySelector('.card__img');
-    element.src = data;
-    element.alt = htmlAltProperty;
+  var element = dom.querySelector('.card__img');
+  element.src = data;
+  element.alt = htmlAltProperty;
 }
 
 function setCommodityStockAmount(dom, data) {
-    var htmlClass = undefined;
-    if (data > 5) {
-      htmlClass = 'card--in-stock';
-    } else if (data >= 1 && data <= 5) {
-      htmlClass = 'card-little';
-    } else if (data === 0) {
-      htmlClass = 'card-soon';
-    };
-    
-    var element = dom.querySelector('.catalog__card');
-    element.classList.remove('card--in-stock');
-    element.classList.add(htmlClass);
+  var htmlClass;
+  if (data > 5) {
+    htmlClass = 'card--in-stock';
+  } else if (data >= 1 && data <= 5) {
+    htmlClass = 'card-little';
+  } else if (data === 0) {
+    htmlClass = 'card-soon';
+  }
+
+  var element = dom.querySelector('.catalog__card');
+  element.classList.remove('card--in-stock');
+  element.classList.add(htmlClass);
 }
 
 function setCommodityPrice(dom, data) {
-    var priceElement = dom.querySelector('.card__price');
-    var currencyElement = dom.querySelector('.card__currency');
-    var weightElement = dom.querySelector('.card__weight');
-    priceElement.textContent = data + ' ';
-    priceElement.appendChild(currencyElement);
-    priceElement.appendChild(weightElement);
+  var priceElement = dom.querySelector('.card__price');
+  var currencyElement = dom.querySelector('.card__currency');
+  var weightElement = dom.querySelector('.card__weight');
+  priceElement.textContent = data + ' ';
+  priceElement.appendChild(currencyElement);
+  priceElement.appendChild(weightElement);
 }
 
 function setCommodityWeight(dom, data) {
-    var element = dom.querySelector('.card__weight');
-    var weight = '/ ' + data + ' Г';
-    element.textContent = weight;
+  var element = dom.querySelector('.card__weight');
+  var weight = '/ ' + data + ' Г';
+  element.textContent = weight;
 }
 
 function setCommodityRating(dom, data) {
-    var htmlClass;
-    var textRating = 'Рейтинг: ';
-    if (data.value >= 4.5) {
-      htmlClass = 'stars__rating--five';
-      textRating += '5 звёзд';
-    } else if (data.value >= 3.5 && data.value < 4.5) {
-      htmlClass = 'stars__rating--four'
-      textRating += '4 звeзды';
-    } else if (data.value >= 2.5 && data.value < 3.5) {
-      htmlClass = 'stars__rating--three'
-      textRating += '3 звeзды';
-    } else if (data.value >= 1.5 && data.value < 2.5) {
-      htmlClass = 'stars__rating--two'
-      textRating += '2 звeзды';
-    } else if (data.value >= 0.5 && data.value < 1.5) {
-      htmlClass = 'stars__rating--one'
-      textRating += '1 звeзда';
-    } else if (data.value >= 0.0 && data.value < 0.5) {
-      htmlClass = 'stars__rating--zero'
-      textRating += 'ноль звёзд';
-    } else htmlClass = '';
+  var htmlClass;
+  var textRating = 'Рейтинг: ';
+  if (data.value >= 4.5) {
+    htmlClass = 'stars__rating--five';
+    textRating += '5 звёзд';
+  } else if (data.value >= 3.5 && data.value < 4.5) {
+    htmlClass = 'stars__rating--four';
+    textRating += '4 звeзды';
+  } else if (data.value >= 2.5 && data.value < 3.5) {
+    htmlClass = 'stars__rating--three';
+    textRating += '3 звeзды';
+  } else if (data.value >= 1.5 && data.value < 2.5) {
+    htmlClass = 'stars__rating--two';
+    textRating += '2 звeзды';
+  } else if (data.value >= 0.5 && data.value < 1.5) {
+    htmlClass = 'stars__rating--one';
+    textRating += '1 звeзда';
+  } else if (data.value >= 0.0 && data.value < 0.5) {
+    htmlClass = 'stars__rating--zero';
+    textRating += 'ноль звёзд';
+  } else {
+    htmlClass = '';
+  }
 
-    var element = dom.querySelector('.stars__rating');
-    element.classList.remove('stars__rating--five');
-    element.classList.add(htmlClass);
-    element.textContent = textRating;
+  var element = dom.querySelector('.stars__rating');
+  element.classList.remove('stars__rating--five');
+  element.classList.add(htmlClass);
+  element.textContent = textRating;
 
-    element = dom.querySelector('.star__count');
-    var number = '(' + data.number + ')'
-    element.textContent = number;
+  element = dom.querySelector('.star__count');
+  var number = '(' + data.number + ')'
+  element.textContent = number;
 }
 
 function setCommodityNutritionFacts(dom, data) {
   var element = dom.querySelector('.card__composition-list');
   element.textContent = data.contents;
-  
-  var element = dom.querySelector('.card__characteristic');
+
+  element = dom.querySelector('.card__characteristic');
   var sugar = data.sugar ? 'С сахаром' : 'Без сахара';
-  var sugarAndEnergy = sugar + '. ' + data.energy + " ккал"
+  var sugarAndEnergy = sugar + '. ' + data.energy + " ккал";
   element.textContent = sugarAndEnergy;
 }
 
@@ -426,7 +403,7 @@ function createDomOfTrolleyGoodsFromTemplate(goods, templateHtmlId) {
   for (var i = 0; i < goods.length; i++) {
     var domElement = createDomOfTrolleyCommodityFromTemplate(goods[i], templateHtmlId);
     domElements.push(domElement);
-  };
+  }
   return domElements;
 }
 
@@ -513,8 +490,8 @@ function getRandomListFromList(list) {
   if (list.length === 0) {
     return list;
   }
-  var newList = list.filter(function() {
-    return randomInRangeUpTo(0, 1) === 0
+  var newList = list.filter(function () {
+    return randomInRangeUpTo(0, 1) === 0;
   });
 
   if (newList.length === 0) {
