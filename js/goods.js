@@ -116,6 +116,11 @@ var CONTENTS = [
   'виллабаджо'
 ];
 
+var NUTRITION_CONTENTS = {
+  min: 1,
+  max: CONTENTS.length
+}
+
 var GOODS_TEMPLATE_ID = 'card'; // #card for '.catalog__card'
 var GOODS_HTML_TAG_CLASS = 'catalog__cards';
 
@@ -248,22 +253,19 @@ function getNutritionFacts()  {
 }
 
 function getSugar() {
-  return getRandomItemFromList(SUGARS);
+  var result = getRandomItemFromList(SUGARS);
+  return result;
 }
 
-function getEnergy()  {
+function getEnergy() {
   return randomInRangeUpTo(ENERGY_MIN, ENERGY_MAX);
 }
 
 function getContents() {
-  return getRandomItemFromList(CONTENTS);
-  /*
-   * Not finished yet !
-   * Not finished yet !
-   * Not finished yet !
-   * Not finished yet !
-   * Not finished yet !
-   */
+  var randomContents = getRandomListFromList(CONTENTS);
+  var result = randomContents.join('; ');
+  result += '.';
+  return result;
 }
 
 function getRatingValue() {
@@ -365,13 +367,13 @@ function setCommodityRating(dom, data) {
 }
 
 function setCommodityNutritionFacts(dom, data) {
-  /*
-   * Not finished yet !
-   * Not finished yet !
-   * Not finished yet !
-   * Not finished yet !
-   * Not finished yet !
-   */
+  var element = dom.querySelector('.card__composition-list');
+  element.textContent = data.contents;
+  
+  var element = dom.querySelector('.card__characteristic');
+  var sugar = data.sugar ? 'С сахаром' : 'Без сахара';
+  var sugarAndEnergy = sugar + '. ' + data.energy + " ккал"
+  element.textContent = sugarAndEnergy;
 }
 
 function renderGoods(domElements, htmlClass) {
@@ -479,6 +481,18 @@ function getDomObjectsByClassName(objectClass) {
 function getRandomItemFromList(list) {
   var index = randomInRange(0, list.length);
   return list[index];
+}
+
+function getRandomListFromList(list) {
+  var diapason = randomInRange(0, list.length);
+  var newList = list.filter(function() {
+    return randomInRangeUpTo(0, 1) === 0
+  });
+  
+  if (newList.length === 0) {
+    return newList = list[0];
+  }
+  return newList;
 }
 
 function randomInRangeUpTo(from, upTo, precision) {
