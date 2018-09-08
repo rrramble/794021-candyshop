@@ -190,7 +190,7 @@ var goods = []; // set in global scope only for debugging purpose
 
 
 /*
- *
+ * Generate catalog of goods
  */
 
 function generateGoods(count) {
@@ -278,7 +278,7 @@ function getRatingNumber() {
 
 
 /*
- * Functions for: creating DOM from list of goods
+ * Make DOM from the catalog of goods
  */
 
 function createDomOfGoodsFromTemplate(goods, templateHtmlId) {
@@ -380,6 +380,11 @@ function setCommodityNutritionFacts(dom, data) {
   element.textContent = sugarAndEnergy;
 }
 
+
+/*
+ * Render DOM of the catalog of goods
+ */
+
 function renderGoods(domElements, htmlClass) {
   for (var i = 0; i < domElements.length; i++) {
     renderItemInGoods(domElements[i], htmlClass);
@@ -393,9 +398,8 @@ function renderItemInGoods(domElement, htmlClass) {
 }
 
 
-
 /*
- * Functions for list of goods in the TROLLEY
+ * Generate trolley content from the list of goods
  */
 
 function fulfillTrolley(list, count) {
@@ -406,6 +410,11 @@ function fulfillTrolley(list, count) {
   }
   return goodsInTrolley;
 }
+
+
+/*
+ * Make DOM from the trolley content
+ */
 
 function createDomOfTrolleyGoodsFromTemplate(goods, templateHtmlId) {
   var domElements = [];
@@ -428,7 +437,6 @@ function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
   return newDom;
 }
 
-
 function setTrolleyCommodityName(dom, name) {
   var element = dom.querySelector('.card-order__title');
   element.textContent = name;
@@ -444,6 +452,11 @@ function setTrolleyCommodityPrice(dom, value) {
   var element = dom.querySelector('.card-order__price');
   element.textContent = value;
 }
+
+
+/*
+ * Render DOM of the trolley content
+ */
 
 function renderTrolley(domElements, htmlClass) {
   for (var i = 0; i < domElements.length; i++) {
