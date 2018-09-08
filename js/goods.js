@@ -128,13 +128,13 @@ var TROLLEY_TEMPLATE_ID = 'card-order';
 var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
 
 var Commodity = function(
-  name = null,
-  picture = null,
-  amount = null,
-  price = null,
-  weight = null,
-  rating = {},
-  nutritionFacts = {}
+  name,
+  picture,
+  amount,
+  price,
+  weight,
+  rating,
+  nutritionFacts
   ) {
   
   this.name = name;
