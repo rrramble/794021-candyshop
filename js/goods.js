@@ -10,8 +10,8 @@ var WAT = 'Wat eez dat?';
 var GOODS_COUNT = 26;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
-var AMOUNT_MIN = 0; //0
-var AMOUNT_MAX = 20; //20
+var AMOUNT_MIN = 0;
+var AMOUNT_MAX = 20;
 var AMOUNT_PRECISION = 0;
 
 var PRICE_MIN = 100;
@@ -171,11 +171,8 @@ var NutritionFacts = function(
  * Main logic
  */
 
-var goods = []; // set in global scope only for debugging purpose
-
 (function() {
-
-  goods = generateGoods(GOODS_COUNT);
+  var goods = generateGoods(GOODS_COUNT);
   var domGoods = createDomOfGoodsFromTemplate(goods, GOODS_TEMPLATE_ID);
   removeCssClass('catalog__cards', 'catalog__cards--load');
   addCssClass('catalog__load', 'visually-hidden');
