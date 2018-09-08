@@ -130,8 +130,8 @@ var Commodity = function (
     weight,
     rating,
     nutritionFacts
-  ) {
-  
+) {
+
   this.name = name;
   this.picture = picture;
   this.amount = amount;
@@ -348,7 +348,7 @@ function setCommodityRating(dom, data) {
   element.textContent = textRating;
 
   element = dom.querySelector('.star__count');
-  var number = '(' + data.number + ')'
+  var number = '(' + data.number + ')';
   element.textContent = number;
 }
 
@@ -358,7 +358,7 @@ function setCommodityNutritionFacts(dom, data) {
 
   element = dom.querySelector('.card__characteristic');
   var sugar = data.sugar ? 'С сахаром' : 'Без сахара';
-  var sugarAndEnergy = sugar + '. ' + data.energy + " ккал";
+  var sugarAndEnergy = sugar + '. ' + data.energy + ' ккал';
   element.textContent = sugarAndEnergy;
 }
 
