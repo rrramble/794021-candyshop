@@ -147,8 +147,8 @@ var Commodity = function(
 };
 
 var Rating = function(
-  value = null,
-  number = null
+  value,
+  number
   ) {
 
   this.value = null;
@@ -156,9 +156,9 @@ var Rating = function(
 };
 
 var NutritionFacts = function(
-  sugar = null,
-  energy = null,
-  contents = ''
+  sugar,
+  energy,
+  contents
   ) {
 
   this.sugar = sugar;
