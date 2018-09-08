@@ -370,7 +370,7 @@ function setCommodityRating(dom, data) {
     element.classList.add(htmlClass);
     element.textContent = textRating;
 
-    var element = dom.querySelector('.star__count');
+    element = dom.querySelector('.star__count');
     var number = '(' + data.number + ')'
     element.textContent = number;
 }
@@ -501,18 +501,24 @@ function getDomObjectsByClassName(objectClass) {
 }
 
 function getRandomItemFromList(list) {
+  if (list.length === 0) {
+    return list;
+  }
+
   var index = randomInRange(0, list.length);
   return list[index];
 }
 
 function getRandomListFromList(list) {
-  var diapason = randomInRange(0, list.length);
+  if (list.length === 0) {
+    return list;
+  }
   var newList = list.filter(function() {
     return randomInRangeUpTo(0, 1) === 0
   });
-  
+
   if (newList.length === 0) {
-    return newList = list[0];
+    newList = list[0];
   }
   return newList;
 }
