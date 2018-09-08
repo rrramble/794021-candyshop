@@ -331,8 +331,12 @@ function setCommodityStockAmount(dom, data) {
 }
 
 function setCommodityPrice(dom, data) {
-    var element = dom.querySelector('.card__price');
-    element.text = data;
+    var priceElement = dom.querySelector('.card__price');
+    var currencyElement = dom.querySelector('.card__currency');
+    var weightElement = dom.querySelector('.card__weight');
+    priceElement.textContent = data + ' ';
+    priceElement.appendChild(currencyElement);
+    priceElement.appendChild(weightElement);
 }
 
 function setCommodityWeight(dom, data) {
