@@ -344,23 +344,31 @@ function setCommodityWeight(dom, data) {
 
 function setCommodityRating(dom, data) {
     var htmlClass;
+    var textRating = 'Рейтинг: ';
     if (data.value >= 4.5) {
-      htmlClass = 'stars__rating--five'
+      htmlClass = 'stars__rating--five';
+      textRating += '5 звёзд';
     } else if (data.value >= 3.5 && data.value < 4.5) {
       htmlClass = 'stars__rating--four'
+      textRating += '4 звeзды';
     } else if (data.value >= 2.5 && data.value < 3.5) {
       htmlClass = 'stars__rating--three'
+      textRating += '3 звeзды';
     } else if (data.value >= 1.5 && data.value < 2.5) {
       htmlClass = 'stars__rating--two'
+      textRating += '2 звeзды';
     } else if (data.value >= 0.5 && data.value < 1.5) {
       htmlClass = 'stars__rating--one'
+      textRating += '1 звeзда';
     } else if (data.value >= 0.0 && data.value < 0.5) {
       htmlClass = 'stars__rating--zero'
-    } else htmlClass = undefined;
+      textRating += 'ноль звёзд';
+    } else htmlClass = '';
 
     var element = dom.querySelector('.stars__rating');
     element.classList.remove('stars__rating--five');
     element.classList.add(htmlClass);
+    element.textContent = textRating;
 
     var element = dom.querySelector('.star__count');
     var number = '(' + data.number + ')'
