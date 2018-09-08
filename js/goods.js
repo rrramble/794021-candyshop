@@ -121,10 +121,10 @@ var NUTRITION_CONTENTS = {
   max: CONTENTS.length
 }
 
-var GOODS_TEMPLATE_ID = 'card'; // #card for '.catalog__card'
+var GOODS_TEMPLATE_ID = 'card';
 var GOODS_HTML_TAG_CLASS = 'catalog__cards';
 
-var TROLLEY_TEMPLATE_ID = 'card-order'; // '#card_order' for '.goods_card'
+var TROLLEY_TEMPLATE_ID = 'card-order';
 var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
 
 var Commodity = function(
@@ -292,7 +292,7 @@ function createDomOfCommodityFromTemplate(commodity, templateHtmlId) {
   var newDom = template.content.cloneNode(true);
 
   setCommodityName(newDom, commodity.name);
-  setCommodityImage(newDom, commodity.picture);
+  setCommodityImage(newDom, commodity.picture, commodity.name);
   setCommodityPrice(newDom, commodity.price);
   setCommodityWeight(newDom, commodity.weight);
   setCommodityStockAmount(newDom, commodity.amount);
@@ -306,10 +306,10 @@ function setCommodityName(dom, data) {
   element.textContent = data;
 }
 
-function setCommodityImage(dom, data) {
+function setCommodityImage(dom, data, htmlAltProperty) {
     var element = dom.querySelector('.card__img');
     element.src = data;
-    element.alt = WAT;
+    element.alt = htmlAltProperty;
 }
 
 function setCommodityStockAmount(dom, data) {
