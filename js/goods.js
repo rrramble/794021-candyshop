@@ -2,7 +2,7 @@
 
 /*
  * Текст задания:
- * https://up.htmlacademy.ru/javascript/15/tasks/13
+ * https://up.htmlacademy.ru/javascript/15/tasks/16
  */
 
 var WAT = 'Wat eez dat?';
