@@ -7,6 +7,8 @@
 
 var WAT = 'Wat eez dat?';
 
+var SELECTOR_HIDDEN = '.visually-hidden';
+
 var GOODS_COUNT = 26;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
@@ -150,13 +152,13 @@ var Commodity = function (
   var goods = generateGoods(GOODS_COUNT);
   var domGoods = createDomOfGoodsFromTemplate(goods, GOODS_TEMPLATE_ID);
   removeCssClass('catalog__cards', 'catalog__cards--load');
-  addCssClass('catalog__load', 'visually-hidden');
+  hideHtmlSelector('.catalog__load');
   renderGoods(domGoods, GOODS_HTML_TAG_CLASS);
 
   var trolleyGoods = fulfillTrolley(goods, GOODS_IN_TROLLEY_COUNT);
   var domTrolleyGoods = createDomOfTrolleyGoodsFromTemplate(trolleyGoods, TROLLEY_TEMPLATE_ID);
   renderTrolley(domTrolleyGoods, TROLLEY_HTML_TAG_CLASS);
-  addCssClass('goods__card-empty', 'visually-hidden');
+  hideHtmlSelector('.goods__card-empty');
   removeCssClass('goods__cards', 'goods__cards--empty');
 })();
 
@@ -523,4 +525,24 @@ function randomInRange(from, to, precision) {
     result = from;
   }
   return result;
+}
+
+function showHtmlSelector(htmlSelector) {
+  var el = document.querySelector(htmlSelector);
+  var className = htmlClassFromSelector(SELECTOR_HIDDEN);
+  el.classList.remove(className);
+}
+
+function hideHtmlSelector(htmlSelector) {
+  var el = document.querySelector(htmlSelector);
+  var className = htmlClassFromSelector(SELECTOR_HIDDEN);
+  el.classList.add(className);
+}
+
+function htmlClassFromSelector(htmlSelector) {
+  var firstChar = htmlSelector[0];
+  if (firstChar === '.') {
+    return htmlSelector.slice(1);
+  }
+  return undefined;
 }
