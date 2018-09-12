@@ -294,9 +294,9 @@ function setCommodityStockAmount(dom, data) {
   if (data > 5) {
     htmlClass = 'card--in-stock';
   } else if (data >= 1 && data <= 5) {
-    htmlClass = 'card-little';
+    htmlClass = 'card--little';
   } else if (data === 0) {
-    htmlClass = 'card-soon';
+    htmlClass = 'card--soon';
   }
 
   var element = dom.querySelector('.catalog__card');
