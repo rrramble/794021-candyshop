@@ -125,6 +125,7 @@ var TROLLEY_TEMPLATE_ID = 'card-order';
 var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
 
 var Commodity = function (
+    index,
     name,
     picture,
     amount,
@@ -133,7 +134,7 @@ var Commodity = function (
     rating,
     nutritionFacts
 ) {
-
+  this.id = index;
   this.name = name;
   this.picture = picture;
   this.amount = amount;
@@ -189,14 +190,15 @@ function Catalog(loadFunction) {
 function generateGoods() {
   var goods = [];
   for (var i = 0; i < GOODS_COUNT; i++) {
-    var commodity = fulfillCommodity(generateCommodity());
+    var commodity = fulfillCommodity(generateCommodity(i));
     goods.push(commodity);
   }
   return goods;
 }
 
-function generateCommodity() {
-  return new Commodity();
+function generateCommodity(index) {
+  var commodity = new Commodity(index);
+  return commodity;
 }
 
 function fulfillCommodity(commodity) {
