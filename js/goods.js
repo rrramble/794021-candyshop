@@ -208,59 +208,34 @@ function generateCommodity(index) {
 }
 
 function fulfillCommodity(commodity) {
-  commodity.name = getName();
-  commodity.picture = getPicture();
-  commodity.amount = getAmount();
-  commodity.price = getPrice();
-  commodity.weight = getWeight();
+  commodity.name = getRandomItemFromList(NAMES);
+  commodity.picture = getRandomItemFromList(PICTURES);
+  commodity.amount = randomInRangeUpTo(
+    AMOUNT_MIN, AMOUNT_MAX, AMOUNT_PRECISION
+  );
+  commodity.price = randomInRange(PRICE_MIN, PRICE_MAX, PRICE_PRECISION);
+  commodity.weight = randomInRange(
+    WEIGHT_MIN, WEIGHT_MAX, WEIGHT_PRECISION
+  );
   commodity.rating = getRating();
   commodity.nutritionFacts = getNutritionFacts();
   commodity.favorite = false;
   return commodity;
 }
 
-function getName() {
-  return getRandomItemFromList(NAMES);
-}
-
-function getPicture() {
-  return getRandomItemFromList(PICTURES);
-}
-
-function getAmount() {
-  return randomInRangeUpTo(AMOUNT_MIN, AMOUNT_MAX, AMOUNT_PRECISION);
-}
-
-function getPrice() {
-  return randomInRange(PRICE_MIN, PRICE_MAX, PRICE_PRECISION);
-}
-
-function getWeight() {
-  return randomInRange(WEIGHT_MIN, WEIGHT_MAX, WEIGHT_PRECISION);
-}
-
 function getRating() {
   var rating = {};
-  rating.value = getRatingValue();
-  rating.number = getRatingNumber();
+  rating.value = randomInRangeUpTo(RATING_VALUE_MIN, RATING_VALUE_MAX);
+  rating.number = randomInRangeUpTo(RATING_NUMBER_MIN, RATING_NUMBER_MAX);
   return rating;
 }
 
 function getNutritionFacts() {
   var nutritionFacts = {};
-  nutritionFacts.sugar = getSugar();
-  nutritionFacts.energy = getEnergy();
+  nutritionFacts.sugar = getRandomItemFromList(SUGARS);
+  nutritionFacts.energy = randomInRangeUpTo(ENERGY_MIN, ENERGY_MAX);
   nutritionFacts.contents = getContents();
   return nutritionFacts;
-}
-
-function getSugar() {
-  var result = getRandomItemFromList(SUGARS);
-  return result;
-}
-
-function getEnergy() {
-  return randomInRangeUpTo(ENERGY_MIN, ENERGY_MAX);
 }
 
 function getContents() {
@@ -268,14 +243,6 @@ function getContents() {
   var result = randomContents.join('; ');
   result += '.';
   return result;
-}
-
-function getRatingValue() {
-  return randomInRangeUpTo(RATING_VALUE_MIN, RATING_VALUE_MAX);
-}
-
-function getRatingNumber() {
-  return randomInRangeUpTo(RATING_NUMBER_MIN, RATING_NUMBER_MAX);
 }
 
 
