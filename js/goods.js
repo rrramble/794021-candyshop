@@ -149,13 +149,13 @@ var Commodity = function (
  */
 
 (function () {
-  var goods = generateGoods(GOODS_COUNT);
-  var domGoods = createDomOfGoodsFromTemplate(goods, GOODS_TEMPLATE_ID);
+  var catalog = new Catalog(generateGoods);
+  var domGoods = createDomOfGoodsFromTemplate(catalog.getGoods(), GOODS_TEMPLATE_ID);
   removeCssClass('catalog__cards', 'catalog__cards--load');
   hideHtmlSelector('.catalog__load');
   renderGoods(domGoods, GOODS_HTML_TAG_CLASS);
 
-  var trolleyGoods = fulfillTrolley(goods, GOODS_IN_TROLLEY_COUNT);
+  var trolleyGoods = fulfillTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
   var domTrolleyGoods = createDomOfTrolleyGoodsFromTemplate(trolleyGoods, TROLLEY_TEMPLATE_ID);
   renderTrolley(domTrolleyGoods, TROLLEY_HTML_TAG_CLASS);
   hideHtmlSelector('.goods__card-empty');
@@ -164,12 +164,31 @@ var Commodity = function (
 
 
 /*
- * Generate catalog of goods
+ * Make catalog of goods
  */
 
-function generateGoods(count) {
+function Catalog(loadFunction) {
+  this.getGoods = function() {
+    return this.goods;
+  }
+
+  this.getCount = function() {
+    return this.goods.length;
+  }
+
+
+  // Costructor of the class
+
+  this.loaded = false;
+  this.goods = loadFunction();
+  if (this.getCount() > 0 ) {
+    this.loaded = true;
+  }
+}
+
+function generateGoods() {
   var goods = [];
-  for (var i = 0; i < count; i++) {
+  for (var i = 0; i < GOODS_COUNT; i++) {
     var commodity = fulfillCommodity(generateCommodity());
     goods.push(commodity);
   }
