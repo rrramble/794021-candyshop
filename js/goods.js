@@ -8,8 +8,9 @@
 var WAT = 'Wat eez dat?';
 
 var SELECTOR_HIDDEN = '.visually-hidden';
+var COMMODITY_HTML_ID_HEAD = 'commodity';
 
-var GOODS_COUNT = 26;
+var GOODS_COUNT = 2;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
 var AMOUNT_MIN = 0;
@@ -149,8 +150,10 @@ var Commodity = function (
  * Main logic
  */
 
+var catalog;
+
 (function () {
-  var catalog = new Catalog(generateGoods);
+  catalog = new Catalog(generateGoods);
   var domGoods = createDomOfGoodsFromTemplate(catalog.getGoods(), GOODS_TEMPLATE_ID);
   removeCssClass('catalog__cards', 'catalog__cards--load');
   hideHtmlSelector('.catalog__load');
@@ -177,6 +180,9 @@ function Catalog(loadFunction) {
     return this.goods.length;
   }
 
+  this.toggleFavorite = function(id) {
+    this.goods[id].favorite = !this.goods[id].favorite;
+  }
 
   // Costructor of the class
 
@@ -209,6 +215,7 @@ function fulfillCommodity(commodity) {
   commodity.weight = getWeight();
   commodity.rating = getRating();
   commodity.nutritionFacts = getNutritionFacts();
+  commodity.favorite = false;
   return commodity;
 }
 
@@ -296,6 +303,8 @@ function createDomOfCommodityFromTemplate(commodity, templateHtmlId) {
   setCommodityStockAmount(newDom, commodity.amount);
   setCommodityRating(newDom, commodity.rating);
   setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
+  setCommodityHandlers(newDom)
+  setCommodityHtmlIds(newDom, commodity.id);
   return newDom;
 }
 
@@ -385,6 +394,51 @@ function setCommodityNutritionFacts(dom, data) {
   element.textContent = sugarAndEnergy;
 }
 
+function setCommodityHtmlIds(dom, id) {
+  var element = dom.querySelector('.catalog__card')
+  element.id = idToHtmlId(id);
+}
+
+function setCommodityHandlers(dom) {
+  var favorite = dom.querySelector('.card__btn-favorite');
+  favorite.addEventListener('click', clickOnFavoriteHandler);
+
+  function clickOnFavoriteHandler(evt) {
+    var id = findParentCommodityId(evt);
+    catalog.toggleFavorite(id);
+  }
+
+}
+
+function idToHtmlId(id) {
+  return COMMODITY_HTML_ID_HEAD + id;
+}
+
+function htmlIdToId(id) {
+  if (isCommodityHtmlId(id)) {
+    var id = id.slice(COMMODITY_HTML_ID_HEAD.length, id.length);
+    return id;
+  }
+  return undefined;
+}
+
+function isCommodityHtmlId(id) {
+  var firstLetters = id.slice(0, COMMODITY_HTML_ID_HEAD.length);
+  if (firstLetters === COMMODITY_HTML_ID_HEAD) {
+    return true;
+  }
+  return false;
+}
+
+function findParentCommodityId(evt) {
+  for (var i = 0; i < evt.path.length; i++) {
+    var id = evt.path[i].id;
+    if (isCommodityHtmlId(id)) {
+      return htmlIdToId(id);
+    }
+  }
+  return undefined;
+}
 
 /*
  * Render DOM of the catalog of goods
@@ -566,4 +620,8 @@ function htmlClassFromSelector(htmlSelector) {
     return htmlSelector.slice(1);
   }
   return undefined;
+}
+
+function toggleBoolean(objectIsTrue) {
+  objectIsTrue = !objectIsTrue;
 }
