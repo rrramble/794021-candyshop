@@ -9,21 +9,19 @@ var WAT = 'Wat eez dat?';
 
 var SELECTOR_HIDDEN = '.visually-hidden';
 var COMMODITY_HTML_ID_HEAD = 'commodity';
+var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
 
 var GOODS_COUNT = 20;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
 var AMOUNT_MIN = 0;
 var AMOUNT_MAX = 20;
-var AMOUNT_PRECISION = 0;
 
 var PRICE_MIN = 100;
 var PRICE_MAX = 1500;
-var PRICE_PRECISION = 0;
 
 var WEIGHT_MIN = 30;
 var WEIGHT_MAX = 300;
-var WEIGHT_PRECISION = 0;
 
 var RATING_VALUE_MIN = 1;
 var RATING_VALUE_MAX = 5;
@@ -152,17 +150,17 @@ var Commodity = function (
 
 var catalog;
 var catalogDom;
+var trolleyGoods;
 
 (function () {
   catalog = new Catalog(generateGoods);
+  putRandomGoodsInTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
   catalogDom = new CatalogDom(catalog.getGoods(), GOODS_TEMPLATE_ID);
-  removeCssClass('catalog__cards', 'catalog__cards--load');
-  hideHtmlSelector('.catalog__load');
   renderGoods(catalogDom.getElements(), GOODS_HTML_TAG_CLASS);
 
-  var trolleyGoods = fulfillTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
-  var domTrolleyGoods = createDomOfTrolleyGoodsFromTemplate(trolleyGoods, TROLLEY_TEMPLATE_ID);
-  renderTrolley(domTrolleyGoods, TROLLEY_HTML_TAG_CLASS);
+  var trolley = catalog.getTrolley();
+  var trolleyDom = createTrolleyDomFromTemplate(trolley, TROLLEY_TEMPLATE_ID);
+  renderTrolley(trolleyDom, TROLLEY_HTML_TAG_CLASS);
   hideHtmlSelector('.goods__card-empty');
   removeCssClass('goods__cards', 'goods__cards--empty');
 })();
@@ -177,8 +175,23 @@ function Catalog(loadFunction) {
     return this.goods;
   }
 
+  this.getTrolley = function() {
+    var result = this.goods.filter(function(item){
+      return item.trolleyAmount > 0;
+    });
+    return result;
+  }
+
+  this.getTrolleyAmount = function(id) {
+    return this.goods[id].trolleyAmount;
+  }
+
   this.getElement = function(id) {
     return this.goods[id];
+  }
+
+  this.getAmount = function(id) {
+    return this.goods[id].amount;
   }
 
   this.getCount = function() {
@@ -194,6 +207,14 @@ function Catalog(loadFunction) {
     return this.goods[id].favorite;
   }
 
+  this.moveToTrolley = function(id, amount) {
+    if (this.goods[id].amount >= amount) {
+      this.goods[id].amount -= amount;
+      this.goods[id].trolleyAmount += amount;
+      return true;
+    };
+    return false;
+  }
 
   // Costructor of the class
 
@@ -222,12 +243,11 @@ function fulfillCommodity(commodity) {
   commodity.name = getRandomItemFromList(NAMES);
   commodity.picture = getRandomItemFromList(PICTURES);
   commodity.amount = randomInRangeUpTo(
-    AMOUNT_MIN, AMOUNT_MAX, AMOUNT_PRECISION
+    AMOUNT_MIN, AMOUNT_MAX
   );
-  commodity.price = randomInRange(PRICE_MIN, PRICE_MAX, PRICE_PRECISION);
-  commodity.weight = randomInRange(
-    WEIGHT_MIN, WEIGHT_MAX, WEIGHT_PRECISION
-  );
+  commodity.trolleyAmount = 0;
+  commodity.price = randomInRangeUpTo(PRICE_MIN, PRICE_MAX);
+  commodity.weight = randomInRangeUpTo(WEIGHT_MIN, WEIGHT_MAX);
   commodity.rating = getRating();
   commodity.nutritionFacts = getNutritionFacts();
   commodity.favorite = false;
@@ -254,6 +274,13 @@ function getContents() {
   var result = randomContents.join('; ');
   result += '.';
   return result;
+}
+
+function putRandomGoodsInTrolley(goods, amount) {
+  for (var i = 0; i < amount; i++) {
+    var index = randomInRange(0, goods.length);
+    catalog.moveToTrolley(index, 1);
+  }
 }
 
 
@@ -304,13 +331,6 @@ function getContents() {
   }
 }
 
-function updateFavorite(commodityId, favoriteStatus) {
-  var commodityId = idToHtmlId(commodityId);
-  var commoditySelector = htmlIdToHtmlSelector(commodityId);
-  var commodityNode = document.querySelector(commoditySelector);
-  setCommodityFavorite(commodityNode, favoriteStatus);
-}
-
 function setCommodityName(dom, data) {
   var element = dom.querySelector('.card__title');
   element.textContent = data;
@@ -332,8 +352,10 @@ function setCommodityStockAmount(dom, data) {
     htmlClass = 'card--soon';
   }
 
-  var element = dom.querySelector('.catalog__card');
+  var element = querySelectorIncludingSelf(dom, '.catalog__card');
   element.classList.remove('card--in-stock');
+  element.classList.remove('card--little');
+  element.classList.remove('card--soon');
   element.classList.add(htmlClass);
 }
 
@@ -397,6 +419,11 @@ function setCommodityNutritionFacts(dom, data) {
   element.textContent = sugarAndEnergy;
 }
 
+function setCommodityHtmlIds(dom, id) {
+  var element = dom.querySelector('.catalog__card')
+  element.id = idToHtmlId(id);
+}
+
 function setCommodityFavorite(dom, isFavorite) {
   var favorite = dom.querySelector('.card__btn-favorite');
   if (isFavorite) {
@@ -406,26 +433,64 @@ function setCommodityFavorite(dom, isFavorite) {
   }
 }
 
-function setCommodityHtmlIds(dom, id) {
-  var element = dom.querySelector('.catalog__card')
-  element.id = idToHtmlId(id);
+function updateDomFavorite(commodityId, favoriteStatus) {
+  var commodityHtmlId = idToHtmlId(commodityId);
+  var commoditySelector = htmlIdToHtmlSelector(commodityHtmlId);
+  var commodityNode = document.querySelector(commoditySelector);
+  setCommodityFavorite(commodityNode, favoriteStatus);
+}
+
+function updateDomGoods(commodityId) {
+  var commodityHtmlId = idToHtmlId(commodityId);
+  var commoditySelector = htmlIdToHtmlSelector(commodityHtmlId);
+  var commodityNode = document.querySelector(commoditySelector);
+  var amount = catalog.getAmount(commodityId);
+  setCommodityStockAmount(commodityNode, amount);
+}
+
+function updateDomTrolley(commodityId) { /////
+  var trolleyAmount = catalog.getTrolleyAmount(commodityId);
+  if (trolleyAmount > 1) {
+    var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+    var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+    var commodityNode = document.querySelector(htmlTrolleySelector);
+    setTrolleyCommodityAmount(commodityNode, trolleyAmount);
+  } else {
+    var domElement = createDomOfTrolleyCommodityFromTemplate(
+      catalog.getElement(commodityId), TROLLEY_TEMPLATE_ID
+    );
+    renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
+  }
 }
 
 function setCommodityHandlers(dom) {
   var favoriteNode = dom.querySelector('.card__btn-favorite');
   favoriteNode.addEventListener('click', clickOnFavoriteHandler);
 
-  function clickOnFavoriteHandler(evt) {
+  var addToTrolleyNode = dom.querySelector('.card__btn');
+  addToTrolleyNode.addEventListener('click', clickOnAddToTrolley);
+
+  function clickOnFavoriteHandler(evt) { // delete 'On'
     var commodityId = findParentCommodityId(evt);
     catalog.toggleFavorite(commodityId);
     var favoriteStatus = catalog.getFavoriteStatus(commodityId);
-    updateFavorite(commodityId, favoriteStatus);
+    updateDomFavorite(commodityId, favoriteStatus);
   }
 
+  function clickOnAddToTrolley(evt) { // delete 'On'
+    var commodityId = findParentCommodityId(evt);
+    catalog.moveToTrolley(commodityId, 1);
+    updateDomGoods(commodityId);
+    updateDomTrolley(commodityId);
+  }
 }
 
 function idToHtmlId(id) {
   return COMMODITY_HTML_ID_HEAD + id;
+}
+
+function idToHtmlTrolleyId(id) {
+  return TROLLEY_HTML_ID_HEAD + id;
 }
 
 function htmlIdToHtmlSelector(id) {
@@ -469,8 +534,13 @@ function findParentCommodityId(evt) {
 
 function renderGoods(domElements, htmlClass) {
   var node = document.createDocumentFragment();
+
   for (var i = 0; i < domElements.length; i++) {
     renderCommodity(domElements[i], htmlClass);
+  }
+  if (domElements.length > 0) {
+    removeCssClass('catalog__cards', 'catalog__cards--load');
+    hideHtmlSelector('.catalog__load');
   }
 }
 
@@ -485,13 +555,43 @@ function renderCommodity(domElement, htmlClass) {
  * Generate trolley content from the list of goods
  */
 
-function fulfillTrolley(list, count) {
+function fulfillTrolley(list) {
   var goodsInTrolley = [];
-  for (var i = 0; i < count; i++) {
+  for (var i = 0; i < GOODS_IN_TROLLEY_COUNT; i++) {
     var newGood = getRandomItemFromList(list);
     goodsInTrolley.push(newGood);
   }
   return goodsInTrolley;
+}
+
+function Trolley(goods, customTrolleyGenerator) {
+  this.plus = function(id) {
+    var index = this.getIndex(id);
+    this.elements[index]++;
+  }
+
+  this.minus = function(id) {
+    var index = this.getIndex(id);
+    if (this.elements[index] > 1) {
+      this.elements[index]--;
+      return true;
+    }
+    else return false;
+  }
+
+  this.getIndex = function(id) {
+    for (var i = 0; i < this.elements.length; i++) {
+      if (this.elements[i].id === id) {
+        return i;
+      }
+    }
+    return undefined;
+  }
+
+  // Constructor block
+  if (customTrolleyGenerator) {
+    this.elements = customTrolleyGenerator(goods);
+  }
 }
 
 
@@ -499,7 +599,7 @@ function fulfillTrolley(list, count) {
  * Make DOM from the trolley content
  */
 
-function createDomOfTrolleyGoodsFromTemplate(goods, templateHtmlId) {
+function createTrolleyDomFromTemplate(goods, templateHtmlId) {
   var domElements = [];
   for (var i = 0; i < goods.length; i++) {
     var domElement = createDomOfTrolleyCommodityFromTemplate(goods[i], templateHtmlId);
@@ -513,11 +613,22 @@ function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
   var template = document.querySelector(htmlSelector);
   var newDom = template.content.cloneNode(true);
 
+  setTrolleyCommodityHtmlId(newDom, commodity.id);
   setTrolleyCommodityName(newDom, commodity.name);
   setTrolleyCommodityImage(newDom, commodity.picture);
   setTrolleyCommodityPrice(newDom, commodity.price);
-
+  setTrolleyCommodityAmount(newDom, commodity.trolleyAmount);
   return newDom;
+}
+
+function setTrolleyCommodityHtmlId(dom, id) {
+  var element = querySelectorIncludingSelf(dom, '.card-order')
+  element.id = idToHtmlTrolleyId(id);
+}
+
+function setTrolleyCommodityAmount(dom, trolleyAmount) {
+  var priceNode = querySelectorIncludingSelf(dom, '.card-order__count');
+  priceNode.value = trolleyAmount;
 }
 
 function setTrolleyCommodityName(dom, name) {
@@ -548,11 +659,17 @@ function renderTrolley(domElements, htmlClass) {
 }
 
 function renderItemInTrolley(domElement, htmlClass) {
-  var htmlTag = '.' + htmlClass;
-  var addTo = document.querySelector(htmlTag);
+  var htmlSelector = htmlClassToSelector(htmlClass);
+  var addTo = document.querySelector(htmlSelector);
   addTo.appendChild(domElement);
 }
 
+function updateTrolley(commodityId, amount) {
+  var htmlId = idToHtmlTrolleyId(commodityId);
+  var htmlSelector = htmlIdToHtmlSelector(htmlId);
+  var domNode = document.querySelector(htmlSelector);
+  setCommodityFavorite(domNode, amount);
+}
 
 /*
  * Miscelaneous not task-oriented utility functions
@@ -601,27 +718,17 @@ function getRandomListFromList(list) {
   return newList;
 }
 
-function randomInRangeUpTo(from, upTo, precision) {
+function randomInRangeUpTo(from, upTo) {
   var to = upTo + 1;
-  return randomInRange(from, to, precision);
+  return randomInRange(from, to);
 }
 
-function randomInRange(from, to, precision) {
-  if (precision === undefined) {
-    precision = 0;
-  }
-
-  var result = (Math.random(to - from) * to + from);
-  if (precision === 0) {
-    return Math.floor(result);
-  }
-
-  result = result.toFixed(precision) / 1;
-  if (result > to) {
-    result = to;
-  }
+function randomInRange(from, to) {
+  var result = Math.floor(Math.random(to - from) * to + from);
   if (result < from) {
     result = from;
+  } else if (result >= to) {
+    result = to - 1;
   }
   return result;
 }
@@ -650,6 +757,21 @@ function htmlClassToSelector(htmlClass) {
   return '.' + htmlClass;
 }
 
+function htmlSelectorToClass(htmlSelector) {
+  return htmlSelector.slice(1);
+}
+
 function toggleBoolean(objectIsTrue) {
   objectIsTrue = !objectIsTrue;
+}
+
+function querySelectorIncludingSelf(dom, selector) {
+  var classes = dom.classList;
+  if (classes) {
+    var className = htmlSelectorToClass(selector);
+    if (classes.contains(className)) {
+      return dom;
+    }
+  }
+  return dom.querySelector(selector);
 }
