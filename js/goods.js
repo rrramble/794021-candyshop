@@ -10,7 +10,7 @@ var WAT = 'Wat eez dat?';
 var SELECTOR_HIDDEN = '.visually-hidden';
 var COMMODITY_HTML_ID_HEAD = 'commodity';
 
-var GOODS_COUNT = 2;
+var GOODS_COUNT = 20;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
 var AMOUNT_MIN = 0;
@@ -151,13 +151,14 @@ var Commodity = function (
  */
 
 var catalog;
+var catalogDom;
 
 (function () {
   catalog = new Catalog(generateGoods);
-  var domGoods = createDomOfGoodsFromTemplate(catalog.getGoods(), GOODS_TEMPLATE_ID);
+  catalogDom = new CatalogDom(catalog.getGoods(), GOODS_TEMPLATE_ID);
   removeCssClass('catalog__cards', 'catalog__cards--load');
   hideHtmlSelector('.catalog__load');
-  renderGoods(domGoods, GOODS_HTML_TAG_CLASS);
+  renderGoods(catalogDom.getElements(), GOODS_HTML_TAG_CLASS);
 
   var trolleyGoods = fulfillTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
   var domTrolleyGoods = createDomOfTrolleyGoodsFromTemplate(trolleyGoods, TROLLEY_TEMPLATE_ID);
@@ -176,13 +177,23 @@ function Catalog(loadFunction) {
     return this.goods;
   }
 
+  this.getElement = function(id) {
+    return this.goods[id];
+  }
+
   this.getCount = function() {
     return this.goods.length;
   }
 
   this.toggleFavorite = function(id) {
     this.goods[id].favorite = !this.goods[id].favorite;
+    return this.goods[id].favorite;
   }
+
+  this.getFavoriteStatus = function(id) {
+    return this.goods[id].favorite;
+  }
+
 
   // Costructor of the class
 
@@ -250,29 +261,54 @@ function getContents() {
  * Make DOM from the catalog of goods
  */
 
-function createDomOfGoodsFromTemplate(goods, templateHtmlId) {
-  var domElements = [];
-  for (var i = 0; i < goods.length; i++) {
-    var domElement = createDomOfCommodityFromTemplate(goods[i], templateHtmlId);
-    domElements.push(domElement);
+ function CatalogDom(goods, templateHtmlId) {
+  this.getElements = function(id) {
+    return this.elements;
   }
-  return domElements;
+
+  this.getElement = function(id) {
+    return this.elements[id];
+  }
+
+  this.getCommodityDomElement = function(id) {
+    var htmlId = idToHtmlId(id);
+    var el = document.querySelector(htmlId);
+    return el;
+  }
+
+  this.createCommodityNode = function(commodity) {
+    var template = document.querySelector('#' + this.templateHtmlId);
+    var newDom = template.content.cloneNode(true);
+
+    setCommodityHtmlIds(newDom, commodity.id);
+    setCommodityName(newDom, commodity.name);
+    setCommodityImage(newDom, commodity.picture, commodity.name);
+    setCommodityPrice(newDom, commodity.price);
+    setCommodityWeight(newDom, commodity.weight);
+    setCommodityStockAmount(newDom, commodity.amount);
+    setCommodityRating(newDom, commodity.rating);
+    setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
+    setCommodityFavorite(newDom, commodity.favorite);
+    setCommodityHandlers(newDom)
+    return newDom;
+  }
+
+
+  // Constructor body
+
+  this.templateHtmlId = templateHtmlId;
+  this.elements = [];
+  for (var i = 0; i < goods.length; i++) {
+    var node = this.createCommodityNode(goods[i]);
+    this.elements.push(node);
+  }
 }
 
-function createDomOfCommodityFromTemplate(commodity, templateHtmlId) {
-  var template = document.querySelector('#' + templateHtmlId);
-  var newDom = template.content.cloneNode(true);
-
-  setCommodityName(newDom, commodity.name);
-  setCommodityImage(newDom, commodity.picture, commodity.name);
-  setCommodityPrice(newDom, commodity.price);
-  setCommodityWeight(newDom, commodity.weight);
-  setCommodityStockAmount(newDom, commodity.amount);
-  setCommodityRating(newDom, commodity.rating);
-  setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
-  setCommodityHandlers(newDom)
-  setCommodityHtmlIds(newDom, commodity.id);
-  return newDom;
+function updateFavorite(commodityId, favoriteStatus) {
+  var commodityId = idToHtmlId(commodityId);
+  var commoditySelector = htmlIdToHtmlSelector(commodityId);
+  var commodityNode = document.querySelector(commoditySelector);
+  setCommodityFavorite(commodityNode, favoriteStatus);
 }
 
 function setCommodityName(dom, data) {
@@ -361,24 +397,43 @@ function setCommodityNutritionFacts(dom, data) {
   element.textContent = sugarAndEnergy;
 }
 
+function setCommodityFavorite(dom, isFavorite) {
+  var favorite = dom.querySelector('.card__btn-favorite');
+  if (isFavorite) {
+    favorite.classList.add('card__btn-favorite--selected');
+  } else {
+    favorite.classList.remove('card__btn-favorite--selected');
+  }
+}
+
 function setCommodityHtmlIds(dom, id) {
   var element = dom.querySelector('.catalog__card')
   element.id = idToHtmlId(id);
 }
 
 function setCommodityHandlers(dom) {
-  var favorite = dom.querySelector('.card__btn-favorite');
-  favorite.addEventListener('click', clickOnFavoriteHandler);
+  var favoriteNode = dom.querySelector('.card__btn-favorite');
+  favoriteNode.addEventListener('click', clickOnFavoriteHandler);
 
   function clickOnFavoriteHandler(evt) {
-    var id = findParentCommodityId(evt);
-    catalog.toggleFavorite(id);
+    var commodityId = findParentCommodityId(evt);
+    catalog.toggleFavorite(commodityId);
+    var favoriteStatus = catalog.getFavoriteStatus(commodityId);
+    updateFavorite(commodityId, favoriteStatus);
   }
 
 }
 
 function idToHtmlId(id) {
   return COMMODITY_HTML_ID_HEAD + id;
+}
+
+function htmlIdToHtmlSelector(id) {
+  return '#' + id;
+}
+
+function idToHtmlSelector(id) {
+  return '#' + idToHtmlId(id);
 }
 
 function htmlIdToId(id) {
@@ -407,20 +462,22 @@ function findParentCommodityId(evt) {
   return undefined;
 }
 
+
 /*
  * Render DOM of the catalog of goods
  */
 
 function renderGoods(domElements, htmlClass) {
+  var node = document.createDocumentFragment();
   for (var i = 0; i < domElements.length; i++) {
-    renderItemInGoods(domElements[i], htmlClass);
+    renderCommodity(domElements[i], htmlClass);
   }
 }
 
-function renderItemInGoods(domElement, htmlClass) {
-  var htmlTag = '.' + htmlClass;
-  var addTo = document.querySelector(htmlTag);
-  addTo.appendChild(domElement);
+function renderCommodity(domElement, htmlClass) {
+  var htmlSelector = htmlClassToSelector(htmlClass);
+  var dom = document.querySelector(htmlSelector);
+  dom.appendChild(domElement);
 }
 
 
@@ -452,8 +509,8 @@ function createDomOfTrolleyGoodsFromTemplate(goods, templateHtmlId) {
 }
 
 function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
-  var htmlTag = '#' + templateHtmlId;
-  var template = document.querySelector(htmlTag);
+  var htmlSelector = htmlIdToHtmlSelector(templateHtmlId);
+  var template = document.querySelector(htmlSelector);
   var newDom = template.content.cloneNode(true);
 
   setTrolleyCommodityName(newDom, commodity.name);
@@ -587,6 +644,10 @@ function htmlClassFromSelector(htmlSelector) {
     return htmlSelector.slice(1);
   }
   return undefined;
+}
+
+function htmlClassToSelector(htmlClass) {
+  return '.' + htmlClass;
 }
 
 function toggleBoolean(objectIsTrue) {
