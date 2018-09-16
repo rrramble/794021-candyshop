@@ -182,16 +182,25 @@ function Catalog(loadFunction) {
     return result;
   }
 
-  this.getTrolleyAmount = function(id) {
-    return this.goods[id].trolleyAmount;
-  }
-
   this.getElement = function(id) {
     return this.goods[id];
   }
 
   this.getAmount = function(id) {
     return this.goods[id].amount;
+  }
+
+  this.getTrolleyAmount = function(id) {
+    return this.goods[id].trolleyAmount;
+  }
+
+  this.setTrolleyAmount = function(id, amount) {
+    var addition = amount - this.getTrolleyAmount(id);
+    this.addToTrolley(id, addition);
+  }
+
+  this.getTotalAmount = function(id) {
+    return this.getAmount(id) + this.getTrolleyAmount(id);
   }
 
   this.getCount = function() {
@@ -207,7 +216,7 @@ function Catalog(loadFunction) {
     return this.goods[id].favorite;
   }
 
-  this.moveToTrolley = function(id, amount) {
+  this.addToTrolley = function(id, amount) {
     if (this.goods[id].amount >= amount) {
       this.goods[id].amount -= amount;
       this.goods[id].trolleyAmount += amount;
@@ -285,7 +294,7 @@ function getContents() {
 function putRandomGoodsInTrolley(goods, amount) {
   for (var i = 0; i < amount; i++) {
     var index = randomInRange(0, goods.length);
-    catalog.moveToTrolley(index, 1);
+    catalog.addToTrolley(index, 1);
   }
 }
 
@@ -492,22 +501,23 @@ function setCommodityHandlers(dom) {
 
   function clickOnAddToTrolley(evt) { // delete 'On'
     var commodityId = findParentCommodityId(evt);
-    catalog.moveToTrolley(commodityId, 1);
+    catalog.addToTrolley(commodityId, 1);
     updateDomGoods(commodityId);
     updateDomTrolley(commodityId);
   }
 }
 
-function setTrolleyElementHandlers(dom) { ////
+function setTrolleyElementHandlers(dom) {
   var node = dom.querySelector('.card-order');
   node.addEventListener('click', clickTrolleyElement);
+  node.addEventListener('change', enterTrolleyElement)
   return;
 
   function clickTrolleyElement(evt) {
     var commodityId = findParentCommodityId(evt);
 
     if (evt.target.classList.contains('card-order__btn--increase')) {
-      catalog.moveToTrolley(commodityId, 1);
+      catalog.addToTrolley(commodityId, 1);
 
     } else if (evt.target.classList.contains('card-order__btn--decrease')) {
       catalog.decreaseTrolley(commodityId, 1);
@@ -516,11 +526,39 @@ function setTrolleyElementHandlers(dom) { ////
       catalog.decreaseTrolley(commodityId, Infinity);
 
     } else {
-      return undefined;
+      return;
     }
-
     updateDomGoods(commodityId);
     updateDomTrolley(commodityId);
+  }
+
+  function enterTrolleyElement(evt) {
+    var commodityId = findParentCommodityId(evt);
+    var previousValue = catalog.getTrolleyAmount(commodityId);
+    var maxAmount = catalog.getTotalAmount(commodityId);
+    var newValue = getElementTrolleyAmountInDom(commodityId) / 1.0;
+
+    if (evt.target.classList.contains('card-order__count')) {
+      if (newValue > maxAmount) {
+        setTrolleyCommodityAmountInDom(commodityId, previousValue);
+        return;
+
+      } else if (newValue < 0) {
+        setTrolleyCommodityAmountInDom(commodityId, previousValue); /////
+        return;
+
+      } else if (newValue === 0) {
+        catalog.decreaseTrolley(commodityId, Infinity);
+
+      } else if (!isNumber(newValue)) {
+        return;
+
+      } else {
+        catalog.setTrolleyAmount(commodityId, newValue);
+      }
+      updateDomGoods(commodityId);
+      updateDomTrolley(commodityId);
+    }
   }
 }
 
@@ -703,6 +741,22 @@ function setTrolleyCommodityAmount(dom, trolleyAmount) {
   amountNode.value = trolleyAmount;
 }
 
+function setTrolleyCommodityAmountInDom(commodityId, trolleyAmount) {
+  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+  var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+  var amountNode = document.querySelector(htmlTrolleySelector);
+  var node = amountNode.querySelector('.card-order__count');
+  node.value = trolleyAmount;
+}
+
+function getElementTrolleyAmountInDom(commodityId) {
+  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+  var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+  var amountNode = document.querySelector(htmlTrolleySelector);
+  var node = amountNode.querySelector('.card-order__count');
+  return node.value;
+}
+
 function deleteDisplayingFromTrolley(commodityId) {
   var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
   var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
@@ -853,4 +907,8 @@ function querySelectorIncludingSelf(dom, selector) {
     }
   }
   return dom.querySelector(selector);
+}
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
 }
