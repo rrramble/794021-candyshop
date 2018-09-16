@@ -454,10 +454,10 @@ function updateDomGoods(commodityId) {
   setCommodityStockAmount(commodityNode, amount);
 }
 
-function updateDomTrolley(commodityId) { /////
+function updateDomTrolley(commodityId) {
   var trolleyAmount = catalog.getTrolleyAmount(commodityId);
   if (trolleyAmount <= 0) {
-    deleteFromTrolley(commodityId);
+    deleteDisplayingFromTrolley(commodityId);
     return;
   };
 
@@ -699,7 +699,7 @@ function setTrolleyCommodityAmount(dom, trolleyAmount) {
   amountNode.value = trolleyAmount;
 }
 
-function deleteFromTrolley(commodityId) { /////
+function deleteDisplayingFromTrolley(commodityId) {
   var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
   var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
   var commodityNode = document.querySelector(htmlTrolleySelector);
