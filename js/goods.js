@@ -498,38 +498,42 @@ function setCommodityHandlers(dom) {
   }
 }
 
-function setTrolleyHandlers(dom) { //
-  var addToTrolleyNode = dom.querySelector('.card-order__btn--increase');
-  addToTrolleyNode.addEventListener('click', clickOnAddToTrolley);
+function setTrolleyElementHandlers(dom) { ////
+  var node = dom.querySelector('.card-order');
+  node.addEventListener('click', clickTrolleyElement);
+  return;
 
-  var decreaseTrolleyNode = dom.querySelector('.card-order__btn--decrease');
-  decreaseTrolleyNode.addEventListener('click', clickDecreaseTrolley);
-
-  function clickOnAddToTrolley(evt) { // delete 'On'
+  function clickTrolleyElement(evt) {
     var commodityId = findParentCommodityId(evt);
-    catalog.moveToTrolley(commodityId, 1);
-    updateDomGoods(commodityId);
-    updateDomTrolley(commodityId);
-  }
 
-  function clickDecreaseTrolley(evt) {
-    var commodityId = findParentCommodityId(evt);
-    catalog.decreaseTrolley(commodityId, 1);
+    if (evt.target.classList.contains('card-order__btn--increase')) {
+      catalog.moveToTrolley(commodityId, 1);
+
+    } else if (evt.target.classList.contains('card-order__btn--decrease')) {
+      catalog.decreaseTrolley(commodityId, 1);
+
+    } else if (evt.target.classList.contains('card-order__close')) {
+      catalog.decreaseTrolley(commodityId, Infinity);
+
+    } else {
+      return undefined;
+    }
+
     updateDomGoods(commodityId);
     updateDomTrolley(commodityId);
   }
 }
 
-  function isShownInTrolley(commodityId) {
-    var htmlIdToSearch = idToHtmlTrolleyId(commodityId);
-    var nodes = document.querySelectorAll('.goods_card.card-order');
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].id === htmlIdToSearch) {
-        return true;
-      }
+function isShownInTrolley(commodityId) {
+  var htmlIdToSearch = idToHtmlTrolleyId(commodityId);
+  var nodes = document.querySelectorAll('.goods_card.card-order');
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].id === htmlIdToSearch) {
+      return true;
     }
-    return false;
   }
+  return false;
+}
 
 function idToHtmlId(id) {
   return COMMODITY_HTML_ID_HEAD + id;
@@ -685,7 +689,7 @@ function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
   setTrolleyCommodityImage(newDom, commodity.picture);
   setTrolleyCommodityPrice(newDom, commodity.price);
   setTrolleyCommodityAmount(newDom, commodity.trolleyAmount);
-  setTrolleyHandlers(newDom);
+  setTrolleyElementHandlers(newDom);
   return newDom;
 }
 
