@@ -11,11 +11,11 @@ var SELECTOR_HIDDEN = '.visually-hidden';
 var COMMODITY_HTML_ID_HEAD = 'commodity';
 var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
 
-var GOODS_COUNT = 20;
+var GOODS_COUNT = 4;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
-var AMOUNT_MIN = 0;
-var AMOUNT_MAX = 20;
+var AMOUNT_MIN = 1;
+var AMOUNT_MAX = 2;
 
 var PRICE_MIN = 100;
 var PRICE_MAX = 1500;
@@ -485,6 +485,18 @@ function setCommodityHandlers(dom) {
   }
 }
 
+function setTrolleyHandlers(dom) { //
+  var addToTrolleyNode = dom.querySelector('.card-order__btn--increase');
+  addToTrolleyNode.addEventListener('click', clickOnAddToTrolley);
+
+  function clickOnAddToTrolley(evt) { // delete 'On'
+    var commodityId = findParentCommodityId(evt);
+    catalog.moveToTrolley(commodityId, 1);
+    updateDomGoods(commodityId);
+    updateDomTrolley(commodityId);
+  }
+}
+
 function idToHtmlId(id) {
   return COMMODITY_HTML_ID_HEAD + id;
 }
@@ -509,6 +521,14 @@ function htmlIdToId(id) {
   return undefined;
 }
 
+function trolleyIdToId(htmlId) {
+  if (isTrolleyHtmlId(htmlId)) {
+    var id = htmlId.slice(TROLLEY_HTML_ID_HEAD.length, htmlId.length);
+    return id;
+  }
+  return undefined;
+}
+
 function isCommodityHtmlId(id) {
   var firstLetters = id.slice(0, COMMODITY_HTML_ID_HEAD.length);
   if (firstLetters === COMMODITY_HTML_ID_HEAD) {
@@ -517,11 +537,24 @@ function isCommodityHtmlId(id) {
   return false;
 }
 
-function findParentCommodityId(evt) {
-  for (var i = 0; i < evt.path.length; i++) {
-    var id = evt.path[i].id;
-    if (isCommodityHtmlId(id)) {
-      return htmlIdToId(id);
+function isTrolleyHtmlId(htmlId) {
+  var firstLetters = htmlId.slice(0, TROLLEY_HTML_ID_HEAD.length);
+  if (firstLetters === TROLLEY_HTML_ID_HEAD) {
+    return true;
+  }
+  return false;
+}
+
+function findParentCommodityId(htmlClasses) {
+  for (var i = 0; i < htmlClasses.path.length; i++) {
+    var htmlClass = htmlClasses.path[i].id;
+
+    if (isCommodityHtmlId(htmlClass)) {
+      return htmlIdToId(htmlClass);
+    }
+
+    if (isTrolleyHtmlId(htmlClass)) {
+      return trolleyIdToId(htmlClass);
     }
   }
   return undefined;
@@ -618,6 +651,7 @@ function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
   setTrolleyCommodityImage(newDom, commodity.picture);
   setTrolleyCommodityPrice(newDom, commodity.price);
   setTrolleyCommodityAmount(newDom, commodity.trolleyAmount);
+  setTrolleyHandlers(newDom);
   return newDom;
 }
 
@@ -627,8 +661,8 @@ function setTrolleyCommodityHtmlId(dom, id) {
 }
 
 function setTrolleyCommodityAmount(dom, trolleyAmount) {
-  var priceNode = querySelectorIncludingSelf(dom, '.card-order__count');
-  priceNode.value = trolleyAmount;
+  var amountNode = querySelectorIncludingSelf(dom, '.card-order__count');
+  amountNode.value = trolleyAmount;
 }
 
 function setTrolleyCommodityName(dom, name) {
