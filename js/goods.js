@@ -194,26 +194,12 @@ function Catalog(loadFunction) {
     return this.goods[id].trolleyAmount;
   }
 
-  this.setTrolleyAmount = function(id, amount) {
-    var addition = amount - this.getTrolleyAmount(id);
-    this.addToTrolley(id, addition);
-  }
-
   this.getTotalAmount = function(id) {
     return this.getAmount(id) + this.getTrolleyAmount(id);
   }
 
   this.getCount = function() {
     return this.goods.length;
-  }
-
-  this.toggleFavorite = function(id) {
-    this.goods[id].favorite = !this.goods[id].favorite;
-    return this.goods[id].favorite;
-  }
-
-  this.getFavoriteStatus = function(id) {
-    return this.goods[id].favorite;
   }
 
   this.addToTrolley = function(id, amount) {
@@ -223,6 +209,20 @@ function Catalog(loadFunction) {
       return true;
     };
     return false;
+  }
+
+  this.setTrolleyAmount = function(id, amount) {
+    var addition = amount - this.getTrolleyAmount(id);
+    this.addToTrolley(id, addition);
+  }
+
+  this.toggleFavorite = function(id) {
+    this.goods[id].favorite = !this.goods[id].favorite;
+    return this.goods[id].favorite;
+  }
+
+  this.getFavoriteStatus = function(id) {
+    return this.goods[id].favorite;
   }
 
   this.decreaseTrolley = function(id, amount) {
