@@ -11,11 +11,11 @@ var SELECTOR_HIDDEN = '.visually-hidden';
 var COMMODITY_HTML_ID_HEAD = 'commodity';
 var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
 
-var GOODS_COUNT = 4;
+var GOODS_COUNT = 20;
 var GOODS_IN_TROLLEY_COUNT = 3;
 
-var AMOUNT_MIN = 1;
-var AMOUNT_MAX = 2;
+var AMOUNT_MIN = 0;
+var AMOUNT_MAX = 100;
 
 var PRICE_MIN = 100;
 var PRICE_MAX = 1500;
@@ -214,6 +214,12 @@ function Catalog(loadFunction) {
       return true;
     };
     return false;
+  }
+
+  this.decreaseTrolley = function(id, amount) {
+    var actualDecrease = Math.min(amount, this.goods[id].trolleyAmount);
+    this.goods[id].amount += actualDecrease;
+    this.goods[id].trolleyAmount -= actualDecrease;
   }
 
   // Costructor of the class
@@ -450,14 +456,21 @@ function updateDomGoods(commodityId) {
 
 function updateDomTrolley(commodityId) { /////
   var trolleyAmount = catalog.getTrolleyAmount(commodityId);
-  if (trolleyAmount > 1) {
+  if (trolleyAmount <= 0) {
+    deleteFromTrolley(commodityId);
+    return;
+  };
+
+  if (isShownInTrolley(commodityId)) {
     var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
     var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
     var commodityNode = document.querySelector(htmlTrolleySelector);
     setTrolleyCommodityAmount(commodityNode, trolleyAmount);
   } else {
+    var commodity = catalog.getElement(commodityId);
     var domElement = createDomOfTrolleyCommodityFromTemplate(
-      catalog.getElement(commodityId), TROLLEY_TEMPLATE_ID
+      commodity,
+      TROLLEY_TEMPLATE_ID
     );
     renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
   }
@@ -489,13 +502,34 @@ function setTrolleyHandlers(dom) { //
   var addToTrolleyNode = dom.querySelector('.card-order__btn--increase');
   addToTrolleyNode.addEventListener('click', clickOnAddToTrolley);
 
+  var decreaseTrolleyNode = dom.querySelector('.card-order__btn--decrease');
+  decreaseTrolleyNode.addEventListener('click', clickDecreaseTrolley);
+
   function clickOnAddToTrolley(evt) { // delete 'On'
     var commodityId = findParentCommodityId(evt);
     catalog.moveToTrolley(commodityId, 1);
     updateDomGoods(commodityId);
     updateDomTrolley(commodityId);
   }
+
+  function clickDecreaseTrolley(evt) {
+    var commodityId = findParentCommodityId(evt);
+    catalog.decreaseTrolley(commodityId, 1);
+    updateDomGoods(commodityId);
+    updateDomTrolley(commodityId);
+  }
 }
+
+  function isShownInTrolley(commodityId) {
+    var htmlIdToSearch = idToHtmlTrolleyId(commodityId);
+    var nodes = document.querySelectorAll('.goods_card.card-order');
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].id === htmlIdToSearch) {
+        return true;
+      }
+    }
+    return false;
+  }
 
 function idToHtmlId(id) {
   return COMMODITY_HTML_ID_HEAD + id;
@@ -663,6 +697,13 @@ function setTrolleyCommodityHtmlId(dom, id) {
 function setTrolleyCommodityAmount(dom, trolleyAmount) {
   var amountNode = querySelectorIncludingSelf(dom, '.card-order__count');
   amountNode.value = trolleyAmount;
+}
+
+function deleteFromTrolley(commodityId) { /////
+  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+  var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+  var commodityNode = document.querySelector(htmlTrolleySelector);
+  commodityNode.remove();
 }
 
 function setTrolleyCommodityName(dom, name) {
