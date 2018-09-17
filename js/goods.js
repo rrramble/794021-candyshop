@@ -85,7 +85,7 @@ function Catalog(loadFunction) {
 
   this.isTrolleyEmpty = function () {
     function trolleyAmountEmpty(item) {
-      return item.trolleyAmount <= 0 ? true : false;
+      return item.trolleyAmount <= 0;
     }
 
     var result = this.goods.every(trolleyAmountEmpty);
