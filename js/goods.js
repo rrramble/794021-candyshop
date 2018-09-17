@@ -150,7 +150,6 @@ var Commodity = function (
 
 var catalog;
 var catalogDom;
-var trolleyGoods;
 
 (function () {
   catalog = new Catalog(generateGoods);
@@ -167,74 +166,74 @@ var trolleyGoods;
  */
 
 function Catalog(loadFunction) {
-  this.getGoods = function() {
+  this.getGoods = function () {
     return this.goods;
-  }
+  };
 
-  this.getTrolley = function() {
+  this.getTrolley = function () {
     var result = this.goods.filter(function(item){
       return item.trolleyAmount > 0;
     });
     return result;
-  }
+  };
 
-  this.getElement = function(id) {
+  this.getElement = function (id) {
     return this.goods[id];
-  }
+  };
 
-  this.getAmount = function(id) {
+  this.getAmount = function (id) {
     return this.goods[id].amount;
-  }
+  };
 
-  this.getTrolleyAmount = function(id) {
+  this.getTrolleyAmount = function (id) {
     return this.goods[id].trolleyAmount;
-  }
+  };
 
-  this.getTotalAmount = function(id) {
+  this.getTotalAmount = function (id) {
     return this.getAmount(id) + this.getTrolleyAmount(id);
-  }
+  };
 
-  this.getCount = function() {
+  this.getCount = function () {
     return this.goods.length;
-  }
+  };
 
-  this.addToTrolley = function(id, amount) {
+  this.addToTrolley = function (id, amount) {
     if (this.goods[id].amount >= amount) {
       this.goods[id].amount -= amount;
       this.goods[id].trolleyAmount += amount;
       return true;
-    };
+    }
     return false;
-  }
+  };
 
-  this.setTrolleyAmount = function(id, amount) {
+  this.setTrolleyAmount = function (id, amount) {
     var addition = amount - this.getTrolleyAmount(id);
     this.addToTrolley(id, addition);
-  }
+  };
 
-  this.isTrolleyEmpty = function() {
+  this.isTrolleyEmpty = function () {
     function trolleyAmountEmpty(item) {
       return item.trolleyAmount <= 0 ? true : false;
     };
 
     var result = this.goods.every(trolleyAmountEmpty);
     return result;
-  }
+  };
 
-  this.toggleFavorite = function(id) {
+  this.toggleFavorite = function (id) {
     this.goods[id].favorite = !this.goods[id].favorite;
     return this.goods[id].favorite;
-  }
+  };
 
-  this.getFavoriteStatus = function(id) {
+  this.getFavoriteStatus = function (id) {
     return this.goods[id].favorite;
-  }
+  };
 
-  this.decreaseTrolley = function(id, amount) {
+  this.decreaseTrolley = function (id, amount) {
     var actualDecrease = Math.min(amount, this.goods[id].trolleyAmount);
     this.goods[id].amount += actualDecrease;
     this.goods[id].trolleyAmount -= actualDecrease;
-  }
+  };
 
   // Costructor of the class
 
@@ -311,21 +310,21 @@ function putRandomGoodsInTrolley(goods, amount) {
  */
 
  function CatalogDom(goods, templateHtmlId) {
-  this.getElements = function(id) {
+  this.getElements = function (id) {
     return this.elements;
   }
 
-  this.getElement = function(id) {
+  this.getElement = function (id) {
     return this.elements[id];
   }
 
-  this.getCommodityDomElement = function(id) {
+  this.getCommodityDomElement = function (id) {
     var htmlId = idToHtmlId(id);
     var el = document.querySelector(htmlId);
     return el;
-  }
+  };
 
-  this.createCommodityNode = function(commodity) {
+  this.createCommodityNode = function (commodity) {
     var template = document.querySelector('#' + this.templateHtmlId);
     var newDom = template.content.cloneNode(true);
 
@@ -338,9 +337,9 @@ function putRandomGoodsInTrolley(goods, amount) {
     setCommodityRating(newDom, commodity.rating);
     setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
     setCommodityFavorite(newDom, commodity.favorite);
-    setCommodityHandlers(newDom)
+    setCommodityHandlers(newDom);
     return newDom;
-  }
+  };
 
 
   // Constructor body
@@ -442,7 +441,7 @@ function setCommodityNutritionFacts(dom, data) {
 }
 
 function setCommodityHtmlIds(dom, id) {
-  var element = dom.querySelector('.catalog__card')
+  var element = dom.querySelector('.catalog__card');
   element.id = idToHtmlId(id);
 }
 
@@ -489,8 +488,8 @@ function updateDomTrolley(commodityId) {
   } else {
     var commodity = catalog.getElement(commodityId);
     var domElement = createDomOfTrolleyCommodityFromTemplate(
-      commodity,
-      TROLLEY_TEMPLATE_ID
+        commodity,
+        TROLLEY_TEMPLATE_ID
     );
     renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
   }
@@ -500,19 +499,19 @@ function updateDomTrolley(commodityId) {
 
 function setCommodityHandlers(dom) {
   var favoriteNode = dom.querySelector('.card__btn-favorite');
-  favoriteNode.addEventListener('click', clickOnFavoriteHandler);
+  favoriteNode.addEventListener('click', clickFavoriteHandler);
 
   var addToTrolleyNode = dom.querySelector('.card__btn');
-  addToTrolleyNode.addEventListener('click', clickOnAddToTrolley);
+  addToTrolleyNode.addEventListener('click', clickAddToTrolley);
 
-  function clickOnFavoriteHandler(evt) { // delete 'On'
+  function clickFavoriteHandler(evt) {
     var commodityId = findParentCommodityId(evt);
     catalog.toggleFavorite(commodityId);
     var favoriteStatus = catalog.getFavoriteStatus(commodityId);
     updateDomFavorite(commodityId, favoriteStatus);
   }
 
-  function clickOnAddToTrolley(evt) { // delete 'On'
+  function clickAddToTrolley(evt) {
     var commodityId = findParentCommodityId(evt);
     catalog.addToTrolley(commodityId, 1);
     updateDomGoods(commodityId);
@@ -523,7 +522,7 @@ function setCommodityHandlers(dom) {
 function setTrolleyElementHandlers(dom) {
   var node = dom.querySelector('.card-order');
   node.addEventListener('click', clickTrolleyElement);
-  node.addEventListener('change', enterTrolleyElement)
+  node.addEventListener('change', enterTrolleyElement);
   return;
 
   function clickTrolleyElement(evt) {
@@ -557,7 +556,7 @@ function setTrolleyElementHandlers(dom) {
         return;
 
       } else if (newValue < 0) {
-        setTrolleyCommodityAmountInDom(commodityId, previousValue); /////
+        setTrolleyCommodityAmountInDom(commodityId, previousValue);
         return;
 
       } else if (newValue === 0) {
@@ -575,12 +574,12 @@ function setTrolleyElementHandlers(dom) {
   }
 }
 
-function setPaymentHandlers() { ///////
+function setPaymentHandlers() {
   var paymentTypeSelector = '.toggle-btn';
   var nodeCash = document.querySelector(paymentTypeSelector);
   nodeCash.addEventListener('click', clickCashPay);
 
-  function clickCashPay(evt) {
+  function clickCashPay() {
     var cardLabelSelector = '.toggle-btn__input[value="card"]';
     var cashLabelSelector = '.toggle-btn__input[value="cash"]';
     var cardFormSelector = '.payment__card-wrap';
@@ -620,13 +619,9 @@ function htmlIdToHtmlSelector(id) {
   return '#' + id;
 }
 
-function idToHtmlSelector(id) {
-  return '#' + idToHtmlId(id);
-}
-
-function htmlIdToId(id) {
-  if (isCommodityHtmlId(id)) {
-    var id = id.slice(COMMODITY_HTML_ID_HEAD.length, id.length);
+function htmlIdToId(htmlId) {
+  if (isCommodityHtmlId(htmlId)) {
+    var id = htmlId.slice(COMMODITY_HTML_ID_HEAD.length, htmlId.length);
     return id;
   }
   return undefined;
@@ -677,8 +672,6 @@ function findParentCommodityId(htmlClasses) {
  */
 
 function renderGoods(domElements, htmlClass) {
-  var node = document.createDocumentFragment();
-
   for (var i = 0; i < domElements.length; i++) {
     renderCommodity(domElements[i], htmlClass);
   }
@@ -696,61 +689,8 @@ function renderCommodity(domElement, htmlClass) {
 
 
 /*
- * Generate trolley content from the list of goods
- */
-
-function fulfillTrolley(list) {
-  var goodsInTrolley = [];
-  for (var i = 0; i < GOODS_IN_TROLLEY_COUNT; i++) {
-    var newGood = getRandomItemFromList(list);
-    goodsInTrolley.push(newGood);
-  }
-  return goodsInTrolley;
-}
-
-function Trolley(goods, customTrolleyGenerator) {
-  this.plus = function(id) {
-    var index = this.getIndex(id);
-    this.elements[index]++;
-  }
-
-  this.minus = function(id) {
-    var index = this.getIndex(id);
-    if (this.elements[index] > 1) {
-      this.elements[index]--;
-      return true;
-    }
-    else return false;
-  }
-
-  this.getIndex = function(id) {
-    for (var i = 0; i < this.elements.length; i++) {
-      if (this.elements[i].id === id) {
-        return i;
-      }
-    }
-    return undefined;
-  }
-
-  // Constructor block
-  if (customTrolleyGenerator) {
-    this.elements = customTrolleyGenerator(goods);
-  }
-}
-
-
-/*
  * Make DOM from the trolley content
  */
-
-function createTrolleyDomFromTemplate(goods, templateHtmlId) {
-  var domElements = [];
-  for (var i = 0; i < goods.length; i++) {
-    var domElement = createDomOfTrolleyCommodityFromTemplate(goods[i], templateHtmlId);
-    domElements.push(domElement);
-  }
-  return domElements;
-}
 
 function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
   var htmlSelector = htmlIdToHtmlSelector(templateHtmlId);
@@ -767,7 +707,7 @@ function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
 }
 
 function setTrolleyCommodityHtmlId(dom, id) {
-  var element = querySelectorIncludingSelf(dom, '.card-order')
+  var element = querySelectorIncludingSelf(dom, '.card-order');
   element.id = idToHtmlTrolleyId(id);
 }
 
@@ -925,10 +865,6 @@ function htmlSelectorToClass(htmlSelector) {
   return htmlSelector.slice(1);
 }
 
-function toggleBoolean(objectIsTrue) {
-  objectIsTrue = !objectIsTrue;
-}
-
 function querySelectorIncludingSelf(dom, selector) {
   var classes = dom.classList;
   if (classes) {
@@ -947,7 +883,7 @@ function isNumber(n) {
 function isChecked(htmlSelector, dom) {
   var parentDom = document;
   if (dom) {
-    var parentDom = dom;
+    parentDom = dom;
   }
   var result = parentDom.querySelector(htmlSelector).checked;
   return result;
