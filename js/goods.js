@@ -379,10 +379,10 @@ function enterTrolleyElement(evt) {
 
   if (evt.target.classList.contains('card-order__count')) {
     if (
-        newValue > maxAmount ||
+      newValue > maxAmount ||
         newValue <= 0 ||
         !window.utils.isNumber(newValue)
-      ) {
+    ) {
       setTrolleyCommodityAmountInDom(commodityId, previousValue);
       return;
 
