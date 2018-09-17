@@ -109,6 +109,9 @@
   }
 
   window.utils.isNumber = function (n) {
+    if (isNaN(n)) {
+      return false;
+    }
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
 

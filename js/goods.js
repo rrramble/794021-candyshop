@@ -378,15 +378,12 @@ function setTrolleyElementHandlers(dom) {
     var newValue = getElementTrolleyAmountInDom(commodityId) / 1.0;
 
     if (evt.target.classList.contains('card-order__count')) {
-      if (newValue > maxAmount) {
+      if (
+          newValue > maxAmount ||
+          newValue <= 0 ||
+          !window.utils.isNumber(newValue)
+        ) {
         setTrolleyCommodityAmountInDom(commodityId, previousValue);
-        return;
-
-      } else if (newValue <= 0) {
-        setTrolleyCommodityAmountInDom(commodityId, previousValue);
-        return;
-
-      } else if (!window.utils.isNumber(newValue)) {
         return;
 
       } else {
