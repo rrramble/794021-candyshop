@@ -314,6 +314,11 @@ function updateDomTrolley(commodityId) {
   window.utils.removeCssClass('goods__cards', 'goods__cards--empty');
 }
 
+
+/*
+ * Goods' elements handlers
+ */
+
 function setCommodityHandlers(dom) {
   var favoriteNode = dom.querySelector('.card__btn-favorite');
   favoriteNode.addEventListener('click', clickFavoriteHandler);
@@ -336,11 +341,16 @@ function setCommodityHandlers(dom) {
   }
 }
 
+/*
+ * Trolley elements handlers
+ */
+
 function setTrolleyElementHandlers(dom) {
   var node = dom.querySelector('.card-order');
   node.addEventListener('click', clickTrolleyElement);
   node.addEventListener('change', enterTrolleyElement);
   return;
+}
 
   function clickTrolleyElement(evt) {
     var commodityId = findParentCommodityId(evt);
@@ -372,12 +382,9 @@ function setTrolleyElementHandlers(dom) {
         setTrolleyCommodityAmountInDom(commodityId, previousValue);
         return;
 
-      } else if (newValue < 0) {
+      } else if (newValue <= 0) {
         setTrolleyCommodityAmountInDom(commodityId, previousValue);
         return;
-
-      } else if (newValue === 0) {
-        catalog.decreaseTrolley(commodityId, Infinity);
 
       } else if (!window.utils.isNumber(newValue)) {
         return;
@@ -389,7 +396,16 @@ function setTrolleyElementHandlers(dom) {
       updateDomTrolley(commodityId);
     }
   }
+
+function deleteTrolleyElementHandlers(dom) {
+  dom.removeEventListener('click', clickTrolleyElement);
+  dom.removeEventListener('change', enterTrolleyElement);
 }
+
+
+/*
+ * Payment handlers
+ */
 
 function setPaymentHandlers() {
   var paymentTypeSelector = '.toggle-btn';
@@ -412,6 +428,7 @@ function setPaymentHandlers() {
     }
   }
 }
+
 
 function isShownInTrolley(commodityId) {
   var htmlIdToSearch = idToHtmlTrolleyId(commodityId);
@@ -550,6 +567,7 @@ function deleteDisplayingFromTrolley(commodityId) {
   var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
   var commodityNode = document.querySelector(htmlTrolleySelector);
   if (commodityNode) {
+    deleteTrolleyElementHandlers(commodityNode);
     commodityNode.remove();
   }
 }
