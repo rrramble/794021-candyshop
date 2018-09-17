@@ -352,47 +352,47 @@ function setTrolleyElementHandlers(dom) {
   return;
 }
 
-  function clickTrolleyElement(evt) {
-    var commodityId = findParentCommodityId(evt);
+function clickTrolleyElement(evt) {
+  var commodityId = findParentCommodityId(evt);
 
-    if (evt.target.classList.contains('card-order__btn--increase')) {
-      catalog.addToTrolley(commodityId, 1);
+  if (evt.target.classList.contains('card-order__btn--increase')) {
+    catalog.addToTrolley(commodityId, 1);
 
-    } else if (evt.target.classList.contains('card-order__btn--decrease')) {
-      catalog.decreaseTrolley(commodityId, 1);
+  } else if (evt.target.classList.contains('card-order__btn--decrease')) {
+    catalog.decreaseTrolley(commodityId, 1);
 
-    } else if (evt.target.classList.contains('card-order__close')) {
-      catalog.decreaseTrolley(commodityId, Infinity);
+  } else if (evt.target.classList.contains('card-order__close')) {
+    catalog.decreaseTrolley(commodityId, Infinity);
+
+  } else {
+    return;
+  }
+  updateDomGoods(commodityId);
+  updateDomTrolley(commodityId);
+}
+
+function enterTrolleyElement(evt) {
+  var commodityId = findParentCommodityId(evt);
+  var previousValue = catalog.getTrolleyAmount(commodityId);
+  var maxAmount = catalog.getTotalAmount(commodityId);
+  var newValue = getElementTrolleyAmountInDom(commodityId) / 1.0;
+
+  if (evt.target.classList.contains('card-order__count')) {
+    if (
+        newValue > maxAmount ||
+        newValue <= 0 ||
+        !window.utils.isNumber(newValue)
+      ) {
+      setTrolleyCommodityAmountInDom(commodityId, previousValue);
+      return;
 
     } else {
-      return;
+      catalog.setTrolleyAmount(commodityId, newValue);
     }
     updateDomGoods(commodityId);
     updateDomTrolley(commodityId);
   }
-
-  function enterTrolleyElement(evt) {
-    var commodityId = findParentCommodityId(evt);
-    var previousValue = catalog.getTrolleyAmount(commodityId);
-    var maxAmount = catalog.getTotalAmount(commodityId);
-    var newValue = getElementTrolleyAmountInDom(commodityId) / 1.0;
-
-    if (evt.target.classList.contains('card-order__count')) {
-      if (
-          newValue > maxAmount ||
-          newValue <= 0 ||
-          !window.utils.isNumber(newValue)
-        ) {
-        setTrolleyCommodityAmountInDom(commodityId, previousValue);
-        return;
-
-      } else {
-        catalog.setTrolleyAmount(commodityId, newValue);
-      }
-      updateDomGoods(commodityId);
-      updateDomTrolley(commodityId);
-    }
-  }
+}
 
 function deleteTrolleyElementHandlers(dom) {
   dom.removeEventListener('click', clickTrolleyElement);

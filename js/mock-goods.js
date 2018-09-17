@@ -117,9 +117,9 @@
   ];
 
 
-/*
- * Main
- */
+  /*
+  * Main
+  */
 
   window.mockGoods = {};
 
@@ -134,9 +134,9 @@
   };
 
 
-/*
- * Miscelaneous
- */
+  /*
+   * Miscelaneous
+   */
 
   function fulfillCommodity(commodity) {
     commodity.name = window.utils.getRandomItemFromList(NAMES);
