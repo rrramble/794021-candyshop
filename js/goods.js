@@ -171,7 +171,7 @@ function Catalog(loadFunction) {
   };
 
   this.getTrolley = function () {
-    var result = this.goods.filter(function(item){
+    var result = this.goods.filter(function (item) {
       return item.trolleyAmount > 0;
     });
     return result;
@@ -214,7 +214,7 @@ function Catalog(loadFunction) {
   this.isTrolleyEmpty = function () {
     function trolleyAmountEmpty(item) {
       return item.trolleyAmount <= 0 ? true : false;
-    };
+    }
 
     var result = this.goods.every(trolleyAmountEmpty);
     return result;
@@ -239,7 +239,7 @@ function Catalog(loadFunction) {
 
   this.loaded = false;
   this.goods = loadFunction();
-  if (this.getCount() > 0 ) {
+  if (this.getCount() > 0) {
     this.loaded = true;
   }
 }
@@ -262,7 +262,7 @@ function fulfillCommodity(commodity) {
   commodity.name = getRandomItemFromList(NAMES);
   commodity.picture = getRandomItemFromList(PICTURES);
   commodity.amount = randomInRangeUpTo(
-    AMOUNT_MIN, AMOUNT_MAX
+      AMOUNT_MIN, AMOUNT_MAX
   );
   commodity.trolleyAmount = 0;
   commodity.price = randomInRangeUpTo(PRICE_MIN, PRICE_MAX);
@@ -309,14 +309,14 @@ function putRandomGoodsInTrolley(goods, amount) {
  * Make DOM from the catalog of goods
  */
 
- function CatalogDom(goods, templateHtmlId) {
-  this.getElements = function (id) {
+function CatalogDom(goods, templateHtmlId) {
+  this.getElements = function () {
     return this.elements;
-  }
+  };
 
   this.getElement = function (id) {
     return this.elements[id];
-  }
+  };
 
   this.getCommodityDomElement = function (id) {
     var htmlId = idToHtmlId(id);
@@ -478,7 +478,7 @@ function updateDomTrolley(commodityId) {
       addCssClass('goods__cards', 'goods__cards--empty');
     }
     return;
-  };
+  }
 
   if (isShownInTrolley(commodityId)) {
     var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
