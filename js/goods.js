@@ -154,14 +154,10 @@ var trolleyGoods;
 
 (function () {
   catalog = new Catalog(generateGoods);
-  putRandomGoodsInTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
   catalogDom = new CatalogDom(catalog.getGoods(), GOODS_TEMPLATE_ID);
   renderGoods(catalogDom.getElements(), GOODS_HTML_TAG_CLASS);
 
-  renderTrolley();
-  hideHtmlSelector('.goods__card-empty');
-  removeCssClass('goods__cards', 'goods__cards--empty');
-
+  putRandomGoodsInTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
   setInterfaceHandlers();
 })();
 
@@ -214,6 +210,15 @@ function Catalog(loadFunction) {
   this.setTrolleyAmount = function(id, amount) {
     var addition = amount - this.getTrolleyAmount(id);
     this.addToTrolley(id, addition);
+  }
+
+  this.isTrolleyEmpty = function() {
+    function trolleyAmountEmpty(item) {
+      return item.trolleyAmount <= 0 ? true : false;
+    };
+
+    var result = this.goods.every(trolleyAmountEmpty);
+    return result;
   }
 
   this.toggleFavorite = function(id) {
@@ -295,6 +300,8 @@ function putRandomGoodsInTrolley(goods, amount) {
   for (var i = 0; i < amount; i++) {
     var index = randomInRange(0, goods.length);
     catalog.addToTrolley(index, 1);
+    updateDomGoods(index);
+    updateDomTrolley(index);
   }
 }
 
@@ -467,6 +474,10 @@ function updateDomTrolley(commodityId) {
   var trolleyAmount = catalog.getTrolleyAmount(commodityId);
   if (trolleyAmount <= 0) {
     deleteDisplayingFromTrolley(commodityId);
+    if (catalog.isTrolleyEmpty()) {
+      showHtmlSelector('.goods__card-empty');
+      addCssClass('goods__cards', 'goods__cards--empty');
+    }
     return;
   };
 
@@ -483,6 +494,8 @@ function updateDomTrolley(commodityId) {
     );
     renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
   }
+  hideHtmlSelector('.goods__card-empty');
+  removeCssClass('goods__cards', 'goods__cards--empty');
 }
 
 function setCommodityHandlers(dom) {
@@ -809,24 +822,10 @@ function setTrolleyCommodityPrice(dom, value) {
  * Render DOM of the trolley content
  */
 
-function renderTrolley(domElements, htmlClass) {
-  for (var i = 0; i < catalog.getCount(); i++) {
-    updateDomTrolley(i);
-  }
-}
-
 function renderItemInTrolley(domElement, htmlClass) {
   var htmlSelector = htmlClassToSelector(htmlClass);
   var addTo = document.querySelector(htmlSelector);
   addTo.appendChild(domElement);
-}
-
-
-function updateTrolley(commodityId, amount) {
-  var htmlId = idToHtmlTrolleyId(commodityId);
-  var htmlSelector = htmlIdToHtmlSelector(htmlId);
-  var domNode = document.querySelector(htmlSelector);
-  setCommodityFavorite(domNode, amount);
 }
 
 function setInterfaceHandlers() {
