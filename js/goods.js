@@ -5,117 +5,8 @@
  * https://up.htmlacademy.ru/javascript/15/tasks/16
  */
 
-var WAT = 'Wat eez dat?';
-
-var SELECTOR_HIDDEN = '.visually-hidden';
 var COMMODITY_HTML_ID_HEAD = 'commodity';
 var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
-
-var GOODS_COUNT = 20;
-var GOODS_IN_TROLLEY_COUNT = 3;
-
-var AMOUNT_MIN = 0;
-var AMOUNT_MAX = 100;
-
-var PRICE_MIN = 100;
-var PRICE_MAX = 1500;
-
-var WEIGHT_MIN = 30;
-var WEIGHT_MAX = 300;
-
-var RATING_VALUE_MIN = 1;
-var RATING_VALUE_MAX = 5;
-
-var RATING_NUMBER_MIN = 10;
-var RATING_NUMBER_MAX = 900;
-
-var ENERGY_MIN = 70;
-var ENERGY_MAX = 500;
-
-var SUGARS = [false, true];
-
-var NAMES = [
-  'Чесночные сливки',
-  'Огуречный педант',
-  'Молочная хрюша',
-  'Грибной шейк',
-  'Баклажановое безумие',
-  'Паприколу итальяно',
-  'Нинзя-удар васаби',
-  'Хитрый баклажан',
-  'Горчичный вызов',
-  'Кедровая липучка',
-  'Корманный портвейн',
-  'Чилийский задира',
-  'Беконовый взрыв',
-  'Арахис vs виноград',
-  'Сельдерейная душа',
-  'Початок в бутылке',
-  'Чернющий мистер чеснок',
-  'Раша федераша',
-  'Кислая мина',
-  'Кукурузное утро',
-  'Икорный фуршет',
-  'Новогоднее настроение',
-  'С пивком потянет',
-  'Мисс креветка',
-  'Бесконечный взрыв',
-  'Невинные винные',
-  'Бельгийское пенное',
-  'Острый язычок'
-];
-
-var PICTURES = [
-  'img/cards/gum-cedar.jpg',
-  'img/cards/gum-chile.jpg',
-  'img/cards/gum-eggplant.jpg',
-  'img/cards/gum-mustard.jpg',
-  'img/cards/gum-portwine.jpg',
-  'img/cards/gum-wasabi.jpg',
-  'img/cards/ice-cucumber.jpg',
-  'img/cards/ice-eggplant.jpg',
-  'img/cards/ice-garlic.jpg',
-  'img/cards/ice-italian.jpg',
-  'img/cards/ice-mushroom.jpg',
-  'img/cards/ice-pig.jpg',
-  'img/cards/marmalade-beer.jpg',
-  'img/cards/marmalade-caviar.jpg',
-  'img/cards/marmalade-corn.jpg',
-  'img/cards/marmalade-new-year.jpg',
-  'img/cards/marmalade-sour.jpg',
-  'img/cards/marshmallow-bacon.jpg',
-  'img/cards/marshmallow-beer.jpg',
-  'img/cards/marshmallow-shrimp.jpg',
-  'img/cards/marshmallow-spicy.jpg',
-  'img/cards/marshmallow-wine.jpg',
-  'img/cards/soda-bacon.jpg',
-  'img/cards/soda-celery.jpg',
-  'img/cards/soda-cob.jpg',
-  'img/cards/soda-garlic.jpg',
-  'img/cards/soda-peanut-grapes.jpg',
-  'img/cards/soda-russian.jpg'
-];
-
-var CONTENTS = [
-  'молоко',
-  'сливки',
-  'вода',
-  'пищевой краситель',
-  'патока',
-  'ароматизатор бекона',
-  'ароматизатор свинца',
-  'ароматизатор дуба, идентичный натуральному',
-  'ароматизатор картофеля',
-  'лимонная кислота',
-  'загуститель',
-  'эмульгатор',
-  'консервант: сорбат калия',
-  'посолочная смесь: соль, нитрат натрия',
-  'ксилит',
-  'карбамид',
-  'вилларибо',
-  'виллабаджо'
-];
 
 var GOODS_TEMPLATE_ID = 'card';
 var GOODS_HTML_TAG_CLASS = 'catalog__cards';
@@ -123,26 +14,7 @@ var GOODS_HTML_TAG_CLASS = 'catalog__cards';
 var TROLLEY_TEMPLATE_ID = 'card-order';
 var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
 
-var Commodity = function (
-    index,
-    name,
-    picture,
-    amount,
-    price,
-    weight,
-    rating,
-    nutritionFacts
-) {
-  this.id = index;
-  this.name = name;
-  this.picture = picture;
-  this.amount = amount;
-  this.price = price;
-  this.weight = weight;
-  this.rating = rating;
-  this.nutritionFacts = nutritionFacts;
-};
-
+var GOODS_IN_TROLLEY_COUNT = 3;
 
 /*
  * Main logic
@@ -152,7 +24,7 @@ var catalog;
 var catalogDom;
 
 (function () {
-  catalog = new Catalog(generateGoods);
+  catalog = new Catalog(window.mockGoods.get);
   catalogDom = new CatalogDom(catalog.getGoods(), GOODS_TEMPLATE_ID);
   renderGoods(catalogDom.getElements(), GOODS_HTML_TAG_CLASS);
 
@@ -237,77 +109,22 @@ function Catalog(loadFunction) {
 
   // Costructor of the class
 
-  this.loaded = false;
   this.goods = loadFunction();
-  if (this.getCount() > 0) {
-    this.loaded = true;
-  }
-}
-
-function generateGoods() {
-  var goods = [];
-  for (var i = 0; i < GOODS_COUNT; i++) {
-    var commodity = fulfillCommodity(generateCommodity(i));
-    goods.push(commodity);
-  }
-  return goods;
-}
-
-function generateCommodity(index) {
-  var commodity = new Commodity(index);
-  return commodity;
-}
-
-function fulfillCommodity(commodity) {
-  commodity.name = getRandomItemFromList(NAMES);
-  commodity.picture = getRandomItemFromList(PICTURES);
-  commodity.amount = randomInRangeUpTo(
-      AMOUNT_MIN, AMOUNT_MAX
-  );
-  commodity.trolleyAmount = 0;
-  commodity.price = randomInRangeUpTo(PRICE_MIN, PRICE_MAX);
-  commodity.weight = randomInRangeUpTo(WEIGHT_MIN, WEIGHT_MAX);
-  commodity.rating = getRating();
-  commodity.nutritionFacts = getNutritionFacts();
-  commodity.favorite = false;
-  return commodity;
-}
-
-function getRating() {
-  var rating = {};
-  rating.value = randomInRangeUpTo(RATING_VALUE_MIN, RATING_VALUE_MAX);
-  rating.number = randomInRangeUpTo(RATING_NUMBER_MIN, RATING_NUMBER_MAX);
-  return rating;
-}
-
-function getNutritionFacts() {
-  var nutritionFacts = {};
-  nutritionFacts.sugar = getRandomItemFromList(SUGARS);
-  nutritionFacts.energy = randomInRangeUpTo(ENERGY_MIN, ENERGY_MAX);
-  nutritionFacts.contents = getContents();
-  return nutritionFacts;
-}
-
-function getContents() {
-  var randomContents = getRandomListFromList(CONTENTS);
-  var result = randomContents.join('; ');
-  result += '.';
-  return result;
 }
 
 function putRandomGoodsInTrolley(goods, amount) {
   for (var i = 0; i < amount; i++) {
-    var index = randomInRange(0, goods.length);
+    var index = window.utils.randomInRange(0, goods.length);
     catalog.addToTrolley(index, 1);
     updateDomGoods(index);
     updateDomTrolley(index);
   }
 }
 
-
 /*
  * Make DOM from the catalog of goods
  */
+
 
 function CatalogDom(goods, templateHtmlId) {
   this.getElements = function () {
@@ -373,7 +190,7 @@ function setCommodityStockAmount(dom, data) {
     htmlClass = 'card--soon';
   }
 
-  var element = querySelectorIncludingSelf(dom, '.catalog__card');
+  var element = window.utils.querySelectorIncludingSelf(dom, '.catalog__card');
   element.classList.remove('card--in-stock');
   element.classList.remove('card--little');
   element.classList.remove('card--soon');
@@ -456,14 +273,14 @@ function setCommodityFavorite(dom, isFavorite) {
 
 function updateDomFavorite(commodityId, favoriteStatus) {
   var commodityHtmlId = idToHtmlId(commodityId);
-  var commoditySelector = htmlIdToHtmlSelector(commodityHtmlId);
+  var commoditySelector = window.utils.htmlIdToHtmlSelector(commodityHtmlId);
   var commodityNode = document.querySelector(commoditySelector);
   setCommodityFavorite(commodityNode, favoriteStatus);
 }
 
 function updateDomGoods(commodityId) {
   var commodityHtmlId = idToHtmlId(commodityId);
-  var commoditySelector = htmlIdToHtmlSelector(commodityHtmlId);
+  var commoditySelector = window.utils.htmlIdToHtmlSelector(commodityHtmlId);
   var commodityNode = document.querySelector(commoditySelector);
   var amount = catalog.getAmount(commodityId);
   setCommodityStockAmount(commodityNode, amount);
@@ -474,15 +291,15 @@ function updateDomTrolley(commodityId) {
   if (trolleyAmount <= 0) {
     deleteDisplayingFromTrolley(commodityId);
     if (catalog.isTrolleyEmpty()) {
-      showHtmlSelector('.goods__card-empty');
-      addCssClass('goods__cards', 'goods__cards--empty');
+      window.utils.showHtmlSelector('.goods__card-empty');
+      window.utils.addCssClass('goods__cards', 'goods__cards--empty');
     }
     return;
   }
 
   if (isShownInTrolley(commodityId)) {
     var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-    var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+    var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
     var commodityNode = document.querySelector(htmlTrolleySelector);
     setTrolleyCommodityAmount(commodityNode, trolleyAmount);
   } else {
@@ -493,8 +310,8 @@ function updateDomTrolley(commodityId) {
     );
     renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
   }
-  hideHtmlSelector('.goods__card-empty');
-  removeCssClass('goods__cards', 'goods__cards--empty');
+  window.utils.hideHtmlSelector('.goods__card-empty');
+  window.utils.removeCssClass('goods__cards', 'goods__cards--empty');
 }
 
 function setCommodityHandlers(dom) {
@@ -562,7 +379,7 @@ function setTrolleyElementHandlers(dom) {
       } else if (newValue === 0) {
         catalog.decreaseTrolley(commodityId, Infinity);
 
-      } else if (!isNumber(newValue)) {
+      } else if (!window.utils.isNumber(newValue)) {
         return;
 
       } else {
@@ -584,11 +401,11 @@ function setPaymentHandlers() {
     var cashLabelSelector = '.toggle-btn__input[value="cash"]';
     var cardFormSelector = '.payment__card-wrap';
 
-    if (isChecked(cardLabelSelector)) {
-      showHtmlSelector(cardFormSelector);
+    if (window.utils.isChecked(cardLabelSelector)) {
+      window.utils.showHtmlSelector(cardFormSelector);
 
-    } else if (isChecked(cashLabelSelector)) {
-      hideHtmlSelector(cardFormSelector);
+    } else if (window.utils.isChecked(cashLabelSelector)) {
+      window.utils.hideHtmlSelector(cardFormSelector);
 
     } else {
       return;
@@ -613,10 +430,6 @@ function idToHtmlId(id) {
 
 function idToHtmlTrolleyId(id) {
   return TROLLEY_HTML_ID_HEAD + id;
-}
-
-function htmlIdToHtmlSelector(id) {
-  return '#' + id;
 }
 
 function htmlIdToId(htmlId) {
@@ -676,13 +489,13 @@ function renderGoods(domElements, htmlClass) {
     renderCommodity(domElements[i], htmlClass);
   }
   if (domElements.length > 0) {
-    removeCssClass('catalog__cards', 'catalog__cards--load');
-    hideHtmlSelector('.catalog__load');
+    window.utils.removeCssClass('catalog__cards', 'catalog__cards--load');
+    window.utils.hideHtmlSelector('.catalog__load');
   }
 }
 
 function renderCommodity(domElement, htmlClass) {
-  var htmlSelector = htmlClassToSelector(htmlClass);
+  var htmlSelector = window.utils.htmlClassToSelector(htmlClass);
   var dom = document.querySelector(htmlSelector);
   dom.appendChild(domElement);
 }
@@ -693,13 +506,13 @@ function renderCommodity(domElement, htmlClass) {
  */
 
 function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
-  var htmlSelector = htmlIdToHtmlSelector(templateHtmlId);
+  var htmlSelector = window.utils.htmlIdToHtmlSelector(templateHtmlId);
   var template = document.querySelector(htmlSelector);
   var newDom = template.content.cloneNode(true);
 
   setTrolleyCommodityHtmlId(newDom, commodity.id);
   setTrolleyCommodityName(newDom, commodity.name);
-  setTrolleyCommodityImage(newDom, commodity.picture);
+  setTrolleyCommodityImage(newDom, commodity.picture, commodity.name);
   setTrolleyCommodityPrice(newDom, commodity.price);
   setTrolleyCommodityAmount(newDom, commodity.trolleyAmount);
   setTrolleyElementHandlers(newDom);
@@ -707,18 +520,18 @@ function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
 }
 
 function setTrolleyCommodityHtmlId(dom, id) {
-  var element = querySelectorIncludingSelf(dom, '.card-order');
+  var element = window.utils.querySelectorIncludingSelf(dom, '.card-order');
   element.id = idToHtmlTrolleyId(id);
 }
 
 function setTrolleyCommodityAmount(dom, trolleyAmount) {
-  var amountNode = querySelectorIncludingSelf(dom, '.card-order__count');
+  var amountNode = window.utils.querySelectorIncludingSelf(dom, '.card-order__count');
   amountNode.value = trolleyAmount;
 }
 
 function setTrolleyCommodityAmountInDom(commodityId, trolleyAmount) {
   var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-  var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
   var amountNode = document.querySelector(htmlTrolleySelector);
   var node = amountNode.querySelector('.card-order__count');
   node.value = trolleyAmount;
@@ -726,7 +539,7 @@ function setTrolleyCommodityAmountInDom(commodityId, trolleyAmount) {
 
 function getElementTrolleyAmountInDom(commodityId) {
   var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-  var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
   var amountNode = document.querySelector(htmlTrolleySelector);
   var node = amountNode.querySelector('.card-order__count');
   return node.value;
@@ -734,7 +547,7 @@ function getElementTrolleyAmountInDom(commodityId) {
 
 function deleteDisplayingFromTrolley(commodityId) {
   var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-  var htmlTrolleySelector = htmlIdToHtmlSelector(htmlTrolleyId);
+  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
   var commodityNode = document.querySelector(htmlTrolleySelector);
   if (commodityNode) {
     commodityNode.remove();
@@ -746,10 +559,10 @@ function setTrolleyCommodityName(dom, name) {
   element.textContent = name;
 }
 
-function setTrolleyCommodityImage(dom, value) {
+function setTrolleyCommodityImage(dom, imageUrl, imageAlt) {
   var element = dom.querySelector('.card-order__img');
-  element.src = value;
-  element.alt = WAT;
+  element.src = imageUrl;
+  element.alt = imageAlt;
 }
 
 function setTrolleyCommodityPrice(dom, value) {
@@ -763,7 +576,7 @@ function setTrolleyCommodityPrice(dom, value) {
  */
 
 function renderItemInTrolley(domElement, htmlClass) {
-  var htmlSelector = htmlClassToSelector(htmlClass);
+  var htmlSelector = window.utils.htmlClassToSelector(htmlClass);
   var addTo = document.querySelector(htmlSelector);
   addTo.appendChild(domElement);
 }
@@ -772,119 +585,4 @@ function setInterfaceHandlers() {
   var paymentSelector = '.payment';
   var node = document.querySelector(paymentSelector);
   node.addEventListener('click', setPaymentHandlers);
-}
-
-
-/*
- * Miscelaneous not task-oriented utility functions
- */
-
-function removeCssClass(objectClass, classToBeRemoved) {
-  var domObjects = getDomObjectsByClassName(objectClass);
-  for (var i = 0; i < domObjects.length; i++) {
-    domObjects[i].classList.remove(classToBeRemoved);
-  }
-}
-
-function addCssClass(objectClass, classToBeAdded) {
-  var domObjects = getDomObjectsByClassName(objectClass);
-  for (var i = 0; i < domObjects.length; i++) {
-    domObjects[i].classList.add(classToBeAdded);
-  }
-}
-
-function getDomObjectsByClassName(objectClass) {
-  var domId = '.' + objectClass;
-  var domObjects = document.querySelectorAll(domId);
-  return domObjects;
-}
-
-function getRandomItemFromList(list) {
-  if (list.length === 0) {
-    return list;
-  }
-
-  var index = randomInRange(0, list.length);
-  return list[index];
-}
-
-function getRandomListFromList(list) {
-  if (list.length === 0) {
-    return list;
-  }
-  var newList = list.filter(function () {
-    return randomInRangeUpTo(0, 1) === 0;
-  });
-
-  if (newList.length === 0) {
-    newList = list[0];
-  }
-  return newList;
-}
-
-function randomInRangeUpTo(from, upTo) {
-  var to = upTo + 1;
-  return randomInRange(from, to);
-}
-
-function randomInRange(from, to) {
-  var result = Math.floor(Math.random(to - from) * to + from);
-  if (result < from) {
-    result = from;
-  } else if (result >= to) {
-    result = to - 1;
-  }
-  return result;
-}
-
-function showHtmlSelector(htmlSelector) {
-  var el = document.querySelector(htmlSelector);
-  var className = htmlClassFromSelector(SELECTOR_HIDDEN);
-  el.classList.remove(className);
-}
-
-function hideHtmlSelector(htmlSelector) {
-  var el = document.querySelector(htmlSelector);
-  var className = htmlClassFromSelector(SELECTOR_HIDDEN);
-  el.classList.add(className);
-}
-
-function htmlClassFromSelector(htmlSelector) {
-  var firstChar = htmlSelector[0];
-  if (firstChar === '.') {
-    return htmlSelector.slice(1);
-  }
-  return undefined;
-}
-
-function htmlClassToSelector(htmlClass) {
-  return '.' + htmlClass;
-}
-
-function htmlSelectorToClass(htmlSelector) {
-  return htmlSelector.slice(1);
-}
-
-function querySelectorIncludingSelf(dom, selector) {
-  var classes = dom.classList;
-  if (classes) {
-    var className = htmlSelectorToClass(selector);
-    if (classes.contains(className)) {
-      return dom;
-    }
-  }
-  return dom.querySelector(selector);
-}
-
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function isChecked(htmlSelector, dom) {
-  var parentDom = document;
-  if (dom) {
-    parentDom = dom;
-  }
-  var result = parentDom.querySelector(htmlSelector).checked;
-  return result;
 }
