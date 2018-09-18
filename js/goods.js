@@ -2,119 +2,11 @@
 
 /*
  * Текст задания:
- * https://up.htmlacademy.ru/javascript/15/tasks/13
+ * https://up.htmlacademy.ru/javascript/15/tasks/16
  */
 
-var WAT = 'Wat eez dat?';
-
-var GOODS_COUNT = 26;
-var GOODS_IN_TROLLEY_COUNT = 3;
-
-var AMOUNT_MIN = 0;
-var AMOUNT_MAX = 20;
-var AMOUNT_PRECISION = 0;
-
-var PRICE_MIN = 100;
-var PRICE_MAX = 1500;
-var PRICE_PRECISION = 0;
-
-var WEIGHT_MIN = 30;
-var WEIGHT_MAX = 300;
-var WEIGHT_PRECISION = 0;
-
-var RATING_VALUE_MIN = 1;
-var RATING_VALUE_MAX = 5;
-
-var RATING_NUMBER_MIN = 10;
-var RATING_NUMBER_MAX = 900;
-
-var ENERGY_MIN = 70;
-var ENERGY_MAX = 500;
-
-var SUGARS = [false, true];
-
-var NAMES = [
-  'Чесночные сливки',
-  'Огуречный педант',
-  'Молочная хрюша',
-  'Грибной шейк',
-  'Баклажановое безумие',
-  'Паприколу итальяно',
-  'Нинзя-удар васаби',
-  'Хитрый баклажан',
-  'Горчичный вызов',
-  'Кедровая липучка',
-  'Корманный портвейн',
-  'Чилийский задира',
-  'Беконовый взрыв',
-  'Арахис vs виноград',
-  'Сельдерейная душа',
-  'Початок в бутылке',
-  'Чернющий мистер чеснок',
-  'Раша федераша',
-  'Кислая мина',
-  'Кукурузное утро',
-  'Икорный фуршет',
-  'Новогоднее настроение',
-  'С пивком потянет',
-  'Мисс креветка',
-  'Бесконечный взрыв',
-  'Невинные винные',
-  'Бельгийское пенное',
-  'Острый язычок'
-];
-
-var PICTURES = [
-  'img/cards/gum-cedar.jpg',
-  'img/cards/gum-chile.jpg',
-  'img/cards/gum-eggplant.jpg',
-  'img/cards/gum-mustard.jpg',
-  'img/cards/gum-portwine.jpg',
-  'img/cards/gum-wasabi.jpg',
-  'img/cards/ice-cucumber.jpg',
-  'img/cards/ice-eggplant.jpg',
-  'img/cards/ice-garlic.jpg',
-  'img/cards/ice-italian.jpg',
-  'img/cards/ice-mushroom.jpg',
-  'img/cards/ice-pig.jpg',
-  'img/cards/marmalade-beer.jpg',
-  'img/cards/marmalade-caviar.jpg',
-  'img/cards/marmalade-corn.jpg',
-  'img/cards/marmalade-new-year.jpg',
-  'img/cards/marmalade-sour.jpg',
-  'img/cards/marshmallow-bacon.jpg',
-  'img/cards/marshmallow-beer.jpg',
-  'img/cards/marshmallow-shrimp.jpg',
-  'img/cards/marshmallow-spicy.jpg',
-  'img/cards/marshmallow-wine.jpg',
-  'img/cards/soda-bacon.jpg',
-  'img/cards/soda-celery.jpg',
-  'img/cards/soda-cob.jpg',
-  'img/cards/soda-garlic.jpg',
-  'img/cards/soda-peanut-grapes.jpg',
-  'img/cards/soda-russian.jpg'
-];
-
-var CONTENTS = [
-  'молоко',
-  'сливки',
-  'вода',
-  'пищевой краситель',
-  'патока',
-  'ароматизатор бекона',
-  'ароматизатор свинца',
-  'ароматизатор дуба, идентичный натуральному',
-  'ароматизатор картофеля',
-  'лимонная кислота',
-  'загуститель',
-  'эмульгатор',
-  'консервант: сорбат калия',
-  'посолочная смесь: соль, нитрат натрия',
-  'ксилит',
-  'карбамид',
-  'вилларибо',
-  'виллабаджо'
-];
+var COMMODITY_HTML_ID_HEAD = 'commodity';
+var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
 
 var GOODS_TEMPLATE_ID = 'card';
 var GOODS_HTML_TAG_CLASS = 'catalog__cards';
@@ -122,158 +14,159 @@ var GOODS_HTML_TAG_CLASS = 'catalog__cards';
 var TROLLEY_TEMPLATE_ID = 'card-order';
 var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
 
-var Commodity = function (
-    name,
-    picture,
-    amount,
-    price,
-    weight,
-    rating,
-    nutritionFacts
-) {
-
-  this.name = name;
-  this.picture = picture;
-  this.amount = amount;
-  this.price = price;
-  this.weight = weight;
-  this.rating = rating;
-  this.nutritionFacts = nutritionFacts;
-};
-
+var GOODS_IN_TROLLEY_COUNT = 3;
 
 /*
  * Main logic
  */
 
-(function () {
-  var goods = generateGoods(GOODS_COUNT);
-  var domGoods = createDomOfGoodsFromTemplate(goods, GOODS_TEMPLATE_ID);
-  removeCssClass('catalog__cards', 'catalog__cards--load');
-  addCssClass('catalog__load', 'visually-hidden');
-  renderGoods(domGoods, GOODS_HTML_TAG_CLASS);
+var catalog;
+var catalogDom;
 
-  var trolleyGoods = fulfillTrolley(goods, GOODS_IN_TROLLEY_COUNT);
-  var domTrolleyGoods = createDomOfTrolleyGoodsFromTemplate(trolleyGoods, TROLLEY_TEMPLATE_ID);
-  renderTrolley(domTrolleyGoods, TROLLEY_HTML_TAG_CLASS);
-  addCssClass('goods__card-empty', 'visually-hidden');
-  removeCssClass('goods__cards', 'goods__cards--empty');
+(function () {
+  catalog = new Catalog(window.mockGoods.get);
+  catalogDom = new CatalogDom(catalog.getGoods(), GOODS_TEMPLATE_ID);
+  renderGoods(catalogDom.getElements(), GOODS_HTML_TAG_CLASS);
+
+  putRandomGoodsInTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
+  setInterfaceHandlers();
 })();
 
 
 /*
- * Generate catalog of goods
+ * Make catalog of goods
  */
 
-function generateGoods(count) {
-  var goods = [];
-  for (var i = 0; i < count; i++) {
-    var commodity = fulfillCommodity(generateCommodity());
-    goods.push(commodity);
+function Catalog(loadFunction) {
+  this.getGoods = function () {
+    return this.goods;
+  };
+
+  this.getTrolley = function () {
+    var result = this.goods.filter(function (item) {
+      return item.trolleyAmount > 0;
+    });
+    return result;
+  };
+
+  this.getElement = function (id) {
+    return this.goods[id];
+  };
+
+  this.getAmount = function (id) {
+    return this.goods[id].amount;
+  };
+
+  this.getTrolleyAmount = function (id) {
+    return this.goods[id].trolleyAmount;
+  };
+
+  this.getTotalAmount = function (id) {
+    return this.getAmount(id) + this.getTrolleyAmount(id);
+  };
+
+  this.getCount = function () {
+    return this.goods.length;
+  };
+
+  this.addToTrolley = function (id, amount) {
+    if (this.goods[id].amount >= amount) {
+      this.goods[id].amount -= amount;
+      this.goods[id].trolleyAmount += amount;
+      return true;
+    }
+    return false;
+  };
+
+  this.setTrolleyAmount = function (id, amount) {
+    var addition = amount - this.getTrolleyAmount(id);
+    this.addToTrolley(id, addition);
+  };
+
+  this.isTrolleyEmpty = function () {
+    function trolleyAmountEmpty(item) {
+      return item.trolleyAmount <= 0;
+    }
+
+    var result = this.goods.every(trolleyAmountEmpty);
+    return result;
+  };
+
+  this.toggleFavorite = function (id) {
+    this.goods[id].favorite = !this.goods[id].favorite;
+    return this.goods[id].favorite;
+  };
+
+  this.getFavoriteStatus = function (id) {
+    return this.goods[id].favorite;
+  };
+
+  this.decreaseTrolley = function (id, amount) {
+    var actualDecrease = Math.min(amount, this.goods[id].trolleyAmount);
+    this.goods[id].amount += actualDecrease;
+    this.goods[id].trolleyAmount -= actualDecrease;
+  };
+
+  // Costructor of the class
+
+  this.goods = loadFunction();
+}
+
+function putRandomGoodsInTrolley(goods, amount) {
+  for (var i = 0; i < amount; i++) {
+    var index = window.utils.randomInRange(0, goods.length);
+    catalog.addToTrolley(index, 1);
+    updateDomGoods(index);
+    updateDomTrolley(index);
   }
-  return goods;
 }
-
-function generateCommodity() {
-  return new Commodity();
-}
-
-function fulfillCommodity(commodity) {
-  commodity.name = getName();
-  commodity.picture = getPicture();
-  commodity.amount = getAmount();
-  commodity.price = getPrice();
-  commodity.weight = getWeight();
-  commodity.rating = getRating();
-  commodity.nutritionFacts = getNutritionFacts();
-  return commodity;
-}
-
-function getName() {
-  return getRandomItemFromList(NAMES);
-}
-
-function getPicture() {
-  return getRandomItemFromList(PICTURES);
-}
-
-function getAmount() {
-  return randomInRangeUpTo(AMOUNT_MIN, AMOUNT_MAX, AMOUNT_PRECISION);
-}
-
-function getPrice() {
-  return randomInRange(PRICE_MIN, PRICE_MAX, PRICE_PRECISION);
-}
-
-function getWeight() {
-  return randomInRange(WEIGHT_MIN, WEIGHT_MAX, WEIGHT_PRECISION);
-}
-
-function getRating() {
-  var rating = {};
-  rating.value = getRatingValue();
-  rating.number = getRatingNumber();
-  return rating;
-}
-
-function getNutritionFacts() {
-  var nutritionFacts = {};
-  nutritionFacts.sugar = getSugar();
-  nutritionFacts.energy = getEnergy();
-  nutritionFacts.contents = getContents();
-  return nutritionFacts;
-}
-
-function getSugar() {
-  var result = getRandomItemFromList(SUGARS);
-  return result;
-}
-
-function getEnergy() {
-  return randomInRangeUpTo(ENERGY_MIN, ENERGY_MAX);
-}
-
-function getContents() {
-  var randomContents = getRandomListFromList(CONTENTS);
-  var result = randomContents.join('; ');
-  result += '.';
-  return result;
-}
-
-function getRatingValue() {
-  return randomInRangeUpTo(RATING_VALUE_MIN, RATING_VALUE_MAX);
-}
-
-function getRatingNumber() {
-  return randomInRangeUpTo(RATING_NUMBER_MIN, RATING_NUMBER_MAX);
-}
-
 
 /*
  * Make DOM from the catalog of goods
  */
 
-function createDomOfGoodsFromTemplate(goods, templateHtmlId) {
-  var domElements = [];
+
+function CatalogDom(goods, templateHtmlId) {
+  this.getElements = function () {
+    return this.elements;
+  };
+
+  this.getElement = function (id) {
+    return this.elements[id];
+  };
+
+  this.getCommodityDomElement = function (id) {
+    var htmlId = idToHtmlId(id);
+    var el = document.querySelector(htmlId);
+    return el;
+  };
+
+  this.createCommodityNode = function (commodity) {
+    var template = document.querySelector('#' + this.templateHtmlId);
+    var newDom = template.content.cloneNode(true);
+
+    setCommodityHtmlIds(newDom, commodity.id);
+    setCommodityName(newDom, commodity.name);
+    setCommodityImage(newDom, commodity.picture, commodity.name);
+    setCommodityPrice(newDom, commodity.price);
+    setCommodityWeight(newDom, commodity.weight);
+    setCommodityStockAmount(newDom, commodity.amount);
+    setCommodityRating(newDom, commodity.rating);
+    setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
+    setCommodityFavorite(newDom, commodity.favorite);
+    setCommodityHandlers(newDom);
+    return newDom;
+  };
+
+
+  // Constructor body
+
+  this.templateHtmlId = templateHtmlId;
+  this.elements = [];
   for (var i = 0; i < goods.length; i++) {
-    var domElement = createDomOfCommodityFromTemplate(goods[i], templateHtmlId);
-    domElements.push(domElement);
+    var node = this.createCommodityNode(goods[i]);
+    this.elements.push(node);
   }
-  return domElements;
-}
-
-function createDomOfCommodityFromTemplate(commodity, templateHtmlId) {
-  var template = document.querySelector('#' + templateHtmlId);
-  var newDom = template.content.cloneNode(true);
-
-  setCommodityName(newDom, commodity.name);
-  setCommodityImage(newDom, commodity.picture, commodity.name);
-  setCommodityPrice(newDom, commodity.price);
-  setCommodityWeight(newDom, commodity.weight);
-  setCommodityStockAmount(newDom, commodity.amount);
-  setCommodityRating(newDom, commodity.rating);
-  setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
-  return newDom;
 }
 
 function setCommodityName(dom, data) {
@@ -292,13 +185,15 @@ function setCommodityStockAmount(dom, data) {
   if (data > 5) {
     htmlClass = 'card--in-stock';
   } else if (data >= 1 && data <= 5) {
-    htmlClass = 'card-little';
+    htmlClass = 'card--little';
   } else if (data === 0) {
-    htmlClass = 'card-soon';
+    htmlClass = 'card--soon';
   }
 
-  var element = dom.querySelector('.catalog__card');
+  var element = window.utils.querySelectorIncludingSelf(dom, '.catalog__card');
   element.classList.remove('card--in-stock');
+  element.classList.remove('card--little');
+  element.classList.remove('card--soon');
   element.classList.add(htmlClass);
 }
 
@@ -362,6 +257,242 @@ function setCommodityNutritionFacts(dom, data) {
   element.textContent = sugarAndEnergy;
 }
 
+function setCommodityHtmlIds(dom, id) {
+  var element = dom.querySelector('.catalog__card');
+  element.id = idToHtmlId(id);
+}
+
+function setCommodityFavorite(dom, isFavorite) {
+  var favorite = dom.querySelector('.card__btn-favorite');
+  if (isFavorite) {
+    favorite.classList.add('card__btn-favorite--selected');
+  } else {
+    favorite.classList.remove('card__btn-favorite--selected');
+  }
+}
+
+function updateDomFavorite(commodityId, favoriteStatus) {
+  var commodityHtmlId = idToHtmlId(commodityId);
+  var commoditySelector = window.utils.htmlIdToHtmlSelector(commodityHtmlId);
+  var commodityNode = document.querySelector(commoditySelector);
+  setCommodityFavorite(commodityNode, favoriteStatus);
+}
+
+function updateDomGoods(commodityId) {
+  var commodityHtmlId = idToHtmlId(commodityId);
+  var commoditySelector = window.utils.htmlIdToHtmlSelector(commodityHtmlId);
+  var commodityNode = document.querySelector(commoditySelector);
+  var amount = catalog.getAmount(commodityId);
+  setCommodityStockAmount(commodityNode, amount);
+}
+
+function updateDomTrolley(commodityId) {
+  var trolleyAmount = catalog.getTrolleyAmount(commodityId);
+  if (trolleyAmount <= 0) {
+    deleteDisplayingFromTrolley(commodityId);
+    if (catalog.isTrolleyEmpty()) {
+      window.utils.showHtmlSelector('.goods__card-empty');
+      window.utils.addCssClass('goods__cards', 'goods__cards--empty');
+    }
+    return;
+  }
+
+  if (isShownInTrolley(commodityId)) {
+    var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+    var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
+    var commodityNode = document.querySelector(htmlTrolleySelector);
+    setTrolleyCommodityAmount(commodityNode, trolleyAmount);
+  } else {
+    var commodity = catalog.getElement(commodityId);
+    var domElement = createDomOfTrolleyCommodityFromTemplate(
+        commodity,
+        TROLLEY_TEMPLATE_ID
+    );
+    renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
+  }
+  window.utils.hideHtmlSelector('.goods__card-empty');
+  window.utils.removeCssClass('goods__cards', 'goods__cards--empty');
+}
+
+
+/*
+ * Goods' elements handlers
+ */
+
+function setCommodityHandlers(dom) {
+  var favoriteNode = dom.querySelector('.card__btn-favorite');
+  favoriteNode.addEventListener('click', clickFavoriteHandler);
+
+  var addToTrolleyNode = dom.querySelector('.card__btn');
+  addToTrolleyNode.addEventListener('click', clickAddToTrolley);
+
+  function clickFavoriteHandler(evt) {
+    var commodityId = findParentCommodityId(evt);
+    catalog.toggleFavorite(commodityId);
+    var favoriteStatus = catalog.getFavoriteStatus(commodityId);
+    updateDomFavorite(commodityId, favoriteStatus);
+  }
+
+  function clickAddToTrolley(evt) {
+    var commodityId = findParentCommodityId(evt);
+    catalog.addToTrolley(commodityId, 1);
+    updateDomGoods(commodityId);
+    updateDomTrolley(commodityId);
+  }
+}
+
+/*
+ * Trolley elements handlers
+ */
+
+function setTrolleyElementHandlers(dom) {
+  var node = dom.querySelector('.card-order');
+  node.addEventListener('click', clickTrolleyElement);
+  node.addEventListener('change', enterTrolleyElement);
+  return;
+}
+
+function clickTrolleyElement(evt) {
+  var commodityId = findParentCommodityId(evt);
+
+  if (evt.target.classList.contains('card-order__btn--increase')) {
+    catalog.addToTrolley(commodityId, 1);
+
+  } else if (evt.target.classList.contains('card-order__btn--decrease')) {
+    catalog.decreaseTrolley(commodityId, 1);
+
+  } else if (evt.target.classList.contains('card-order__close')) {
+    catalog.decreaseTrolley(commodityId, Infinity);
+
+  } else {
+    return;
+  }
+  updateDomGoods(commodityId);
+  updateDomTrolley(commodityId);
+}
+
+function enterTrolleyElement(evt) {
+  var commodityId = findParentCommodityId(evt);
+  var previousValue = catalog.getTrolleyAmount(commodityId);
+  var maxAmount = catalog.getTotalAmount(commodityId);
+  var newValue = getElementTrolleyAmountInDom(commodityId) / 1.0;
+
+  if (evt.target.classList.contains('card-order__count')) {
+    if (
+      newValue > maxAmount ||
+        newValue <= 0 ||
+        !window.utils.isNumber(newValue)
+    ) {
+      setTrolleyCommodityAmountInDom(commodityId, previousValue);
+      return;
+
+    } else {
+      catalog.setTrolleyAmount(commodityId, newValue);
+    }
+    updateDomGoods(commodityId);
+    updateDomTrolley(commodityId);
+  }
+}
+
+function deleteTrolleyElementHandlers(dom) {
+  dom.removeEventListener('click', clickTrolleyElement);
+  dom.removeEventListener('change', enterTrolleyElement);
+}
+
+
+/*
+ * Payment handlers
+ */
+
+function setPaymentHandlers() {
+  var paymentTypeSelector = '.toggle-btn';
+  var nodeCash = document.querySelector(paymentTypeSelector);
+  nodeCash.addEventListener('click', clickCashPay);
+
+  function clickCashPay() {
+    var cardLabelSelector = '.toggle-btn__input[value="card"]';
+    var cashLabelSelector = '.toggle-btn__input[value="cash"]';
+    var cardFormSelector = '.payment__card-wrap';
+
+    if (window.utils.isChecked(cardLabelSelector)) {
+      window.utils.showHtmlSelector(cardFormSelector);
+
+    } else if (window.utils.isChecked(cashLabelSelector)) {
+      window.utils.hideHtmlSelector(cardFormSelector);
+
+    } else {
+      return;
+    }
+  }
+}
+
+
+function isShownInTrolley(commodityId) {
+  var htmlIdToSearch = idToHtmlTrolleyId(commodityId);
+  var nodes = document.querySelectorAll('.goods_card.card-order');
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].id === htmlIdToSearch) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function idToHtmlId(id) {
+  return COMMODITY_HTML_ID_HEAD + id;
+}
+
+function idToHtmlTrolleyId(id) {
+  return TROLLEY_HTML_ID_HEAD + id;
+}
+
+function htmlIdToId(htmlId) {
+  if (isCommodityHtmlId(htmlId)) {
+    var id = htmlId.slice(COMMODITY_HTML_ID_HEAD.length, htmlId.length);
+    return id;
+  }
+  return undefined;
+}
+
+function trolleyIdToId(htmlId) {
+  if (isTrolleyHtmlId(htmlId)) {
+    var id = htmlId.slice(TROLLEY_HTML_ID_HEAD.length, htmlId.length);
+    return id;
+  }
+  return undefined;
+}
+
+function isCommodityHtmlId(id) {
+  var firstLetters = id.slice(0, COMMODITY_HTML_ID_HEAD.length);
+  if (firstLetters === COMMODITY_HTML_ID_HEAD) {
+    return true;
+  }
+  return false;
+}
+
+function isTrolleyHtmlId(htmlId) {
+  var firstLetters = htmlId.slice(0, TROLLEY_HTML_ID_HEAD.length);
+  if (firstLetters === TROLLEY_HTML_ID_HEAD) {
+    return true;
+  }
+  return false;
+}
+
+function findParentCommodityId(htmlClasses) {
+  for (var i = 0; i < htmlClasses.path.length; i++) {
+    var htmlClass = htmlClasses.path[i].id;
+
+    if (isCommodityHtmlId(htmlClass)) {
+      return htmlIdToId(htmlClass);
+    }
+
+    if (isTrolleyHtmlId(htmlClass)) {
+      return trolleyIdToId(htmlClass);
+    }
+  }
+  return undefined;
+}
+
 
 /*
  * Render DOM of the catalog of goods
@@ -369,28 +500,18 @@ function setCommodityNutritionFacts(dom, data) {
 
 function renderGoods(domElements, htmlClass) {
   for (var i = 0; i < domElements.length; i++) {
-    renderItemInGoods(domElements[i], htmlClass);
+    renderCommodity(domElements[i], htmlClass);
+  }
+  if (domElements.length > 0) {
+    window.utils.removeCssClass('catalog__cards', 'catalog__cards--load');
+    window.utils.hideHtmlSelector('.catalog__load');
   }
 }
 
-function renderItemInGoods(domElement, htmlClass) {
-  var htmlTag = '.' + htmlClass;
-  var addTo = document.querySelector(htmlTag);
-  addTo.appendChild(domElement);
-}
-
-
-/*
- * Generate trolley content from the list of goods
- */
-
-function fulfillTrolley(list, count) {
-  var goodsInTrolley = [];
-  for (var i = 0; i < count; i++) {
-    var newGood = getRandomItemFromList(list);
-    goodsInTrolley.push(newGood);
-  }
-  return goodsInTrolley;
+function renderCommodity(domElement, htmlClass) {
+  var htmlSelector = window.utils.htmlClassToSelector(htmlClass);
+  var dom = document.querySelector(htmlSelector);
+  dom.appendChild(domElement);
 }
 
 
@@ -398,25 +519,54 @@ function fulfillTrolley(list, count) {
  * Make DOM from the trolley content
  */
 
-function createDomOfTrolleyGoodsFromTemplate(goods, templateHtmlId) {
-  var domElements = [];
-  for (var i = 0; i < goods.length; i++) {
-    var domElement = createDomOfTrolleyCommodityFromTemplate(goods[i], templateHtmlId);
-    domElements.push(domElement);
-  }
-  return domElements;
-}
-
 function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
-  var htmlTag = '#' + templateHtmlId;
-  var template = document.querySelector(htmlTag);
+  var htmlSelector = window.utils.htmlIdToHtmlSelector(templateHtmlId);
+  var template = document.querySelector(htmlSelector);
   var newDom = template.content.cloneNode(true);
 
+  setTrolleyCommodityHtmlId(newDom, commodity.id);
   setTrolleyCommodityName(newDom, commodity.name);
-  setTrolleyCommodityImage(newDom, commodity.picture);
+  setTrolleyCommodityImage(newDom, commodity.picture, commodity.name);
   setTrolleyCommodityPrice(newDom, commodity.price);
-
+  setTrolleyCommodityAmount(newDom, commodity.trolleyAmount);
+  setTrolleyElementHandlers(newDom);
   return newDom;
+}
+
+function setTrolleyCommodityHtmlId(dom, id) {
+  var element = window.utils.querySelectorIncludingSelf(dom, '.card-order');
+  element.id = idToHtmlTrolleyId(id);
+}
+
+function setTrolleyCommodityAmount(dom, trolleyAmount) {
+  var amountNode = window.utils.querySelectorIncludingSelf(dom, '.card-order__count');
+  amountNode.value = trolleyAmount;
+}
+
+function setTrolleyCommodityAmountInDom(commodityId, trolleyAmount) {
+  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
+  var amountNode = document.querySelector(htmlTrolleySelector);
+  var node = amountNode.querySelector('.card-order__count');
+  node.value = trolleyAmount;
+}
+
+function getElementTrolleyAmountInDom(commodityId) {
+  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
+  var amountNode = document.querySelector(htmlTrolleySelector);
+  var node = amountNode.querySelector('.card-order__count');
+  return node.value;
+}
+
+function deleteDisplayingFromTrolley(commodityId) {
+  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
+  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
+  var commodityNode = document.querySelector(htmlTrolleySelector);
+  if (commodityNode) {
+    deleteTrolleyElementHandlers(commodityNode);
+    commodityNode.remove();
+  }
 }
 
 function setTrolleyCommodityName(dom, name) {
@@ -424,10 +574,10 @@ function setTrolleyCommodityName(dom, name) {
   element.textContent = name;
 }
 
-function setTrolleyCommodityImage(dom, value) {
+function setTrolleyCommodityImage(dom, imageUrl, imageAlt) {
   var element = dom.querySelector('.card-order__img');
-  element.src = value;
-  element.alt = WAT;
+  element.src = imageUrl;
+  element.alt = imageAlt;
 }
 
 function setTrolleyCommodityPrice(dom, value) {
@@ -440,87 +590,14 @@ function setTrolleyCommodityPrice(dom, value) {
  * Render DOM of the trolley content
  */
 
-function renderTrolley(domElements, htmlClass) {
-  for (var i = 0; i < domElements.length; i++) {
-    renderItemInTrolley(domElements[i], htmlClass);
-  }
-}
-
 function renderItemInTrolley(domElement, htmlClass) {
-  var htmlTag = '.' + htmlClass;
-  var addTo = document.querySelector(htmlTag);
+  var htmlSelector = window.utils.htmlClassToSelector(htmlClass);
+  var addTo = document.querySelector(htmlSelector);
   addTo.appendChild(domElement);
 }
 
-
-/*
- * Miscelaneous not task-oriented utility functions
- */
-
-function removeCssClass(objectClass, classToBeRemoved) {
-  var domObjects = getDomObjectsByClassName(objectClass);
-  for (var i = 0; i < domObjects.length; i++) {
-    domObjects[i].classList.remove(classToBeRemoved);
-  }
-}
-
-function addCssClass(objectClass, classToBeAdded) {
-  var domObjects = getDomObjectsByClassName(objectClass);
-  for (var i = 0; i < domObjects.length; i++) {
-    domObjects[i].classList.add(classToBeAdded);
-  }
-}
-
-function getDomObjectsByClassName(objectClass) {
-  var domId = '.' + objectClass;
-  var domObjects = document.querySelectorAll(domId);
-  return domObjects;
-}
-
-function getRandomItemFromList(list) {
-  if (list.length === 0) {
-    return list;
-  }
-
-  var index = randomInRange(0, list.length);
-  return list[index];
-}
-
-function getRandomListFromList(list) {
-  if (list.length === 0) {
-    return list;
-  }
-  var newList = list.filter(function () {
-    return randomInRangeUpTo(0, 1) === 0;
-  });
-
-  if (newList.length === 0) {
-    newList = list[0];
-  }
-  return newList;
-}
-
-function randomInRangeUpTo(from, upTo, precision) {
-  var to = upTo + 1;
-  return randomInRange(from, to, precision);
-}
-
-function randomInRange(from, to, precision) {
-  if (precision === undefined) {
-    precision = 0;
-  }
-
-  var result = (Math.random(to - from) * to + from);
-  if (precision === 0) {
-    return Math.floor(result);
-  }
-
-  result = result.toFixed(precision) / 1;
-  if (result > to) {
-    result = to;
-  }
-  if (result < from) {
-    result = from;
-  }
-  return result;
+function setInterfaceHandlers() {
+  var paymentSelector = '.payment';
+  var node = document.querySelector(paymentSelector);
+  node.addEventListener('click', setPaymentHandlers);
 }
