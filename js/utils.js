@@ -180,28 +180,36 @@
     node.addEventListener(type, cb);
   }
 
-  window.utils.luhnCheck = function (cardNumber) {
-    var numbers = cardNumber.toString(10).split(' ');
+  window.utils.isLuhnChecked = function (cardNumber) {
+    var noSpaces = window.utils.trimAll(cardNumber.toString());
+    if (noSpaces.length !== 16) {
+      return false;
+    }
+    var numbers = noSpaces.split('');
     var semiDoubled = numbers.map(semiDouble);
     var sum = semiDoubled.reduce(window.utils.sum, 0);
-    return !(sum % 10 === 0);
+    return (sum % 10 === 0);
 
     function semiDouble (char, index) {
       var digit = parseInt(char);
-      if (isEven(index)) {
+      if (window.utils.isEven(index)) {
         var digitDoubled = digit * 2;
         digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
       }
       return digit;
     };
+  }
 
-    function isEven(a) {
-      return a % 2 === 0;
-    }
+  window.utils.isEven = function (a) {
+    return a % 2 === 0;
   }
 
   window.utils.sum = function (a, b) {
     return b ? a + b : a;
+  }
+
+  window.utils.trimAll = function (s) {
+    return s.replace(/\s/g,'');
   }
 
   window.utils.omitPx = function (px) {
