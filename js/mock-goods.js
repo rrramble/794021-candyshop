@@ -14,7 +14,7 @@
   var MOCK_GOODS_COUNT = 20;
 
   var AMOUNT_MIN = 0;
-  var AMOUNT_MAX = 100;
+  var AMOUNT_MAX = 20;
 
   var PRICE_MIN = 100;
   var PRICE_MAX = 1500;

@@ -69,12 +69,6 @@
     return newList;
   };
 
-  window.utils.showHtmlSelector = function (htmlSelector) {
-    var el = document.querySelector(htmlSelector);
-    var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
-    el.classList.remove(className);
-  };
-
   window.utils.htmlClassFromSelector = function (htmlSelector) {
     var firstChar = htmlSelector[0];
     if (firstChar === '.') {
@@ -83,8 +77,14 @@
     return undefined;
   };
 
-  window.utils.hideHtmlSelector = function (htmlSelector) {
-    var el = document.querySelector(htmlSelector);
+  window.utils.showHtmlSelector = function (node, htmlSelector) {
+    var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
+    el.classList.remove(className);
+  };
+
+  window.utils.hideHtmlSelector = function (node, htmlSelector) {
+    var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
     el.classList.add(className);
   };
@@ -128,4 +128,80 @@
     return '#' + id;
   };
 
+  window.utils.isInRange= function (value, from, to) {
+    return (value >= from && value < to);
+  };
+
+  window.utils.setDomId = function (node, htmlSelector, data) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    subNode.id = data;
+  }
+
+  window.utils.setDomTextContent = function (node, htmlSelector, data) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    subNode.textContent = data;
+  }
+
+  window.utils.setDomImage = function (node, htmlSelector, imageUrl, imageAlt) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    var actualUrl = imageUrl;
+    if (!imageUrl) {
+      actualUrl = '';
+    }
+    subNode.src = actualUrl;
+
+    if (imageAlt) {
+      subNode.alt = imageAlt;
+    }
+  }
+
+  window.utils.setDomValue = function (node, selector, data) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, selector);
+    subNode.value = data;
+  }
+
+  window.utils.setDomName = function (node, selector, data) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, selector);
+    subNode.name = data;
+  }
+
+  window.utils.replaceDomItem = function (mainDomObject, oldChildSelector, newChildNode) {
+    var startDomObject = mainDomObject;
+    if (!mainDomObject) {
+      startDomObject = document;
+    }
+    var parentNode = startDomObject.querySelector(oldChildSelector).parentNode;
+    var oldChildNode = parentNode.querySelector(oldChildSelector);
+    parentNode.replaceChild(newChildNode, oldChildNode);
+  }
+
+  window.utils.setDomHandlers = function (domNode, htmlSelector, cb, type) {
+    var node = domNode.querySelector(htmlSelector);
+    node.addEventListener(type, cb);
+  }
+
+  window.utils.luhnCheck = function (cardNumber) {
+    numbers = cardNumber.toString(10).split(' ');
+    semiDoubled = numbers.map(iter);
+    return !(semiDoubled.reduce(window.utils.sum, 0) % 10 === 0);
+
+    function iter (char, index) {
+      var digit = parseInt(char);
+      if (isEven(index)) {
+        var digitDoubled = digit * 2;
+        digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
+      }
+      return digit;
+    };
+
+    function isEven(a) {
+      return a % 2 === 0;
+    }
+  }
+
+  window.utils.sum = function (a, b) {
+    return b ? a + b : a;
+  }
+
 })();
+
