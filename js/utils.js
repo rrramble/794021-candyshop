@@ -181,11 +181,12 @@
   }
 
   window.utils.luhnCheck = function (cardNumber) {
-    numbers = cardNumber.toString(10).split(' ');
-    semiDoubled = numbers.map(iter);
-    return !(semiDoubled.reduce(window.utils.sum, 0) % 10 === 0);
+    var numbers = cardNumber.toString(10).split(' ');
+    var semiDoubled = numbers.map(semiDouble);
+    var sum = semiDoubled.reduce(window.utils.sum, 0);
+    return !(sum % 10 === 0);
 
-    function iter (char, index) {
+    function semiDouble (char, index) {
       var digit = parseInt(char);
       if (isEven(index)) {
         var digitDoubled = digit * 2;
