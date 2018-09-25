@@ -35,7 +35,8 @@ var FILTER = {
   RANGE_MIN_BTN_CLASS: 'range__btn--left',
   RANGE_MAX_BTN_CLASS: 'range__btn--right',
   MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
-  MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max'
+  MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
+  RANGE_BTN_PARENT_SELECTOR: '.range__filter'
 }
 
 var GOODS_IN_TROLLEY_COUNT = 3;
@@ -82,22 +83,22 @@ var GOODS_IN_TROLLEY_COUNT = 3;
 
   }
 
-  function paymentHandlers(evt) {
+  function paymentHandlers (evt) {
     switch(true) {
       case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
         window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
         break;
 
       case (window.utils.isChecked(PAYMENT.CASH_LABEL_SELECTOR)):
-        window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR); 
+        window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
         break;
     }
   }
 
-  function deliveryHandlers(evt) {
+  function deliveryHandlers (evt) {
     switch(true) {
       case (window.utils.isChecked(DELIVERY.BY_COURIER_SELECTOR)):
-        window.utils.hideHtmlSelector(document, DELIVERY.SUBWAY_STATIONS_SELECTOR); 
+        window.utils.hideHtmlSelector(document, DELIVERY.SUBWAY_STATIONS_SELECTOR);
         break;
 
       case (window.utils.isChecked(DELIVERY.SELF_TAKE_OUT_SELECTOR)):
@@ -106,7 +107,7 @@ var GOODS_IN_TROLLEY_COUNT = 3;
     }
   }
 
-  function filterHandlers(evt) {
+  function filterHandlers (evt) {
     switch(true) {
       case (evt.target.classList.contains(FILTER.RANGE_MIN_BTN_CLASS)):
         updateSliderPositionValue();
@@ -118,11 +119,22 @@ var GOODS_IN_TROLLEY_COUNT = 3;
     }
   }
 
-  function updateSliderPositionValue() {
-    var minSliderValue = 60; ///// Needs to make and use  function to calculate the actual value
-    var maxSliderValue = 230; ///// Needs to make and use  function to calculate the actual value
+  function updateSliderPositionValue () {
+    var minSliderValue = getMinSliderValue();
+    var maxSliderValue = getMaxSliderValue();
     window.utils.setDomTextContent(document, FILTER.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
     window.utils.setDomTextContent(document, FILTER.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
+
+    function getMinSliderValue () {
+      var parentWidth = window.utils.getHtmlSelectorWidth(FILTER.RANGE_BTN_PARENT_SELECTOR);
+      var width = window.utils.getHtmlClassLeftProperty(FILTER.RANGE_MIN_BTN_CLASS);
+      return window.utils.intPercent(parentWidth, width);
+    }
+    function getMaxSliderValue () {
+      var parentWidth = window.utils.getHtmlSelectorWidth(FILTER.RANGE_BTN_PARENT_SELECTOR);
+      var width = window.utils.getHtmlClassRightProperty(FILTER.RANGE_MAX_BTN_CLASS);
+      return window.utils.intPercent(parentWidth, parentWidth - width);
+    }
   }
 
 })();
