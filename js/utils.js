@@ -203,5 +203,9 @@
     return b ? a + b : a;
   }
 
+  window.utils.omitPx(px) {
+    return px.parseInt();
+  }
+
 })();
 
