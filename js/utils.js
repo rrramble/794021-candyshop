@@ -160,6 +160,11 @@
     subNode.value = data;
   }
 
+  window.utils.getDomValue = function (node, selector, data) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, selector);
+    return subNode.value;
+  }
+
   window.utils.setDomName = function (node, selector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     subNode.name = data;
@@ -246,6 +251,21 @@
       percent = 100;
     }
     return percent.toFixed(0);
+  }
+
+  window.utils.disableButton = function (selector, node) {
+    var baseNode = node ? node : document;
+    baseNode.querySelector(selector).disabled = true;
+  }
+
+  window.utils.enableButton = function (selector, node) {
+    var baseNode = node ? node : document;
+    baseNode.querySelector(selector).disabled = false;
+  }
+
+  window.utils.setInputToBeRequired = function (isToBeRequired, selector, node) {
+    var baseNode = node ? node : document;
+    baseNode.querySelector(selector).required = isToBeRequired;
   }
 
 })();
