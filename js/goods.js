@@ -30,6 +30,14 @@ var DELIVERY = {
   SUBWAY_STATIONS_SELECTOR: '.deliver__stores'
 }
 
+var FILTER = {
+  MAIN_SELECTOR: '.catalog__filter.range',
+  RANGE_MIN_BTN_CLASS: 'range__btn--left',
+  RANGE_MAX_BTN_CLASS: 'range__btn--right',
+  MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
+  MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max'
+}
+
 var GOODS_IN_TROLLEY_COUNT = 3;
 
 (function () {
@@ -64,6 +72,14 @@ var GOODS_IN_TROLLEY_COUNT = 3;
       deliveryHandlers,
       'click'
     );
+
+    window.utils.setDomHandlers(
+      document,
+      FILTER.MAIN_SELECTOR,
+      filterHandlers,
+      'mouseup'
+    );
+
   }
 
   function paymentHandlers(evt) {
@@ -88,6 +104,25 @@ var GOODS_IN_TROLLEY_COUNT = 3;
         window.utils.showHtmlSelector(document, DELIVERY.SUBWAY_STATIONS_SELECTOR);
         break;
     }
+  }
+
+  function filterHandlers(evt) {
+    switch(true) {
+      case (evt.target.classList.contains(FILTER.RANGE_MIN_BTN_CLASS)):
+        updateSliderPositionValue();
+        break;
+
+      case (evt.target.classList.contains(FILTER.RANGE_MAX_BTN_CLASS)):
+        updateSliderPositionValue();
+        break;
+    }
+  }
+
+  function updateSliderPositionValue() {
+    var minSliderValue = 60; ///// Needs to make and use  function to calculate the actual value
+    var maxSliderValue = 230; ///// Needs to make and use  function to calculate the actual value
+    window.utils.setDomTextContent(document, FILTER.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
+    window.utils.setDomTextContent(document, FILTER.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
   }
 
 })();
