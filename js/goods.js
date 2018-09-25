@@ -5,43 +5,59 @@
  * https://up.htmlacademy.ru/javascript/15/tasks/16
  */
 
-var COMMODITY_HTML_ID_HEAD = 'commodity';
-var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
-
-var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
-var GOODS_HTML_SELECTOR = '.catalog__cards';
-
-var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
-var TROLLEY_HTML_SELECTOR = '.goods__cards';
-
-var PAYMENT = {
-  MAIN_SELECTOR: '.payment',
-  METHOD_SELECTOR: '.payment__method',
-  CARD_LABEL_SELECTOR: '.toggle-btn__input[value="card"]',
-  CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
-  CARD_FORM_SELECTOR: '.payment__inputs'
-}
-
-var DELIVERY = {
-  MAIN_SELECTOR: '.deliver',
-  METHOD_SELECTOR: '.deliver__toggle',
-  SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
-  BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
-  SUBWAY_STATIONS_SELECTOR: '.deliver__stores'
-}
-
-var FILTER = {
-  MAIN_SELECTOR: '.catalog__filter.range',
-  RANGE_MIN_BTN_CLASS: 'range__btn--left',
-  RANGE_MAX_BTN_CLASS: 'range__btn--right',
-  MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
-  MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
-  RANGE_BTN_PARENT_SELECTOR: '.range__filter'
-}
-
-var GOODS_IN_TROLLEY_COUNT = 3;
-
 (function () {
+
+  var COMMODITY_HTML_ID_HEAD = 'commodity';
+  var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
+
+  var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
+  var GOODS_HTML_SELECTOR = '.catalog__cards';
+
+  var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
+  var TROLLEY_HTML_SELECTOR = '.goods__cards';
+
+  var BUY_FORM = {
+    MAIN_SELECTOR: '.buy',
+    SUBMIT_BTN_SELECTOR: '.buy__submit-btn'
+  }
+
+  var PAYMENT = {
+    MAIN_SELECTOR: '.payment',
+    METHOD_SELECTOR: '.payment__method',
+    CARD_FIELDS_MAIN_SELECTOR: '.payment__card-wrap',
+    CARD_LABEL_SELECTOR: '.toggle-btn__input[value="card"]',
+    CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
+    CARD_FORM_SELECTOR: '.payment__inputs',
+    CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
+    CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
+    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc'
+  }
+
+  var DELIVERY = {
+    MAIN_SELECTOR: '.deliver',
+    METHOD_SELECTOR: '.deliver__toggle',
+    SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
+    BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
+    SUBWAY_STATIONS_SELECTOR: '.deliver__stores'
+  }
+
+  var FILTER = {
+    MAIN_SELECTOR: '.catalog__filter.range',
+    RANGE_MIN_BTN_CLASS: 'range__btn--left',
+    RANGE_MAX_BTN_CLASS: 'range__btn--right',
+    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
+    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
+    RANGE_BTN_PARENT_SELECTOR: '.range__filter'
+  }
+
+  var GOODS_IN_TROLLEY_COUNT = 3;
+
+
+/*
+ * Main code
+ */
+
   var catalog = new window.Catalog(window.mockGoods.get);
   var trolley = new window.Trolley(catalog);
   var dom = new window.Dom(
@@ -60,11 +76,20 @@ var GOODS_IN_TROLLEY_COUNT = 3;
   return;
 
   function setInterfaceHandlers() {
+    window.utils.disableButton(BUY_FORM.SUBMIT_BTN_SELECTOR);
+
     window.utils.setDomHandlers(
       document,
-      PAYMENT.MAIN_SELECTOR,
-      paymentHandlers,
+      PAYMENT.METHOD_SELECTOR,
+      paymentTypeHandlers,
       'click'
+    );
+
+    window.utils.setDomHandlers(
+      document,
+      PAYMENT.CARD_FIELDS_MAIN_SELECTOR,
+      paymentCardEditHandlers,
+      'change'
     );
 
     window.utils.setDomHandlers(
@@ -80,19 +105,49 @@ var GOODS_IN_TROLLEY_COUNT = 3;
       filterHandlers,
       'mouseup'
     );
-
   }
 
-  function paymentHandlers (evt) {
+  function paymentTypeHandlers (evt) {
     switch(true) {
       case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
-        window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+        adjustFormForCardPayment();
         break;
-
       case (window.utils.isChecked(PAYMENT.CASH_LABEL_SELECTOR)):
-        window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+        adjustFormForCashPayment();
         break;
     }
+  }
+
+  function paymentCardEditHandlers (evt) {
+    switch(true) {
+      case (evt.currentTarget.classList.contains(PAYMENT.CARD_NUMBER_INPUT_CLASS)):
+        if (isCardFormValid()) {
+          window.utils.enableButton(BUY_FORM.SUBMIT_BTN_SELECTOR);
+        }
+        break;
+      }
+  }
+
+  function adjustFormForCardPayment () {
+    window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+    setFieldsForCardPayment(true);
+  }
+
+  function adjustFormForCashPayment () {
+    window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+    setFieldsForCardPayment(false);
+  }
+
+  function setFieldsForCardPayment (isToBeSet) {
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+  }
+
+  function isCardFormValid () {
+    var cardNumber = window.utils.getDomValue(BUY_FORM.CARD_NUMBER_INPUT_SELECTOR);
+    var result = window.utils.isLuhmChecked(cardNumber);
   }
 
   function deliveryHandlers (evt) {
