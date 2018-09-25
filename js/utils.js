@@ -203,8 +203,40 @@
     return b ? a + b : a;
   }
 
-  window.utils.omitPx(px) {
-    return px.parseInt();
+  window.utils.omitPx = function (px) {
+    return parseFloat(px.toString());
+  }
+
+  window.utils.getHtmlSelectorProperty = function (property, htmlSelector, node) {
+    var baseNode = node ? node : document;
+    var node = document.querySelector(htmlSelector);
+    var result = window.getComputedStyle(node).getPropertyValue(property);
+    return result;
+  }
+
+  window.utils.getHtmlSelectorWidth = function (htmlSelector, node) {
+    var resultPx = window.utils.getHtmlSelectorProperty('width', htmlSelector, node)
+    return window.utils.omitPx(resultPx);
+  }
+
+  window.utils.getHtmlClassLeftProperty = function (htmlClass, node) {
+    var selector = window.utils.htmlClassToSelector(htmlClass);
+    var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
+    return window.utils.omitPx(leftPx);
+  }
+
+  window.utils.getHtmlClassRightProperty = function (htmlClass, node) {
+    var selector = window.utils.htmlClassToSelector(htmlClass);
+    var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
+    return window.utils.omitPx(rightPx);
+  }
+
+  window.utils.intPercent = function (base, part) {
+    var percent = base !== 0 ? part / base * 100 : 0;
+    if (percent > 100) {
+      percent = 100;
+    }
+    return percent.toFixed(0);
   }
 
 })();
