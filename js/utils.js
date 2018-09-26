@@ -30,6 +30,8 @@
     }
   };
 
+
+
   window.utils.randomInRange = function (from, to) {
     var result = Math.floor(Math.random(to - from) * to + from);
     if (result < from) {
@@ -132,6 +134,10 @@
     return (value >= from && value < to);
   };
 
+  window.utils.isInRangeUpTo= function (value, from, to) {
+    return (value >= from && value <= to);
+  };
+
   window.utils.setDomId = function (node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.id = data;
@@ -160,7 +166,7 @@
     subNode.value = data;
   }
 
-  window.utils.getDomValue = function (node, selector, data) {
+  window.utils.getDomValue = function (node, selector) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     return subNode.value;
   }
@@ -205,6 +211,13 @@
     };
   }
 
+  window.utils.isCvcChecked = function (cvc) {
+    var noFillings = window.utils.trimAll(cvc) / 1;
+    var number = noFillings.toFixed(0);
+    var result = window.utils.isInRangeUpTo(number, 0, 999) && noFillings.length === 3;
+    return result;
+  }
+
   window.utils.isEven = function (a) {
     return a % 2 === 0;
   }
@@ -214,7 +227,9 @@
   }
 
   window.utils.trimAll = function (s) {
-    return s.replace(/\s/g,'');
+    var noSpaces = s.replace(/\s/g,'');
+    var noFillings = noSpaces.replace('.', '').replace('-', '').replace('_', '');
+    return noFillings;
   }
 
   window.utils.omitPx = function (px) {
@@ -266,6 +281,25 @@
   window.utils.setInputToBeRequired = function (isToBeRequired, selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).required = isToBeRequired;
+  }
+
+  ////
+  window.utils.setDomValid = function (shouldBeValid, selector, node) {
+    var baseNode = node ? node : document;
+    var node = baseNode.querySelector(selector);
+    if (shouldBeValid) {
+      node.setCustomValidity('');
+    } else {
+      node.setCustomValidity('Некорретные данные');
+    }
+  }
+
+  window.utils.setInputValidators = function (isToBeRequired, cb, selector, node) {
+    var baseNode = node ? node : document;
+    var node = baseNode.querySelector(selector);
+    if (isToBeRequired) {
+    } else {
+    }
   }
 
 })();

@@ -16,7 +16,16 @@
   var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
   var TROLLEY_HTML_SELECTOR = '.goods__cards';
 
-  var BUY_FORM = {
+  var Filter = {
+    MAIN_SELECTOR: '.catalog__filter.range',
+    RANGE_MIN_BTN_CLASS: 'range__btn--left',
+    RANGE_MAX_BTN_CLASS: 'range__btn--right',
+    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
+    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
+    RANGE_BTN_PARENT_SELECTOR: '.range__filter'
+  }
+
+  var Order = {
     MAIN_SELECTOR: '.buy',
     SUBMIT_BTN_SELECTOR: '.buy__submit-btn'
   }
@@ -29,6 +38,7 @@
     CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
     CARD_FORM_SELECTOR: '.payment__inputs',
     CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
+    CARD_NUMBER_INPUT_CLASS: 'text-input__input',
     CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
     CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
     CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc'
@@ -42,14 +52,6 @@
     SUBWAY_STATIONS_SELECTOR: '.deliver__stores'
   }
 
-  var FILTER = {
-    MAIN_SELECTOR: '.catalog__filter.range',
-    RANGE_MIN_BTN_CLASS: 'range__btn--left',
-    RANGE_MAX_BTN_CLASS: 'range__btn--right',
-    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
-    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
-    RANGE_BTN_PARENT_SELECTOR: '.range__filter'
-  }
 
   var GOODS_IN_TROLLEY_COUNT = 3;
 
@@ -75,33 +77,40 @@
   setInterfaceHandlers();
   return;
 
+  /*
+   * End of main code
+   */
+
+
   function setInterfaceHandlers() {
-    window.utils.disableButton(BUY_FORM.SUBMIT_BTN_SELECTOR);
+    setFieldsForCardPayment(true);
 
     window.utils.setDomHandlers(
-      document,
-      PAYMENT.METHOD_SELECTOR,
+      document, Order.MAIN_SELECTOR,
+      checkFormValidity,
+      'submit'
+    );
+
+    window.utils.setDomHandlers(
+      document, PAYMENT.METHOD_SELECTOR,
       paymentTypeHandlers,
       'click'
     );
 
     window.utils.setDomHandlers(
-      document,
-      PAYMENT.CARD_FIELDS_MAIN_SELECTOR,
-      paymentCardEditHandlers,
+      document, PAYMENT.CARD_FIELDS_MAIN_SELECTOR,
+      paymentCardChangeHandlers,
       'change'
     );
 
     window.utils.setDomHandlers(
-      document,
-      DELIVERY.MAIN_SELECTOR,
+      document, DELIVERY.MAIN_SELECTOR,
       deliveryHandlers,
       'click'
     );
 
     window.utils.setDomHandlers(
-      document,
-      FILTER.MAIN_SELECTOR,
+      document, Filter.MAIN_SELECTOR,
       filterHandlers,
       'mouseup'
     );
@@ -118,12 +127,10 @@
     }
   }
 
-  function paymentCardEditHandlers (evt) {
+  function paymentCardChangeHandlers (evt) {
     switch(true) {
-      case (evt.currentTarget.classList.contains(PAYMENT.CARD_NUMBER_INPUT_CLASS)):
-        if (isCardFormValid()) {
-          window.utils.enableButton(BUY_FORM.SUBMIT_BTN_SELECTOR);
-        }
+      case (evt.srcElement.classList.contains(PAYMENT.CARD_NUMBER_INPUT_CLASS)):
+        checkFormValidity();
         break;
       }
   }
@@ -145,9 +152,39 @@
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
   }
 
-  function isCardFormValid () {
-    var cardNumber = window.utils.getDomValue(BUY_FORM.CARD_NUMBER_INPUT_SELECTOR);
-    var result = window.utils.isLuhmChecked(cardNumber);
+  function checkFormValidity() {
+    switch (true) {
+      case (!isCardNumberValid()):
+        window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        event.preventDefault();
+        break;    
+      case (!isCardCvcValid()):
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        event.preventDefault();
+        break;
+      default:
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    }
+  }
+
+  function isCardNumberValid () {
+    var cardNumber = window.utils.getDomValue(document, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    var result = window.utils.isLuhnChecked(cardNumber);
+    if (!result) {
+      return false;
+    }
+    return true;
+  }
+
+
+  function isCardCvcValid () {
+    var cvc = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    var result = window.utils.isCvcChecked(cvc);
+    if (!result) {
+      return false;
+    }
+    return true;
   }
 
   function deliveryHandlers (evt) {
@@ -164,11 +201,11 @@
 
   function filterHandlers (evt) {
     switch(true) {
-      case (evt.target.classList.contains(FILTER.RANGE_MIN_BTN_CLASS)):
+      case (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)):
         updateSliderPositionValue();
         break;
 
-      case (evt.target.classList.contains(FILTER.RANGE_MAX_BTN_CLASS)):
+      case (evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS)):
         updateSliderPositionValue();
         break;
     }
@@ -177,17 +214,17 @@
   function updateSliderPositionValue () {
     var minSliderValue = getMinSliderValue();
     var maxSliderValue = getMaxSliderValue();
-    window.utils.setDomTextContent(document, FILTER.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
-    window.utils.setDomTextContent(document, FILTER.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
+    window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
+    window.utils.setDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
 
     function getMinSliderValue () {
-      var parentWidth = window.utils.getHtmlSelectorWidth(FILTER.RANGE_BTN_PARENT_SELECTOR);
-      var width = window.utils.getHtmlClassLeftProperty(FILTER.RANGE_MIN_BTN_CLASS);
+      var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
+      var width = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
       return window.utils.intPercent(parentWidth, width);
     }
     function getMaxSliderValue () {
-      var parentWidth = window.utils.getHtmlSelectorWidth(FILTER.RANGE_BTN_PARENT_SELECTOR);
-      var width = window.utils.getHtmlClassRightProperty(FILTER.RANGE_MAX_BTN_CLASS);
+      var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
+      var width = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
       return window.utils.intPercent(parentWidth, parentWidth - width);
     }
   }
