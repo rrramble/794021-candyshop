@@ -52,6 +52,6 @@
 
     // Costructor of the class
     this.goods = loadGoods();
-  }
+  };
 
 })();
