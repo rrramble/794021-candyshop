@@ -26,21 +26,23 @@
     };
 
     this.getCount = function () {
-      var result = this.getGoods().reduce(function(accu, item) {
+      var result = this.getGoods().reduce(function (accu, item) {
         return item.amount > 0 ? ++accu : accu;
       }, 0);
       return result.toFixed(0);
     };
 
     this.getTotalOrderedSum = function () {
-      var result = this.getGoods().reduce(function(accu, item) {
-        return accu += item.amount * item.price;
+      var result = this.getGoods().reduce(function (accu, item) {
+        accu += item.amount * item.price;
+        return accu;
       }, 0);
       return result.toFixed(0);
     };
 
     this.setFavoriteStatus = function (id, favoriteStatus) {
-      return this.getItem(id).favorite = favoriteStatus;
+      this.getItem(id).favorite = favoriteStatus;
+      return favoriteStatus;
     };
 
     this.putItem = function (id, amount) {
@@ -61,10 +63,10 @@
     };
 
     this.isEmpty = function () {
-      return this.goods.every(function(item) {
+      return this.goods.every(function (item) {
         return item.amount <= 0;
       });
-    }
+    };
 
     // Constructor
 
@@ -73,11 +75,11 @@
 
     // Miscelaneous functions
 
-    function fillItem (commodityItem) {
+    function fillItem(commodityItem) {
       var item = Object.assign({}, commodityItem);
       item.amount = 0;
       return item;
-    };
+    }
 
-  }
+  };
 })();
