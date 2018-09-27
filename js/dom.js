@@ -238,7 +238,7 @@
         if (this.trolley.getAmount(i) > 0) {
           node.appendChild(this.trolleyNodes[i]);
         }
-      };
+      }
       document.querySelector(this.trolleyParentHtmlSelector).appendChild(node);
       this.checkAndRenderTrolleyPlaceholder();
     };
@@ -320,14 +320,14 @@
       if (isCommodityHtmlSelector(htmlSelector)) {
         return htmlSelector.slice(COMMODITY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
       }
-      throw new Error ('Not a commodity selector');
+      throw new Error('Not a commodity selector');
     }
 
     function trolleyHtmlSelectorToCommodityId(htmlSelector) {
       if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
         return htmlSelector.slice(TROLLEY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
       }
-      throw new Error ('Not a trolley commodity selector');
+      throw new Error('Not a trolley commodity selector');
     }
 
     function isCommodityHtmlSelector(htmlSelector) {
@@ -354,6 +354,6 @@
       }
       return false;
     }
-  }
+  };
 
 })();
