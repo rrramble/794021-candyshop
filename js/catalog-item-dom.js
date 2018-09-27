@@ -6,7 +6,6 @@
 
 (function () {
 
-  var COMMODITY_HTML_SELECTOR_HEAD = '#commodity';
   var COMMODITY_HTML_ID_HEAD = 'commodity';
 
   window.CatalogItemDom = function (commodity, templateNode) {
@@ -14,17 +13,17 @@
 
     // Constructor body
 
-    var node = templateNode.content.cloneNode(true);
-    setId(node, commodity.id);
-    setName(node, commodity.name)
-    setImage(node, commodity.picture, commodity.name);
-    setPrice(node, commodity.price);
-    setWeight(node, commodity.weight);
-    setStockAmount(node, commodity.amount);
-    setRating(node, commodity.rating, commodity.number);
-    setNutritionFacts(node, commodity.nutritionFacts);
-    setFavorite(node, commodity.favorite);
-    return node;
+    var baseNode = templateNode.content.cloneNode(true);
+    setId(baseNode, commodity.id);
+    setName(baseNode, commodity.name);
+    setImage(baseNode, commodity.picture, commodity.name);
+    setPrice(baseNode, commodity.price);
+    setWeight(baseNode, commodity.weight);
+    setStockAmount(baseNode, commodity.amount);
+    setRating(baseNode, commodity.rating, commodity.number);
+    setNutritionFacts(baseNode, commodity.nutritionFacts);
+    setFavorite(baseNode, commodity.favorite);
+    return baseNode;
 
     // End of constructor body
 
@@ -39,7 +38,7 @@
     }
 
     function setImage(node, url, alt) {
-      window.utils.setDomImage(node, '.card__img', url, alt)
+      window.utils.setDomImage(node, '.card__img', url, alt);
     }
 
     function setPrice(node, price) {
@@ -118,11 +117,6 @@
       }
     }
 
-    function update(commodityId) {
-      var amount = catalog.getAmount(commodityId);
-      var commodityNode = trolleyDomNodeFromCommodityId(commodityId);
-      setCommodityStockAmount(commodityNode, amount);
-    }
+  };
 
-  }
 })();
