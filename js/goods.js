@@ -36,12 +36,12 @@
     CARD_FIELDS_MAIN_SELECTOR: '.payment__card-wrap',
     CARD_LABEL_SELECTOR: '.toggle-btn__input[value="card"]',
     CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
-    CARD_FORM_SELECTOR: '.payment__inputs',
+    CARD_FORM_SELECTOR: '.payment__card-wrap',
     CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
     CARD_NUMBER_INPUT_CLASS: 'text-input__input',
     CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
-    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
-    CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc'
+    CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc',
+    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder'
   }
 
   var DELIVERY = {
@@ -86,20 +86,20 @@
     setFieldsForCardPayment(true);
 
     window.utils.setDomHandlers(
-      document, Order.MAIN_SELECTOR,
-      checkFormValidity,
-      'submit'
-    );
-
-    window.utils.setDomHandlers(
       document, PAYMENT.METHOD_SELECTOR,
       paymentTypeHandlers,
       'click'
     );
 
     window.utils.setDomHandlers(
+      document, Order.MAIN_SELECTOR,
+      checkOrderFormValidity,
+      'submit'
+    );
+
+    window.utils.setDomHandlers(
       document, PAYMENT.CARD_FIELDS_MAIN_SELECTOR,
-      paymentCardChangeHandlers,
+      checkOrderFormValidity,
       'change'
     );
 
@@ -127,14 +127,6 @@
     }
   }
 
-  function paymentCardChangeHandlers (evt) {
-    switch(true) {
-      case (evt.srcElement.classList.contains(PAYMENT.CARD_NUMBER_INPUT_CLASS)):
-        checkFormValidity();
-        break;
-      }
-  }
-
   function adjustFormForCardPayment () {
     window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
     setFieldsForCardPayment(true);
@@ -143,48 +135,70 @@
   function adjustFormForCashPayment () {
     window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
     setFieldsForCardPayment(false);
+   	resetCardValidity();
   }
 
   function setFieldsForCardPayment (isToBeSet) {
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
-  function checkFormValidity() {
+  function checkOrderFormValidity() {
     switch (true) {
       case (!isCardNumberValid()):
         window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        event.preventDefault();
         break;    
+      case (!isCardDateValid()):
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        break;
       case (!isCardCvcValid()):
         window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        event.preventDefault();
+        window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+        break;
+      case (!isCardholderNameValid()):
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
         break;
       default:
-        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+      	resetCardValidity();
     }
+  }
+
+  function resetCardValidity () {
+    window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setDomValid(true, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
   function isCardNumberValid () {
     var cardNumber = window.utils.getDomValue(document, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
     var result = window.utils.isLuhnChecked(cardNumber);
-    if (!result) {
-      return false;
-    }
-    return true;
+    return result;
   }
 
+  function isCardDateValid () {
+    var cardDate = window.utils.getDomValue(document, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    var result = window.utils.isCardDateChecked(cardDate);
+    return result;
+  }
 
   function isCardCvcValid () {
     var cvc = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    var result = window.utils.isCvcChecked(cvc);
-    if (!result) {
-      return false;
-    }
-    return true;
+    var state = window.utils.isCvcChecked(cvc);
+    return state;
+  }
+
+  function isCardholderNameValid () {
+    var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    var state = window.utils.isCacrdholderNameChecked(cardholder);
+    return state;
   }
 
   function deliveryHandlers (evt) {

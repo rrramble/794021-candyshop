@@ -211,11 +211,27 @@
     };
   }
 
+  window.utils.isCardDateChecked = function (cardDate) {
+    var noFillings = window.utils.trimSpaces(cardDate);
+    var month = noFillings.slice(0, 2);
+    var divider = noFillings.slice(2, 3);
+    var year = noFillings.slice(3);
+    return window.utils.isInRangeUpTo(month, 1, 12) &&
+      window.utils.isInRangeUpTo(year, 18, 50) &&
+      !window.utils.isNumber(divider);
+  }
+
   window.utils.isCvcChecked = function (cvc) {
     var noFillings = window.utils.trimAll(cvc) / 1;
     var number = noFillings.toFixed(0);
-    var result = window.utils.isInRangeUpTo(number, 0, 999) && noFillings.length === 3;
+    var result = window.utils.isInRangeUpTo(number, 0, 999) &&
+      number.length === 3;
     return result;
+  }
+
+  window.utils.isCacrdholderNameChecked = function (fullName) {
+    var noFillings = window.utils.trimAll(fullName);
+    return noFillings.length > 0;
   }
 
   window.utils.isEven = function (a) {
@@ -230,6 +246,11 @@
     var noSpaces = s.replace(/\s/g,'');
     var noFillings = noSpaces.replace('.', '').replace('-', '').replace('_', '');
     return noFillings;
+  }
+
+  window.utils.trimSpaces = function (s) {
+    var noSpaces = s.replace(/\s/g,'');
+    return noSpaces;
   }
 
   window.utils.omitPx = function (px) {
@@ -290,7 +311,9 @@
     if (shouldBeValid) {
       node.setCustomValidity('');
     } else {
-      node.setCustomValidity('Некорретные данные');
+      if (node.validity.valid) {
+        node.setCustomValidity('Некорретные данные');
+      }
     }
   }
 
