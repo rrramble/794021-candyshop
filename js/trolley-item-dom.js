@@ -8,10 +8,6 @@
 
   var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
 
-  var TROLLEY_EMPTY_TEXT = 'В корзине ничего нет';
-  var TROLLEY_FILLED_TEMPLATE_TEXT = 'Выбрано товаров на сумму: ';
-  var TROLLEY_TEXT_SELECTOR = '.main-header__basket';
-
 
   window.TrolleyItemDom = function (commodity, templateNode) {
 
@@ -19,19 +15,19 @@
     // Constructor body
 
     this.commodity = commodity;
-    var node = templateNode.content.cloneNode(true);
-    setId(node, commodity.id);
-    setTitle(node, commodity.name);
-    setImage(node, commodity.picture, commodity.name);
-    setPrice(node, commodity.price);
-    setAmount(node, commodity.amount);
-    setNameAndId(node, '------placeholder-----');
+    var baseNode = templateNode.content.cloneNode(true);
+    setId(baseNode, commodity.id);
+    setTitle(baseNode, commodity.name);
+    setImage(baseNode, commodity.picture, commodity.name);
+    setPrice(baseNode, commodity.price);
+    setAmount(baseNode, commodity.amount);
+    setNameAndId(baseNode, '------placeholder-----');
     /*
     if (commodity.amount <= 0) {
       window.utils.hideHtmlSelector(node, '.card-order');
     }
     */
-    return node;
+    return baseNode;
 
     // End of constructor body
 
@@ -46,7 +42,7 @@
     }
 
     function setImage(node, url, alt) {
-      window.utils.setDomImage(node, '.card-order__img', url, alt)
+      window.utils.setDomImage(node, '.card-order__img', url, alt);
     }
 
     function setPrice(node, price) {
@@ -62,23 +58,6 @@
       window.utils.setDomId(node, '.card-order__count', 'card-order__' + name);
     }
 
-    function update(trolley, commodityId) {
-      var trolleyAmount = trolley.getAmount(commodityId);
-      if (trolleyAmount <= 0) {
-        deleteDisplayingFromTrolley(commodityId);
-      }
+  };
 
-      if (isShownInTrolley(commodityId)) {
-        setTrolleyCommodityAmountInDom(commodityId, trolleyAmount);
-      } else {
-        var commodity = catalog.goods(commodityId);
-        var domElement = createDomOfTrolleyCommodityFromTemplate(
-            commodity,
-            TROLLEY_TEMPLATE_ID
-        );
-        renderItemInTrolley(domElement, TROLLEY_HTML_CLASS);
-      }
-    }
-
-  }
 })();
