@@ -211,7 +211,7 @@
   }
 
   function filterHandlers(evt) {
-    switch (true){
+    switch (true) {
       case (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)):
         updateSliderPositionValue();
         break;
