@@ -206,7 +206,8 @@
         digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
       }
       return digit;
-    };
+    }
+
   };
 
   window.utils.isCardDateChecked = function (cardDate) {
@@ -263,7 +264,7 @@
   };
 
   window.utils.getHtmlSelectorWidth = function (htmlSelector, node) {
-    var resultPx = window.utils.getHtmlSelectorProperty('width', htmlSelector, node)
+    var resultPx = window.utils.getHtmlSelectorProperty('width', htmlSelector, node);
     return window.utils.omitPx(resultPx);
   };
 
@@ -308,7 +309,7 @@
     if (shouldBeValid) {
       childNode.setCustomValidity('');
     } else if (childNode.validity.valid) {
-        childNode.setCustomValidity('Некорретные данные');
+      childNode.setCustomValidity('Некорретные данные');
     }
   };
 
