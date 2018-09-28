@@ -308,7 +308,7 @@
     var childNode = baseNode.querySelector(selector);
     if (shouldBeValid) {
       childNode.setCustomValidity('');
-    } else if (childNode.validity.valid) {
+    } else {
       childNode.setCustomValidity('Некорретные данные');
     }
   };

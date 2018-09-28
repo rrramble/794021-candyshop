@@ -23,8 +23,19 @@
   };
 
   var Order = {
-    MAIN_SELECTOR: '.buy',
+    MAIN_SELECTOR: '.buy form',
     SUBMIT_BTN_SELECTOR: '.buy__submit-btn'
+  };
+
+  var Contacts = {
+    NAME_SELECTOR: '#contact-data__name',
+    NAME_MIN_LENGTH: 1,
+
+    PHONE_SELECTOR: '#contact-data__tel',
+    PHONE_MIN_LENGTH: 10,
+    PHONE_MAX_LENGTH: 22,
+
+    EMAIL_SELECTOR: '#contact-data__email',
   };
 
   var PAYMENT = {
@@ -94,6 +105,7 @@
 
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
+    setContactsToBeRequired(true);
 
     window.utils.setDomEventHandler(
         document, PAYMENT.METHOD_SELECTOR,
@@ -103,14 +115,20 @@
 
     window.utils.setDomEventHandler(
         document, Order.MAIN_SELECTOR,
-        checkOrderFormValidity,
-        'submit'
+        contactsCheckHandler,
+        'change'
     );
 
     window.utils.setDomEventHandler(
-        document, PAYMENT.CARD_FIELDS_MAIN_SELECTOR,
-        checkOrderFormValidity,
+        document, Order.MAIN_SELECTOR,
+        paymentCheckHandler,
         'change'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Order.MAIN_SELECTOR,
+        checkOrderFormValidity,
+        'submit'
     );
 
     window.utils.setDomEventHandler(
@@ -126,6 +144,49 @@
     );
   }
   
+
+  /*
+   * Contacts checking
+   */
+
+  function contactsCheckHandler() {
+    switch (true) {
+      case (!isNameValid()):
+        window.utils.setDomValid(false, Contacts.NAME_SELECTOR);
+        break;
+      case (isEmailTyped() && !isEmailValid()):
+        window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
+        window.utils.setDomValid(false, Contacts.EMAIL_SELECTOR);
+        break;
+      default:
+        resetContactsValidity();        
+    }
+
+    function isNameValid() {
+      var value = window.utils.getDomValue(document, Contacts.NAME_SELECTOR);
+      var trimmed = window.utils.trimAll(value);
+      return trimmed.length > 0;
+    }
+
+    function isEmailTyped() {
+      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      var trimmed = window.utils.trimSpaces(value);
+      return trimmed.length > 0;
+    }
+
+    function isEmailValid() {
+      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      var se = /^[\w\.\-_]{1,}@[\w\.\-]{6,}/;
+      return se.test(value);
+    }
+  }
+
+  function resetContactsValidity() {
+    window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
+    window.utils.setDomValid(true, Contacts.PHONE_SELECTOR);
+    window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
+  }
+
   function paymentTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
@@ -136,6 +197,11 @@
         break;
     }
   }
+
+
+  /*
+   * Check payment
+   */
   
   function adjustFormForCardPayment() {
     window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
@@ -167,7 +233,13 @@
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
-  function checkOrderFormValidity() {
+  function checkOrderFormValidity () {
+    contactsCheckHandler();
+    paymentCheckHandler();
+  }
+
+
+  function paymentCheckHandler() {
     switch (true) {
       case (!isCardNumberValid()):
         window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
@@ -190,6 +262,26 @@
       default:
         resetCardValidity();
     }
+
+    function isCardNumberValid() {
+      var cardNumber = window.utils.getDomValue(document, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+      return window.utils.isLuhnChecked(cardNumber);
+    }
+
+    function isCardDateValid() {
+      var cardDate = window.utils.getDomValue(document, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+      return window.utils.isCardDateChecked(cardDate);
+    }
+
+    function isCardCvcValid() {
+      var cvc = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+      return window.utils.isCvcChecked(cvc);
+    }
+
+    function isCardholderNameValid() {
+      var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+      return window.utils.isCacrdholderNameChecked(cardholder);
+    }
   }
 
   function resetCardValidity() {
@@ -199,29 +291,18 @@
     window.utils.setDomValid(true, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
-  function isCardNumberValid() {
-    var cardNumber = window.utils.getDomValue(document, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-    var result = window.utils.isLuhnChecked(cardNumber);
-    return result;
+  function setContactsToBeRequired(isToBeSet) {
+    window.utils.setInputToBeRequired(isToBeSet, Contacts.NAME_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_SELECTOR);
+
+    window.utils.setInputToBeRequired(isToBeSet, Contacts.PHONE_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_SELECTOR);
   }
 
-  function isCardDateValid() {
-    var cardDate = window.utils.getDomValue(document, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    var result = window.utils.isCardDateChecked(cardDate);
-    return result;
-  }
-
-  function isCardCvcValid() {
-    var cvc = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    var state = window.utils.isCvcChecked(cvc);
-    return state;
-  }
-
-  function isCardholderNameValid() {
-    var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    var state = window.utils.isCacrdholderNameChecked(cardholder);
-    return state;
-  }
+  /*
+   *
+   */
 
   function deliveryHandlers() {
     switch (true) {
