@@ -95,31 +95,31 @@
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document, PAYMENT.METHOD_SELECTOR,
         paymentTypeHandlers,
         'click'
     );
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document, Order.MAIN_SELECTOR,
         checkOrderFormValidity,
         'submit'
     );
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document, PAYMENT.CARD_FIELDS_MAIN_SELECTOR,
         checkOrderFormValidity,
         'change'
     );
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document, DELIVERY.MAIN_SELECTOR,
         deliveryHandlers,
         'click'
     );
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document, Filter.MAIN_SELECTOR,
         filterHandlers,
         'mouseup'

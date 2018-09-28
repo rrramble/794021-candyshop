@@ -279,20 +279,20 @@
     this.catalogNodes = this.createCatalogDom();
     this.trolleyNodes = this.createTrolleyDom();
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document,
         this.catalogParentHtmlSelector,
         this.commodityCb.bind(this),
         'click'
     );
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document,
         this.trolleyParentHtmlSelector,
         this.commodityCb.bind(this),
         'click'
     );
 
-    window.utils.setDomHandlers(
+    window.utils.setDomEventHandler(
         document,
         this.trolleyParentHtmlSelector,
         this.trolleyChangeCb.bind(this),

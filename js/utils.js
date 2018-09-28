@@ -184,7 +184,7 @@
     parentNode.replaceChild(newChildNode, oldChildNode);
   };
 
-  window.utils.setDomHandlers = function (domNode, htmlSelector, cb, type) {
+  window.utils.setDomEventHandler = function (domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.addEventListener(type, cb);
   };
