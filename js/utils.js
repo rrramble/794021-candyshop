@@ -115,12 +115,9 @@
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
 
-  window.utils.isChecked = function (htmlSelector, dom) {
-    var parentDom = document;
-    if (dom) {
-      parentDom = dom;
-    }
-    var result = parentDom.querySelector(htmlSelector).checked;
+  window.utils.isChecked = function (htmlSelector, node) {
+    var baseNode = node ? node : document;
+    var result = baseNode.querySelector(htmlSelector).checked;
     return result;
   };
 

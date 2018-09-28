@@ -70,10 +70,17 @@
     METHOD_SELECTOR: '.deliver__toggle',
     SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
-    SUBWAY_STATIONS_SELECTOR: '.deliver__stores',
+
+    Store: {
+      MAIN_SELECTOR: '.deliver__store',
+    },
   
     Courier: {
-      MAIN_SELECTOR: '.deliver__courier'
+      MAIN_SELECTOR: '.deliver__courier',
+      STREET_SELECTOR: '#deliver__street',
+      HOUSE_SELECTOR: '#deliver__house',
+      FLOOR_SELECTOR: '#deliver__floor',
+      ROOM_SELECTOR: '#deliver__room'
     }
   };
 
@@ -112,9 +119,9 @@
     setContactsToBeRequired(true);
 
     window.utils.setDomEventHandler(
-        document, PAYMENT.METHOD_SELECTOR,
-        paymentTypeHandler,
-        'click'
+        document, Filter.MAIN_SELECTOR,
+        filterHandler,
+        'mouseup'
     );
 
     window.utils.setDomEventHandler(
@@ -124,8 +131,26 @@
     );
 
     window.utils.setDomEventHandler(
+        document, PAYMENT.METHOD_SELECTOR,
+        paymentTypeHandler,
+        'click'
+    );
+
+    window.utils.setDomEventHandler(
         document, Order.MAIN_SELECTOR,
         paymentCheckHandler,
+        'change'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Delivery.MAIN_SELECTOR,
+        deliveryTypeHandler,
+        'click'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Delivery.MAIN_SELECTOR,
+        deliveryCheckHandler,
         'change'
     );
 
@@ -135,22 +160,21 @@
         'submit'
     );
 
-    window.utils.setDomEventHandler(
-        document, Delivery.MAIN_SELECTOR,
-        deliveryHandler,
-        'click'
-    );
-
-    window.utils.setDomEventHandler(
-        document, Filter.MAIN_SELECTOR,
-        filterHandler,
-        'mouseup'
-    );
   }
 
 
   /*
-   * Contacts checking
+   * Overall order form checking
+   */
+
+  function checkOrderFormValidity() {
+    contactsCheckHandler();
+    paymentCheckHandler();
+    deliveryCheckHandler();
+  }
+
+  /*
+   * Contacts handler and checking
    */
 
   function contactsCheckHandler() {
@@ -191,33 +215,33 @@
     window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
   }
 
+
+  /*
+   * Payment handler and checking
+   */
+
   function paymentTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
-        adjustFormForCardPayment();
+        adjustFormForPayment('card');
         break;
       case (window.utils.isChecked(PAYMENT.CASH_LABEL_SELECTOR)):
-        adjustFormForCashPayment();
+        adjustFormForPayment('cash');
         break;
     }
   }
 
-
-  /*
-   * Check payment
-   */
-
-  function adjustFormForCardPayment() {
-    window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
-    window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
-    setFieldsForCardPayment(true);
-  }
-
-  function adjustFormForCashPayment() {
-    window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
-    window.utils.showHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
-    setFieldsForCardPayment(false);
-    resetCardValidity();
+  function adjustFormForPayment(type) {
+    if (type === 'card') {
+      window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+      window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(true);
+    } else {
+      window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+      window.utils.showHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(false);
+      resetCardValidity();
+    }
   }
 
   function setFieldsForCardPayment(isToBeSet) {
@@ -237,14 +261,11 @@
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
-  function checkOrderFormValidity() {
-    contactsCheckHandler();
-    paymentCheckHandler();
-  }
-
-
   function paymentCheckHandler() {
     switch (true) {
+      case (!window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
+        resetCardValidity();
+        break;
       case (!isCardNumberValid()):
         window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
         break;
@@ -309,18 +330,87 @@
    * Delivery handler and checking
    */
 
-  function deliveryHandler() {
+  function deliveryTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        window.utils.hideHtmlSelector(document, Delivery.SUBWAY_STATIONS_SELECTOR);
-        window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+        adjustFormForDelivery('courier');
         break;
-
       case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
-        window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
-        window.utils.showHtmlSelector(document, Delivery.SUBWAY_STATIONS_SELECTOR);
+        adjustFormForDelivery('takeout');
         break;
     }
+  }
+
+  function adjustFormForDelivery(type) {
+    if (type === 'courier') {
+      window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
+      window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+
+      window.utils.setInputToBeRequired(true, Delivery.Courier.STREET_SELECTOR);
+      window.utils.setInputToBeRequired(true, Delivery.Courier.HOUSE_SELECTOR);
+      window.utils.setInputToBeRequired(true, Delivery.Courier.ROOM_SELECTOR);
+
+    } else {
+      window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+      window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
+
+      window.utils.setInputToBeRequired(false, Delivery.Courier.STREET_SELECTOR);
+      window.utils.setInputToBeRequired(false, Delivery.Courier.HOUSE_SELECTOR);
+      window.utils.setInputToBeRequired(false, Delivery.Courier.ROOM_SELECTOR);
+
+      resetContactsValidity();
+    }
+  }
+
+  function deliveryCheckHandler() {
+    switch (true) {
+      case (!window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
+        resetDeliveryValidity();
+        break;
+      case (!isStreetValid()):
+        window.utils.setDomValid(false, Delivery.Courier.STREET_SELECTOR);
+        break;
+      case (!isHouseValid()):
+        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomValid(false, Delivery.Courier.HOUSE_SELECTOR);
+        break;
+      case (isFloorTyped() && !isFloorValid()):
+        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+        window.utils.setDomValid(false, Delivery.Courier.FLOOR_SELECTOR);
+        break;
+      default:
+        resetDeliveryValidity();
+    }
+  
+    function isStreetValid() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.STREET_SELECTOR);
+      var noFillings = window.utils.trimSpaces(value);
+      return noFillings.length > 0;
+    }
+
+    function isHouseValid() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.HOUSE_SELECTOR);
+      var noFillings = window.utils.trimSpaces(value);
+      return noFillings.length > 0;
+    }
+  
+    function isFloorTyped() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
+      return value.length > 0;
+    }
+
+    function isFloorValid() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
+      return window.utils.isNumber(value);
+    }
+  }
+
+  function resetDeliveryValidity() {
+    window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
 
 
