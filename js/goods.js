@@ -74,7 +74,7 @@
     Store: {
       MAIN_SELECTOR: '.deliver__store',
     },
-  
+
     Courier: {
       MAIN_SELECTOR: '.deliver__courier',
       STREET_SELECTOR: '#deliver__street',
@@ -382,7 +382,7 @@
       default:
         resetDeliveryValidity();
     }
-  
+
     function isStreetValid() {
       var value = window.utils.getDomValue(document, Delivery.Courier.STREET_SELECTOR);
       var noFillings = window.utils.trimSpaces(value);
@@ -394,7 +394,7 @@
       var noFillings = window.utils.trimSpaces(value);
       return noFillings.length > 0;
     }
-  
+
     function isFloorTyped() {
       var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
       return value.length > 0;
