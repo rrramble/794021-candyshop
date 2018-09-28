@@ -34,11 +34,23 @@
     CARD_LABEL_SELECTOR: '.toggle-btn__input[value="card"]',
     CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
     CARD_FORM_SELECTOR: '.payment__card-wrap',
+
     CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
     CARD_NUMBER_INPUT_CLASS: 'text-input__input',
+    CARD_NUMBER_MIN_LENGTH: 16,
+    CARD_NUMBER_MAX_LENGTH: 19,
+
     CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
+    CARD_DATE_MIN_LENGTH: 5,
+    CARD_DATE_MAX_LENGTH: 5,
+
     CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc',
+    CARD_CVC_MIN_LENGTH: 3,
+    CARD_CVC_MAX_LENGTH: 3,
+
     CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    CARD_HOLDER_MIN_WIDTH: 1,
+
     CASH_PAYMENT_MESSAGE_SELECTOR: '.payment__cash-wrap'
   };
 
@@ -140,9 +152,19 @@
 
   function setFieldsForCardPayment(isToBeSet) {
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_NUMBER_MIN_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_NUMBER_MAX_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_DATE_MIN_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_DATE_MAX_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_CVC_MIN_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_CVC_MAX_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
   function checkOrderFormValidity() {

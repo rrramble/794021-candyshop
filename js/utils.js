@@ -313,4 +313,14 @@
     }
   };
 
+  window.utils.setHtmlTagAttribute = function (shouldBeSet, parameter, value, selector, node) {
+    var baseNode = node ? node : document;
+    var childNode = baseNode.querySelector(selector);
+    if (shouldBeSet) {
+      childNode.setAttribute(parameter, value);
+    } else {
+      childNode.removeAttribute(parameter);
+    }
+  };
+
 })();
