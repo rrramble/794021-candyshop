@@ -97,7 +97,7 @@
 
     window.utils.setDomEventHandler(
         document, PAYMENT.METHOD_SELECTOR,
-        paymentTypeHandlers,
+        paymentTypeHandler,
         'click'
     );
 
@@ -125,8 +125,8 @@
         'mouseup'
     );
   }
-
-  function paymentTypeHandlers() {
+  
+  function paymentTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
         adjustFormForCardPayment();
@@ -136,7 +136,7 @@
         break;
     }
   }
-
+  
   function adjustFormForCardPayment() {
     window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
     window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
