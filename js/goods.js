@@ -38,7 +38,7 @@
     CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
     CARD_NUMBER_INPUT_CLASS: 'text-input__input',
     CARD_NUMBER_MIN_LENGTH: 16,
-    CARD_NUMBER_MAX_LENGTH: 19,
+    CARD_NUMBER_MAX_LENGTH: 16,
 
     CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
     CARD_DATE_MIN_LENGTH: 5,
