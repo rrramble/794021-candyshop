@@ -65,12 +65,16 @@
     CASH_PAYMENT_MESSAGE_SELECTOR: '.payment__cash-wrap'
   };
 
-  var DELIVERY = {
+  var Delivery = {
     MAIN_SELECTOR: '.deliver',
     METHOD_SELECTOR: '.deliver__toggle',
     SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
-    SUBWAY_STATIONS_SELECTOR: '.deliver__stores'
+    SUBWAY_STATIONS_SELECTOR: '.deliver__stores',
+  
+    Courier: {
+      MAIN_SELECTOR: '.deliver__courier'
+    }
   };
 
 
@@ -132,14 +136,14 @@
     );
 
     window.utils.setDomEventHandler(
-        document, DELIVERY.MAIN_SELECTOR,
-        deliveryHandlers,
+        document, Delivery.MAIN_SELECTOR,
+        deliveryHandler,
         'click'
     );
 
     window.utils.setDomEventHandler(
         document, Filter.MAIN_SELECTOR,
-        filterHandlers,
+        filterHandler,
         'mouseup'
     );
   }
@@ -300,23 +304,31 @@
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_SELECTOR);
   }
 
+
   /*
-   *
+   * Delivery handler and checking
    */
 
-  function deliveryHandlers() {
+  function deliveryHandler() {
     switch (true) {
-      case (window.utils.isChecked(DELIVERY.BY_COURIER_SELECTOR)):
-        window.utils.hideHtmlSelector(document, DELIVERY.SUBWAY_STATIONS_SELECTOR);
+      case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
+        window.utils.hideHtmlSelector(document, Delivery.SUBWAY_STATIONS_SELECTOR);
+        window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
         break;
 
-      case (window.utils.isChecked(DELIVERY.SELF_TAKE_OUT_SELECTOR)):
-        window.utils.showHtmlSelector(document, DELIVERY.SUBWAY_STATIONS_SELECTOR);
+      case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
+        window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+        window.utils.showHtmlSelector(document, Delivery.SUBWAY_STATIONS_SELECTOR);
         break;
     }
   }
 
-  function filterHandlers(evt) {
+
+  /*
+   *
+   */
+
+  function filterHandler(evt) {
     switch (true) {
       case (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)):
         updateSliderPositionValue();
@@ -327,6 +339,11 @@
         break;
     }
   }
+
+
+  /*
+   *
+   */
 
   function updateSliderPositionValue() {
     var minSliderValue = getMinSliderValue();
