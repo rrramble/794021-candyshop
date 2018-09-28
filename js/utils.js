@@ -320,4 +320,10 @@
     }
   };
 
+  window.utils.blockInput = function (shouldBeBlocked, selector, node) {
+    var baseNode = node ? node : document;
+    var childNode = baseNode.querySelector(selector);
+    childNode.disabled = shouldBeBlocked;
+  };
+
 })();
