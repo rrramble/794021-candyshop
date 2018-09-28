@@ -38,7 +38,8 @@
     CARD_NUMBER_INPUT_CLASS: 'text-input__input',
     CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
     CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc',
-    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder'
+    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    CASH_PAYMENT_MESSAGE_SELECTOR: '.payment__cash-wrap'
   };
 
   var DELIVERY = {
@@ -126,11 +127,13 @@
 
   function adjustFormForCardPayment() {
     window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+    window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
     setFieldsForCardPayment(true);
   }
 
   function adjustFormForCashPayment() {
     window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+    window.utils.showHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
     setFieldsForCardPayment(false);
     resetCardValidity();
   }
