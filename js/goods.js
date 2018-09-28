@@ -41,6 +41,11 @@
   var PAYMENT = {
     MAIN_SELECTOR: '.payment',
     METHOD_SELECTOR: '.payment__method',
+
+    CARD_VALIDITY_SELECTOR: '.payment__card-status',
+    CARD_VALID_MESSAGE: 'Одобрен',
+    CARD_INVALID_MESSAGE: 'Не определён',
+
     CARD_FIELDS_MAIN_SELECTOR: '.payment__card-wrap',
     CARD_LABEL_SELECTOR: '.toggle-btn__input[value="card"]',
     CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
@@ -248,21 +253,21 @@
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_NUMBER_MIN_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_NUMBER_MAX_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.blockInput(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
 
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_DATE_MIN_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_DATE_MAX_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    window.utils.blockInput(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
 
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_CVC_MIN_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_CVC_MAX_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    window.utils.blockInput(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
 
     window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.blockInput(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
   function paymentCheckHandler() {
@@ -272,23 +277,28 @@
         break;
       case (!isCardNumberValid()):
         window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
         break;
       case (!isCardDateValid()):
         window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
         window.utils.setDomValid(false, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
         break;
       case (!isCardCvcValid()):
         window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
         window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
         window.utils.setDomValid(false, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
         break;
       case (!isCardholderNameValid()):
         window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
         window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
         window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
         window.utils.setDomValid(false, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
         break;
       default:
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_VALID_MESSAGE);
         resetCardValidity();
     }
 
@@ -308,7 +318,7 @@
     }
 
     function isCardholderNameValid() {
-      var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+      var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
       return window.utils.isCacrdholderNameChecked(cardholder);
     }
   }
