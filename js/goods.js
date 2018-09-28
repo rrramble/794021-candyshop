@@ -143,7 +143,7 @@
         'mouseup'
     );
   }
-  
+
 
   /*
    * Contacts checking
@@ -159,7 +159,7 @@
         window.utils.setDomValid(false, Contacts.EMAIL_SELECTOR);
         break;
       default:
-        resetContactsValidity();        
+        resetContactsValidity();
     }
 
     function isNameValid() {
@@ -202,7 +202,7 @@
   /*
    * Check payment
    */
-  
+
   function adjustFormForCardPayment() {
     window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
     window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
@@ -233,7 +233,7 @@
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
   }
 
-  function checkOrderFormValidity () {
+  function checkOrderFormValidity() {
     contactsCheckHandler();
     paymentCheckHandler();
   }
