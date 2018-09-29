@@ -5,599 +5,467 @@
  * https://up.htmlacademy.ru/javascript/15/tasks/16
  */
 
-var COMMODITY_HTML_ID_HEAD = 'commodity';
-var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
-
-var GOODS_TEMPLATE_ID = 'card';
-var GOODS_HTML_TAG_CLASS = 'catalog__cards';
-
-var TROLLEY_TEMPLATE_ID = 'card-order';
-var TROLLEY_HTML_TAG_CLASS = 'goods__cards';
-
-var GOODS_IN_TROLLEY_COUNT = 3;
-
-/*
- * Main logic
- */
-
-var catalog;
-var catalogDom;
-
 (function () {
-  catalog = new Catalog(window.mockGoods.get);
-  catalogDom = new CatalogDom(catalog.getGoods(), GOODS_TEMPLATE_ID);
-  renderGoods(catalogDom.getElements(), GOODS_HTML_TAG_CLASS);
 
-  putRandomGoodsInTrolley(catalog.getGoods(), GOODS_IN_TROLLEY_COUNT);
+  var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
+  var GOODS_HTML_SELECTOR = '.catalog__cards';
+
+  var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
+  var TROLLEY_HTML_SELECTOR = '.goods__cards';
+
+  var Filter = {
+    MAIN_SELECTOR: '.catalog__filter.range',
+    RANGE_MIN_BTN_CLASS: 'range__btn--left',
+    RANGE_MAX_BTN_CLASS: 'range__btn--right',
+    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
+    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
+    RANGE_BTN_PARENT_SELECTOR: '.range__filter'
+  };
+
+  var Order = {
+    MAIN_SELECTOR: '.buy form',
+    SUBMIT_BTN_SELECTOR: '.buy__submit-btn'
+  };
+
+  var Contacts = {
+    NAME_SELECTOR: '#contact-data__name',
+    NAME_MIN_LENGTH: 1,
+
+    PHONE_SELECTOR: '#contact-data__tel',
+    PHONE_MIN_LENGTH: 10,
+    PHONE_MAX_LENGTH: 22,
+
+    EMAIL_SELECTOR: '#contact-data__email',
+  };
+
+  var PAYMENT = {
+    MAIN_SELECTOR: '.payment',
+    METHOD_SELECTOR: '.payment__method',
+
+    CARD_VALIDITY_SELECTOR: '.payment__card-status',
+    CARD_VALID_MESSAGE: 'Одобрен',
+    CARD_INVALID_MESSAGE: 'Не определён',
+
+    CARD_FIELDS_MAIN_SELECTOR: '.payment__card-wrap',
+    CARD_LABEL_SELECTOR: '.toggle-btn__input[value="card"]',
+    CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
+    CARD_FORM_SELECTOR: '.payment__card-wrap',
+
+    CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
+    CARD_NUMBER_INPUT_CLASS: 'text-input__input',
+    CARD_NUMBER_MIN_LENGTH: 16,
+    CARD_NUMBER_MAX_LENGTH: 16,
+
+    CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
+    CARD_DATE_MIN_LENGTH: 5,
+    CARD_DATE_MAX_LENGTH: 5,
+
+    CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc',
+    CARD_CVC_MIN_LENGTH: 3,
+    CARD_CVC_MAX_LENGTH: 3,
+
+    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    CARD_HOLDER_MIN_WIDTH: 1,
+
+    CASH_PAYMENT_MESSAGE_SELECTOR: '.payment__cash-wrap'
+  };
+
+  var Delivery = {
+    MAIN_SELECTOR: '.deliver',
+    METHOD_SELECTOR: '.deliver__toggle',
+    SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
+    BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
+
+    Store: {
+      MAIN_SELECTOR: '.deliver__store',
+    },
+
+    Courier: {
+      MAIN_SELECTOR: '.deliver__courier',
+      STREET_SELECTOR: '#deliver__street',
+      HOUSE_SELECTOR: '#deliver__house',
+      FLOOR_SELECTOR: '#deliver__floor',
+      ROOM_SELECTOR: '#deliver__room'
+    }
+  };
+
+
+  /*
+   * Main code
+   */
+
+  var catalog = new window.Catalog(window.mockGoods.get);
+  var trolley = new window.Trolley(catalog);
+  var dom = new window.Dom(
+      catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
+      trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
+  );
+  dom.renderCatalogDom();
+  dom.renderTrolleyDom();
+
+  /*
+  var GOODS_IN_TROLLEY_COUNT = 3;
+  putRandomGoodsInTrolley(
+      catalog, catalogDom.updateView,
+      trolley, trolleyDom.updateView,
+      GOODS_IN_TROLLEY_COUNT);
+   */
+
   setInterfaceHandlers();
-})();
-
-
-/*
- * Make catalog of goods
- */
-
-function Catalog(loadFunction) {
-  this.getGoods = function () {
-    return this.goods;
-  };
-
-  this.getTrolley = function () {
-    var result = this.goods.filter(function (item) {
-      return item.trolleyAmount > 0;
-    });
-    return result;
-  };
-
-  this.getElement = function (id) {
-    return this.goods[id];
-  };
-
-  this.getAmount = function (id) {
-    return this.goods[id].amount;
-  };
-
-  this.getTrolleyAmount = function (id) {
-    return this.goods[id].trolleyAmount;
-  };
-
-  this.getTotalAmount = function (id) {
-    return this.getAmount(id) + this.getTrolleyAmount(id);
-  };
-
-  this.getCount = function () {
-    return this.goods.length;
-  };
-
-  this.addToTrolley = function (id, amount) {
-    if (this.goods[id].amount >= amount) {
-      this.goods[id].amount -= amount;
-      this.goods[id].trolleyAmount += amount;
-      return true;
-    }
-    return false;
-  };
-
-  this.setTrolleyAmount = function (id, amount) {
-    var addition = amount - this.getTrolleyAmount(id);
-    this.addToTrolley(id, addition);
-  };
-
-  this.isTrolleyEmpty = function () {
-    function trolleyAmountEmpty(item) {
-      return item.trolleyAmount <= 0;
-    }
-
-    var result = this.goods.every(trolleyAmountEmpty);
-    return result;
-  };
-
-  this.toggleFavorite = function (id) {
-    this.goods[id].favorite = !this.goods[id].favorite;
-    return this.goods[id].favorite;
-  };
-
-  this.getFavoriteStatus = function (id) {
-    return this.goods[id].favorite;
-  };
-
-  this.decreaseTrolley = function (id, amount) {
-    var actualDecrease = Math.min(amount, this.goods[id].trolleyAmount);
-    this.goods[id].amount += actualDecrease;
-    this.goods[id].trolleyAmount -= actualDecrease;
-  };
-
-  // Costructor of the class
-
-  this.goods = loadFunction();
-}
-
-function putRandomGoodsInTrolley(goods, amount) {
-  for (var i = 0; i < amount; i++) {
-    var index = window.utils.randomInRange(0, goods.length);
-    catalog.addToTrolley(index, 1);
-    updateDomGoods(index);
-    updateDomTrolley(index);
-  }
-}
-
-/*
- * Make DOM from the catalog of goods
- */
-
-
-function CatalogDom(goods, templateHtmlId) {
-  this.getElements = function () {
-    return this.elements;
-  };
-
-  this.getElement = function (id) {
-    return this.elements[id];
-  };
-
-  this.getCommodityDomElement = function (id) {
-    var htmlId = idToHtmlId(id);
-    var el = document.querySelector(htmlId);
-    return el;
-  };
-
-  this.createCommodityNode = function (commodity) {
-    var template = document.querySelector('#' + this.templateHtmlId);
-    var newDom = template.content.cloneNode(true);
-
-    setCommodityHtmlIds(newDom, commodity.id);
-    setCommodityName(newDom, commodity.name);
-    setCommodityImage(newDom, commodity.picture, commodity.name);
-    setCommodityPrice(newDom, commodity.price);
-    setCommodityWeight(newDom, commodity.weight);
-    setCommodityStockAmount(newDom, commodity.amount);
-    setCommodityRating(newDom, commodity.rating);
-    setCommodityNutritionFacts(newDom, commodity.nutritionFacts);
-    setCommodityFavorite(newDom, commodity.favorite);
-    setCommodityHandlers(newDom);
-    return newDom;
-  };
-
-
-  // Constructor body
-
-  this.templateHtmlId = templateHtmlId;
-  this.elements = [];
-  for (var i = 0; i < goods.length; i++) {
-    var node = this.createCommodityNode(goods[i]);
-    this.elements.push(node);
-  }
-}
-
-function setCommodityName(dom, data) {
-  var element = dom.querySelector('.card__title');
-  element.textContent = data;
-}
-
-function setCommodityImage(dom, data, htmlAltProperty) {
-  var element = dom.querySelector('.card__img');
-  element.src = data;
-  element.alt = htmlAltProperty;
-}
-
-function setCommodityStockAmount(dom, data) {
-  var htmlClass;
-  if (data > 5) {
-    htmlClass = 'card--in-stock';
-  } else if (data >= 1 && data <= 5) {
-    htmlClass = 'card--little';
-  } else if (data === 0) {
-    htmlClass = 'card--soon';
-  }
-
-  var element = window.utils.querySelectorIncludingSelf(dom, '.catalog__card');
-  element.classList.remove('card--in-stock');
-  element.classList.remove('card--little');
-  element.classList.remove('card--soon');
-  element.classList.add(htmlClass);
-}
-
-function setCommodityPrice(dom, data) {
-  var priceElement = dom.querySelector('.card__price');
-  var currencyElement = dom.querySelector('.card__currency');
-  var weightElement = dom.querySelector('.card__weight');
-  priceElement.textContent = data + ' ';
-  priceElement.appendChild(currencyElement);
-  priceElement.appendChild(weightElement);
-}
-
-function setCommodityWeight(dom, data) {
-  var element = dom.querySelector('.card__weight');
-  var weight = '/ ' + data + ' Г';
-  element.textContent = weight;
-}
-
-function setCommodityRating(dom, data) {
-  var htmlClass;
-  var textRating = 'Рейтинг: ';
-  if (data.value >= 4.5) {
-    htmlClass = 'stars__rating--five';
-    textRating += '5 звёзд';
-  } else if (data.value >= 3.5 && data.value < 4.5) {
-    htmlClass = 'stars__rating--four';
-    textRating += '4 звeзды';
-  } else if (data.value >= 2.5 && data.value < 3.5) {
-    htmlClass = 'stars__rating--three';
-    textRating += '3 звeзды';
-  } else if (data.value >= 1.5 && data.value < 2.5) {
-    htmlClass = 'stars__rating--two';
-    textRating += '2 звeзды';
-  } else if (data.value >= 0.5 && data.value < 1.5) {
-    htmlClass = 'stars__rating--one';
-    textRating += '1 звeзда';
-  } else if (data.value >= 0.0 && data.value < 0.5) {
-    htmlClass = 'stars__rating--zero';
-    textRating += 'ноль звёзд';
-  } else {
-    htmlClass = '';
-  }
-
-  var element = dom.querySelector('.stars__rating');
-  element.classList.remove('stars__rating--five');
-  element.classList.add(htmlClass);
-  element.textContent = textRating;
-
-  element = dom.querySelector('.star__count');
-  var number = '(' + data.number + ')';
-  element.textContent = number;
-}
-
-function setCommodityNutritionFacts(dom, data) {
-  var element = dom.querySelector('.card__composition-list');
-  element.textContent = data.contents;
-
-  element = dom.querySelector('.card__characteristic');
-  var sugar = data.sugar ? 'С сахаром' : 'Без сахара';
-  var sugarAndEnergy = sugar + '. ' + data.energy + ' ккал';
-  element.textContent = sugarAndEnergy;
-}
-
-function setCommodityHtmlIds(dom, id) {
-  var element = dom.querySelector('.catalog__card');
-  element.id = idToHtmlId(id);
-}
-
-function setCommodityFavorite(dom, isFavorite) {
-  var favorite = dom.querySelector('.card__btn-favorite');
-  if (isFavorite) {
-    favorite.classList.add('card__btn-favorite--selected');
-  } else {
-    favorite.classList.remove('card__btn-favorite--selected');
-  }
-}
-
-function updateDomFavorite(commodityId, favoriteStatus) {
-  var commodityHtmlId = idToHtmlId(commodityId);
-  var commoditySelector = window.utils.htmlIdToHtmlSelector(commodityHtmlId);
-  var commodityNode = document.querySelector(commoditySelector);
-  setCommodityFavorite(commodityNode, favoriteStatus);
-}
-
-function updateDomGoods(commodityId) {
-  var commodityHtmlId = idToHtmlId(commodityId);
-  var commoditySelector = window.utils.htmlIdToHtmlSelector(commodityHtmlId);
-  var commodityNode = document.querySelector(commoditySelector);
-  var amount = catalog.getAmount(commodityId);
-  setCommodityStockAmount(commodityNode, amount);
-}
-
-function updateDomTrolley(commodityId) {
-  var trolleyAmount = catalog.getTrolleyAmount(commodityId);
-  if (trolleyAmount <= 0) {
-    deleteDisplayingFromTrolley(commodityId);
-    if (catalog.isTrolleyEmpty()) {
-      window.utils.showHtmlSelector('.goods__card-empty');
-      window.utils.addCssClass('goods__cards', 'goods__cards--empty');
-    }
-    return;
-  }
-
-  if (isShownInTrolley(commodityId)) {
-    var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-    var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
-    var commodityNode = document.querySelector(htmlTrolleySelector);
-    setTrolleyCommodityAmount(commodityNode, trolleyAmount);
-  } else {
-    var commodity = catalog.getElement(commodityId);
-    var domElement = createDomOfTrolleyCommodityFromTemplate(
-        commodity,
-        TROLLEY_TEMPLATE_ID
-    );
-    renderItemInTrolley(domElement, TROLLEY_HTML_TAG_CLASS);
-  }
-  window.utils.hideHtmlSelector('.goods__card-empty');
-  window.utils.removeCssClass('goods__cards', 'goods__cards--empty');
-}
-
-
-/*
- * Goods' elements handlers
- */
-
-function setCommodityHandlers(dom) {
-  var favoriteNode = dom.querySelector('.card__btn-favorite');
-  favoriteNode.addEventListener('click', clickFavoriteHandler);
-
-  var addToTrolleyNode = dom.querySelector('.card__btn');
-  addToTrolleyNode.addEventListener('click', clickAddToTrolley);
-
-  function clickFavoriteHandler(evt) {
-    var commodityId = findParentCommodityId(evt);
-    catalog.toggleFavorite(commodityId);
-    var favoriteStatus = catalog.getFavoriteStatus(commodityId);
-    updateDomFavorite(commodityId, favoriteStatus);
-  }
-
-  function clickAddToTrolley(evt) {
-    var commodityId = findParentCommodityId(evt);
-    catalog.addToTrolley(commodityId, 1);
-    updateDomGoods(commodityId);
-    updateDomTrolley(commodityId);
-  }
-}
-
-/*
- * Trolley elements handlers
- */
-
-function setTrolleyElementHandlers(dom) {
-  var node = dom.querySelector('.card-order');
-  node.addEventListener('click', clickTrolleyElement);
-  node.addEventListener('change', enterTrolleyElement);
   return;
-}
 
-function clickTrolleyElement(evt) {
-  var commodityId = findParentCommodityId(evt);
+  /*
+   * End of main code
+   */
 
-  if (evt.target.classList.contains('card-order__btn--increase')) {
-    catalog.addToTrolley(commodityId, 1);
 
-  } else if (evt.target.classList.contains('card-order__btn--decrease')) {
-    catalog.decreaseTrolley(commodityId, 1);
+  function setInterfaceHandlers() {
+    setFieldsForCardPayment(true);
+    setContactsToBeRequired(true);
 
-  } else if (evt.target.classList.contains('card-order__close')) {
-    catalog.decreaseTrolley(commodityId, Infinity);
+    window.utils.setDomEventHandler(
+        document, Filter.MAIN_SELECTOR,
+        filterHandler,
+        'mouseup'
+    );
 
-  } else {
-    return;
+    window.utils.setDomEventHandler(
+        document, Order.MAIN_SELECTOR,
+        contactsCheckHandler,
+        'change'
+    );
+
+    window.utils.setDomEventHandler(
+        document, PAYMENT.METHOD_SELECTOR,
+        paymentTypeHandler,
+        'click'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Order.MAIN_SELECTOR,
+        paymentCheckHandler,
+        'change'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Delivery.MAIN_SELECTOR,
+        deliveryTypeHandler,
+        'click'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Delivery.MAIN_SELECTOR,
+        deliveryCheckHandler,
+        'change'
+    );
+
+    window.utils.setDomEventHandler(
+        document, Order.MAIN_SELECTOR,
+        checkOrderFormValidity,
+        'submit'
+    );
+
   }
-  updateDomGoods(commodityId);
-  updateDomTrolley(commodityId);
-}
 
-function enterTrolleyElement(evt) {
-  var commodityId = findParentCommodityId(evt);
-  var previousValue = catalog.getTrolleyAmount(commodityId);
-  var maxAmount = catalog.getTotalAmount(commodityId);
-  var newValue = getElementTrolleyAmountInDom(commodityId) / 1.0;
 
-  if (evt.target.classList.contains('card-order__count')) {
-    if (
-      newValue > maxAmount ||
-        newValue <= 0 ||
-        !window.utils.isNumber(newValue)
-    ) {
-      setTrolleyCommodityAmountInDom(commodityId, previousValue);
-      return;
+  /*
+   * Overall order form checking
+   */
+
+  function checkOrderFormValidity() {
+    contactsCheckHandler();
+    paymentCheckHandler();
+    deliveryCheckHandler();
+  }
+
+  /*
+   * Contacts handler and checking
+   */
+
+  function contactsCheckHandler() {
+    switch (true) {
+      case (!isNameValid()):
+        window.utils.setDomValid(false, Contacts.NAME_SELECTOR);
+        break;
+      case (isEmailTyped() && !isEmailValid()):
+        window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
+        window.utils.setDomValid(false, Contacts.EMAIL_SELECTOR);
+        break;
+      default:
+        resetContactsValidity();
+    }
+
+    function isNameValid() {
+      var value = window.utils.getDomValue(document, Contacts.NAME_SELECTOR);
+      var trimmed = window.utils.trimAll(value);
+      return trimmed.length > 0;
+    }
+
+    function isEmailTyped() {
+      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      var trimmed = window.utils.trimSpaces(value);
+      return trimmed.length > 0;
+    }
+
+    function isEmailValid() {
+      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      var se = /^[\w\.\-_]{1,}@[\w\.\-]{6,}/;
+      return se.test(value);
+    }
+  }
+
+  function resetContactsValidity() {
+    window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
+    window.utils.setDomValid(true, Contacts.PHONE_SELECTOR);
+    window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
+  }
+
+
+  /*
+   * Payment handler and checking
+   */
+
+  function paymentTypeHandler() {
+    switch (true) {
+      case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
+        adjustFormForPayment('card');
+        break;
+      case (window.utils.isChecked(PAYMENT.CASH_LABEL_SELECTOR)):
+        adjustFormForPayment('cash');
+        break;
+    }
+  }
+
+  function adjustFormForPayment(type) {
+    if (type === 'card') {
+      window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+      window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(true);
+    } else {
+      window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
+      window.utils.showHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(false);
+      resetCardValidity();
+    }
+  }
+
+  function setFieldsForCardPayment(isToBeSet) {
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_NUMBER_MIN_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_NUMBER_MAX_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_DATE_MIN_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_DATE_MAX_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_CVC_MIN_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_CVC_MAX_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+
+    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+  }
+
+  function paymentCheckHandler() {
+    switch (true) {
+      case (!window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
+        resetCardValidity();
+        break;
+      case (!isCardNumberValid()):
+        window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        break;
+      case (!isCardDateValid()):
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        break;
+      case (!isCardCvcValid()):
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        break;
+      case (!isCardholderNameValid()):
+        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomValid(false, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        break;
+      default:
+        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_VALID_MESSAGE);
+        resetCardValidity();
+    }
+
+    function isCardNumberValid() {
+      var cardNumber = window.utils.getDomValue(document, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+      return window.utils.isLuhnChecked(cardNumber);
+    }
+
+    function isCardDateValid() {
+      var cardDate = window.utils.getDomValue(document, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+      return window.utils.isCardDateChecked(cardDate);
+    }
+
+    function isCardCvcValid() {
+      var cvc = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+      return window.utils.isCvcChecked(cvc);
+    }
+
+    function isCardholderNameValid() {
+      var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+      return window.utils.isCacrdholderNameChecked(cardholder);
+    }
+  }
+
+  function resetCardValidity() {
+    window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setDomValid(true, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+  }
+
+  function setContactsToBeRequired(isToBeSet) {
+    window.utils.setInputToBeRequired(isToBeSet, Contacts.NAME_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_SELECTOR);
+
+    window.utils.setInputToBeRequired(isToBeSet, Contacts.PHONE_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_SELECTOR);
+  }
+
+
+  /*
+   * Delivery handler and checking
+   */
+
+  function deliveryTypeHandler() {
+    switch (true) {
+      case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
+        adjustFormForDelivery('courier');
+        break;
+      case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
+        adjustFormForDelivery('takeout');
+        break;
+    }
+  }
+
+  function adjustFormForDelivery(type) {
+    if (type === 'courier') {
+      window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
+      window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+
+      window.utils.setInputToBeRequired(true, Delivery.Courier.STREET_SELECTOR);
+      window.utils.setInputToBeRequired(true, Delivery.Courier.HOUSE_SELECTOR);
+      window.utils.setInputToBeRequired(true, Delivery.Courier.ROOM_SELECTOR);
 
     } else {
-      catalog.setTrolleyAmount(commodityId, newValue);
-    }
-    updateDomGoods(commodityId);
-    updateDomTrolley(commodityId);
-  }
-}
+      window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+      window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
 
-function deleteTrolleyElementHandlers(dom) {
-  dom.removeEventListener('click', clickTrolleyElement);
-  dom.removeEventListener('change', enterTrolleyElement);
-}
+      window.utils.setInputToBeRequired(false, Delivery.Courier.STREET_SELECTOR);
+      window.utils.setInputToBeRequired(false, Delivery.Courier.HOUSE_SELECTOR);
+      window.utils.setInputToBeRequired(false, Delivery.Courier.ROOM_SELECTOR);
 
-
-/*
- * Payment handlers
- */
-
-function setPaymentHandlers() {
-  var paymentTypeSelector = '.toggle-btn';
-  var nodeCash = document.querySelector(paymentTypeSelector);
-  nodeCash.addEventListener('click', clickCashPay);
-
-  function clickCashPay() {
-    var cardLabelSelector = '.toggle-btn__input[value="card"]';
-    var cashLabelSelector = '.toggle-btn__input[value="cash"]';
-    var cardFormSelector = '.payment__card-wrap';
-
-    if (window.utils.isChecked(cardLabelSelector)) {
-      window.utils.showHtmlSelector(cardFormSelector);
-
-    } else if (window.utils.isChecked(cashLabelSelector)) {
-      window.utils.hideHtmlSelector(cardFormSelector);
-
-    } else {
-      return;
+      resetContactsValidity();
     }
   }
-}
 
-
-function isShownInTrolley(commodityId) {
-  var htmlIdToSearch = idToHtmlTrolleyId(commodityId);
-  var nodes = document.querySelectorAll('.goods_card.card-order');
-  for (var i = 0; i < nodes.length; i++) {
-    if (nodes[i].id === htmlIdToSearch) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function idToHtmlId(id) {
-  return COMMODITY_HTML_ID_HEAD + id;
-}
-
-function idToHtmlTrolleyId(id) {
-  return TROLLEY_HTML_ID_HEAD + id;
-}
-
-function htmlIdToId(htmlId) {
-  if (isCommodityHtmlId(htmlId)) {
-    var id = htmlId.slice(COMMODITY_HTML_ID_HEAD.length, htmlId.length);
-    return id;
-  }
-  return undefined;
-}
-
-function trolleyIdToId(htmlId) {
-  if (isTrolleyHtmlId(htmlId)) {
-    var id = htmlId.slice(TROLLEY_HTML_ID_HEAD.length, htmlId.length);
-    return id;
-  }
-  return undefined;
-}
-
-function isCommodityHtmlId(id) {
-  var firstLetters = id.slice(0, COMMODITY_HTML_ID_HEAD.length);
-  if (firstLetters === COMMODITY_HTML_ID_HEAD) {
-    return true;
-  }
-  return false;
-}
-
-function isTrolleyHtmlId(htmlId) {
-  var firstLetters = htmlId.slice(0, TROLLEY_HTML_ID_HEAD.length);
-  if (firstLetters === TROLLEY_HTML_ID_HEAD) {
-    return true;
-  }
-  return false;
-}
-
-function findParentCommodityId(htmlClasses) {
-  for (var i = 0; i < htmlClasses.path.length; i++) {
-    var htmlClass = htmlClasses.path[i].id;
-
-    if (isCommodityHtmlId(htmlClass)) {
-      return htmlIdToId(htmlClass);
+  function deliveryCheckHandler() {
+    switch (true) {
+      case (!window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
+        resetDeliveryValidity();
+        break;
+      case (!isStreetValid()):
+        window.utils.setDomValid(false, Delivery.Courier.STREET_SELECTOR);
+        break;
+      case (!isHouseValid()):
+        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomValid(false, Delivery.Courier.HOUSE_SELECTOR);
+        break;
+      case (isFloorTyped() && !isFloorValid()):
+        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+        window.utils.setDomValid(false, Delivery.Courier.FLOOR_SELECTOR);
+        break;
+      default:
+        resetDeliveryValidity();
     }
 
-    if (isTrolleyHtmlId(htmlClass)) {
-      return trolleyIdToId(htmlClass);
+    function isStreetValid() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.STREET_SELECTOR);
+      var noFillings = window.utils.trimSpaces(value);
+      return noFillings.length > 0;
+    }
+
+    function isHouseValid() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.HOUSE_SELECTOR);
+      var noFillings = window.utils.trimSpaces(value);
+      return noFillings.length > 0;
+    }
+
+    function isFloorTyped() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
+      return value.length > 0;
+    }
+
+    function isFloorValid() {
+      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
+      return window.utils.isNumber(value);
     }
   }
-  return undefined;
-}
 
-
-/*
- * Render DOM of the catalog of goods
- */
-
-function renderGoods(domElements, htmlClass) {
-  for (var i = 0; i < domElements.length; i++) {
-    renderCommodity(domElements[i], htmlClass);
+  function resetDeliveryValidity() {
+    window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
-  if (domElements.length > 0) {
-    window.utils.removeCssClass('catalog__cards', 'catalog__cards--load');
-    window.utils.hideHtmlSelector('.catalog__load');
+
+
+  /*
+   *
+   */
+
+  function filterHandler(evt) {
+    switch (true) {
+      case (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)):
+        updateSliderPositionValue();
+        break;
+
+      case (evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS)):
+        updateSliderPositionValue();
+        break;
+    }
   }
-}
-
-function renderCommodity(domElement, htmlClass) {
-  var htmlSelector = window.utils.htmlClassToSelector(htmlClass);
-  var dom = document.querySelector(htmlSelector);
-  dom.appendChild(domElement);
-}
 
 
-/*
- * Make DOM from the trolley content
- */
+  /*
+   *
+   */
 
-function createDomOfTrolleyCommodityFromTemplate(commodity, templateHtmlId) {
-  var htmlSelector = window.utils.htmlIdToHtmlSelector(templateHtmlId);
-  var template = document.querySelector(htmlSelector);
-  var newDom = template.content.cloneNode(true);
+  function updateSliderPositionValue() {
+    var minSliderValue = getMinSliderValue();
+    var maxSliderValue = getMaxSliderValue();
+    window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
+    window.utils.setDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
 
-  setTrolleyCommodityHtmlId(newDom, commodity.id);
-  setTrolleyCommodityName(newDom, commodity.name);
-  setTrolleyCommodityImage(newDom, commodity.picture, commodity.name);
-  setTrolleyCommodityPrice(newDom, commodity.price);
-  setTrolleyCommodityAmount(newDom, commodity.trolleyAmount);
-  setTrolleyElementHandlers(newDom);
-  return newDom;
-}
+    function getMinSliderValue() {
+      var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
+      var width = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
+      return window.utils.intPercent(parentWidth, width);
+    }
 
-function setTrolleyCommodityHtmlId(dom, id) {
-  var element = window.utils.querySelectorIncludingSelf(dom, '.card-order');
-  element.id = idToHtmlTrolleyId(id);
-}
-
-function setTrolleyCommodityAmount(dom, trolleyAmount) {
-  var amountNode = window.utils.querySelectorIncludingSelf(dom, '.card-order__count');
-  amountNode.value = trolleyAmount;
-}
-
-function setTrolleyCommodityAmountInDom(commodityId, trolleyAmount) {
-  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
-  var amountNode = document.querySelector(htmlTrolleySelector);
-  var node = amountNode.querySelector('.card-order__count');
-  node.value = trolleyAmount;
-}
-
-function getElementTrolleyAmountInDom(commodityId) {
-  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
-  var amountNode = document.querySelector(htmlTrolleySelector);
-  var node = amountNode.querySelector('.card-order__count');
-  return node.value;
-}
-
-function deleteDisplayingFromTrolley(commodityId) {
-  var htmlTrolleyId = idToHtmlTrolleyId(commodityId);
-  var htmlTrolleySelector = window.utils.htmlIdToHtmlSelector(htmlTrolleyId);
-  var commodityNode = document.querySelector(htmlTrolleySelector);
-  if (commodityNode) {
-    deleteTrolleyElementHandlers(commodityNode);
-    commodityNode.remove();
+    function getMaxSliderValue() {
+      var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
+      var width = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
+      return window.utils.intPercent(parentWidth, parentWidth - width);
+    }
   }
-}
 
-function setTrolleyCommodityName(dom, name) {
-  var element = dom.querySelector('.card-order__title');
-  element.textContent = name;
-}
-
-function setTrolleyCommodityImage(dom, imageUrl, imageAlt) {
-  var element = dom.querySelector('.card-order__img');
-  element.src = imageUrl;
-  element.alt = imageAlt;
-}
-
-function setTrolleyCommodityPrice(dom, value) {
-  var element = dom.querySelector('.card-order__price');
-  element.textContent = value;
-}
-
-
-/*
- * Render DOM of the trolley content
- */
-
-function renderItemInTrolley(domElement, htmlClass) {
-  var htmlSelector = window.utils.htmlClassToSelector(htmlClass);
-  var addTo = document.querySelector(htmlSelector);
-  addTo.appendChild(domElement);
-}
-
-function setInterfaceHandlers() {
-  var paymentSelector = '.payment';
-  var node = document.querySelector(paymentSelector);
-  node.addEventListener('click', setPaymentHandlers);
-}
+})();
