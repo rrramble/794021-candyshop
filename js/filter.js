@@ -14,10 +14,6 @@
     RANGE_BTN_PARENT_SELECTOR: '.range__filter'
   };
 
-  var state = {
-    down: false
-  };
-
   var price = {};
 
   window.Filter = function(minPrice, maxPrice) {
@@ -43,6 +39,18 @@
 
     function eventHandlerMouseUp (evt) {
       var sliderClass = getSliderClass(evt);
+      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
+      window.utils.removeDomEventHandler(
+          document, sliderSelector, eventHandlerMouseMove, 'mousemove'
+      );
+        window.utils.removeDomEventHandler(
+          document, sliderSelector, eventHandlerMouseUp, 'mouseup'
+      );
+    }
+
+    function eventHandlerMouseMove (evt) {
+      var sliderClass = getSliderClass(evt);
+      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
 
       switch (true) {
         case (sliderClass === Filter.RANGE_MIN_BTN_CLASS):
@@ -52,20 +60,7 @@
           updateSliderPositionValue('max');
           break;
       }
-
-      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
-      window.utils.removeDomEventHandler(
-          document, sliderSelector, eventHandlerMouseUp, 'mouseup'
-      );
-      window.utils.removeDomEventHandler(
-          document, sliderSelector, eventHandlerMouseMove, 'mousemove'
-      );
-
     }
-
-    function eventHandlerMouseMove (evt) {
-    }
-
 
     function updateSliderPositionValue(which) {
       if (which === 'min') {
