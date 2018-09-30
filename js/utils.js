@@ -290,6 +290,16 @@
     return percent.toFixed(0);
   };
 
+  window.utils.percentToIntValue = function (percent, min, max) {
+    var value = (max - min) * percent / 100 + min;
+    if (value < min) {
+      value = min;
+    } else if (value > max) {
+      value = max;
+    }
+    return value.toFixed(0);
+  };
+
   window.utils.disableButton = function (selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = true;
@@ -330,5 +340,15 @@
     var childNode = baseNode.querySelector(selector);
     childNode.disabled = shouldBeBlocked;
   };
+
+  window.utils.listMin = function (list) {
+    var result = Math.min.apply(null, list);
+    return result;
+  }
+
+  window.utils.listMax = function (list) {
+    var result = Math.max.apply(null, list);
+    return result;
+  }
 
 })();
