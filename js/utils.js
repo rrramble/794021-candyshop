@@ -133,6 +133,16 @@
     return (value >= from && value <= to);
   };
 
+  window.utils.setWithinRange = function (value, from, upTo) {
+    if (value < from) {
+      return from;
+    }
+    if (value > upTo) {
+      return upTo;
+    }
+    return value;
+  }
+
   window.utils.setDomId = function (node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.id = data;
@@ -276,10 +286,22 @@
     return window.utils.omitPx(leftPx);
   };
 
+  window.utils.setHtmlClassLeftProperty = function (value, htmlClass, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlClassToSelector(htmlClass);
+    baseNode.querySelector(selector).style.left = value + 'px';
+  };
+
   window.utils.getHtmlClassRightProperty = function (htmlClass, node) {
     var selector = window.utils.htmlClassToSelector(htmlClass);
     var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
     return window.utils.omitPx(rightPx);
+  };
+
+  window.utils.setHtmlClassRightProperty = function (value, htmlClass, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlClassToSelector(htmlClass);
+    baseNode.querySelector(selector).style.right = value + 'px';
   };
 
   window.utils.intPercent = function (base, part) {
@@ -349,6 +371,11 @@
   window.utils.listMax = function (list) {
     var result = Math.max.apply(null, list);
     return result;
+  }
+
+  window.utils.getMovementX = function (begin, end) {
+    var value = end.x - begin.x;
+    return value;
   }
 
 })();
