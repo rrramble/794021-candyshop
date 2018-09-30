@@ -14,41 +14,62 @@
     RANGE_BTN_PARENT_SELECTOR: '.range__filter'
   };
 
+  var state = {
+    down: false
+  };
+
   window.Filter = function() {
 
-    this.eventHandler = function (evt) {
-      switch (true) {
-        case (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)):
-          updateSliderPositionValue();
-          break;
-
-        case (evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS)):
-          updateSliderPositionValue();
-          break;
+    this.eventHandlerMouseDown = function (evt) {
+      var sliderClass = getSliderClass(evt);
+      if (!sliderClass) {
+        return;
       }
+      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
+
+      window.utils.setDomEventHandler(
+          document, sliderSelector, eventHandlerMouseUp, 'mouseup'
+      );
+      window.utils.setDomEventHandler(
+          document, sliderSelector, eventHandlerMouseMove, 'mousemove'
+      );
     }
 
-    /*
-     * Constructor body
-     */
+    function eventHandlerMouseUp (evt) {
+      var sliderClass = getSliderClass(evt);
 
-    this.state = {
-      down: false,
-      move: false
-    };
-    return;
+      switch (true) {
+        case (sliderClass === Filter.RANGE_MIN_BTN_CLASS):
+          updateSliderPositionValue('min');
+          break;
+        case (sliderClass === Filter.RANGE_MAX_BTN_CLASS):
+          updateSliderPositionValue('max');
+          break;
+      }
 
-    /*
-     * End of Constructor body
-     */
+      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
+      window.utils.removeDomEventHandler(
+          document, sliderSelector, eventHandlerMouseUp, 'mouseup'
+      );
+      window.utils.removeDomEventHandler(
+          document, sliderSelector, eventHandlerMouseMove, 'mousemove'
+      );
+
+    }
+
+    function eventHandlerMouseMove (evt) {
+    }
 
 
-
-    function updateSliderPositionValue() {
-      var minSliderValue = getMinSliderValue();
-      var maxSliderValue = getMaxSliderValue();
-      window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
-      window.utils.setDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
+    function updateSliderPositionValue(which) {
+      if (which === 'min') {
+        var value = getMinSliderValue();
+        window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, value);
+      } else if (which === 'max') {
+        var value = getMaxSliderValue();
+        window.utils.setDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR, value);
+      }
+      return;
 
       function getMinSliderValue() {
         var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
@@ -61,6 +82,16 @@
         var width = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
         return window.utils.intPercent(parentWidth, parentWidth - width);
       }
+    }
+
+    function getSliderClass(evt) {
+      if (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)) {
+        return Filter.RANGE_MIN_BTN_CLASS;
+      };
+      if (evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS)) {
+        return Filter.RANGE_MAX_BTN_CLASS;
+      };
+      return undefined;
     }
 
   } // End of class definition
