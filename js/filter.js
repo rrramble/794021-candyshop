@@ -33,6 +33,7 @@
         return;
       }
       var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
+      mouse.x = evt.clientX;
 
       window.utils.setDomEventHandler(
           document, sliderSelector, eventHandlerMouseUp, 'mouseup'
@@ -40,9 +41,7 @@
       window.utils.setDomEventHandler(
           document, sliderSelector, eventHandlerMouseMove, 'mousemove'
       );
-
-      mouse.x = evt.clientX;
-  }
+    }
 
     function eventHandlerMouseUp (evt) {
       var sliderClass = getSliderClass(evt);
@@ -59,13 +58,10 @@
       var sliderClass = getSliderClass(evt);
       var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
 
-      switch (true) {
-        case (sliderClass === Filter.RANGE_MIN_BTN_CLASS):
+      if (sliderClass === Filter.RANGE_MIN_BTN_CLASS) {
           updateSliderPosition('min', evt);
-          break;
-        case (sliderClass === Filter.RANGE_MAX_BTN_CLASS):
+      } else if (sliderClass === Filter.RANGE_MAX_BTN_CLASS) {
           updateSliderPosition('max', evt);
-          break;
       }
     }
 
