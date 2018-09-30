@@ -13,7 +13,7 @@
   var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
   var TROLLEY_HTML_SELECTOR = '.goods__cards';
 
-  var Filter = {
+  var FilterRange = {
     MIN_RANGE_SELECTOR: '.range__btn--left',
     MAX_RANGE_SELECTOR: '.range__btn--right'
   };
@@ -121,14 +121,14 @@
     setContactsToBeRequired(true);
 
     window.utils.setDomEventHandler(
-        document, Filter.MIN_RANGE_SELECTOR,
-        filter.eventHandlerMouseDown,
+        document, FilterRange.MIN_RANGE_SELECTOR,
+        filter.mouseDownHandler,
         'mousedown'
     );
 
     window.utils.setDomEventHandler(
-        document, Filter.MAX_RANGE_SELECTOR,
-        filter.eventHandlerMouseDown,
+        document, FilterRange.MAX_RANGE_SELECTOR,
+        filter.mouseDownHandler,
         'mousedown'
     );
 

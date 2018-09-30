@@ -7,6 +7,7 @@
 (function () {
 
   var Filter = {
+    MAIN_SECTION_SELECTOR: '.catalog__filter.range',
     RANGE_MIN_BTN_CLASS: 'range__btn--left',
     RANGE_MAX_BTN_CLASS: 'range__btn--right',
     MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
@@ -21,46 +22,44 @@
     x: 0
   };
 
+  var Slider = {
+    MOUSE_MOVE_UP_SELECTOR: 'main'
+  };
+
   window.Filter = function(minPrice, maxPrice) {
     price.min = minPrice;
     price.max = maxPrice;
     updateSliderValue('min');
     updateSliderValue('max');
 
-    this.eventHandlerMouseDown = function (evt) {
-      var sliderClass = getSliderClass(evt);
-      if (!sliderClass) {
-        return;
-      }
-      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
+    this.mouseDownHandler = function (evt) {
+      evt.preventDefault();
       mouse.x = evt.clientX;
 
       window.utils.setDomEventHandler(
-          document, sliderSelector, eventHandlerMouseUp, 'mouseup'
+          document, Slider.MOUSE_MOVE_UP_SELECTOR, mouseUpHandler, 'mouseup'
       );
       window.utils.setDomEventHandler(
-          document, sliderSelector, eventHandlerMouseMove, 'mousemove'
+          document, Slider.MOUSE_MOVE_UP_SELECTOR, mouseMoveHandler, 'mousemove'
       );
     }
 
-    function eventHandlerMouseUp (evt) {
-      var sliderClass = getSliderClass(evt);
-      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
+    function mouseUpHandler (evt) {
+      evt.preventDefault();
       window.utils.removeDomEventHandler(
-          document, sliderSelector, eventHandlerMouseMove, 'mousemove'
+          document, Slider.MOUSE_MOVE_UP_SELECTOR, mouseMoveHandler, 'mousemove'
       );
         window.utils.removeDomEventHandler(
-          document, sliderSelector, eventHandlerMouseUp, 'mouseup'
+          document, Slider.MOUSE_MOVE_UP_SELECTOR, mouseUpHandler, 'mouseup'
       );
     }
 
-    function eventHandlerMouseMove (evt) {
-      var sliderClass = getSliderClass(evt);
-      var sliderSelector = window.utils.htmlClassToSelector(sliderClass);
-
-      if (sliderClass === Filter.RANGE_MIN_BTN_CLASS) {
+    function mouseMoveHandler (evt) {
+      evt.preventDefault();
+      var pinClass = getPinClass(evt);
+      if (pinClass === Filter.RANGE_MIN_BTN_CLASS) {
           updateSliderPosition('min', evt);
-      } else if (sliderClass === Filter.RANGE_MAX_BTN_CLASS) {
+      } else if (pinClass === Filter.RANGE_MAX_BTN_CLASS) {
           updateSliderPosition('max', evt);
       }
     }
@@ -112,7 +111,7 @@
       }
     }
 
-    function getSliderClass(evt) {
+    function getPinClass(evt) {
       if (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)) {
         return Filter.RANGE_MIN_BTN_CLASS;
       };
