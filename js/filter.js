@@ -71,7 +71,6 @@
 
     function updateSliderPosition(which, evt) {
       var dx = mouse.x - evt.clientX;
-      console.log(dx);
 
       var minSliderLeftDistance = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
       var width = getSliderWidth();
