@@ -141,7 +141,7 @@
       return upTo;
     }
     return value;
-  }
+  };
 
   window.utils.setDomId = function (node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
@@ -199,7 +199,7 @@
   window.utils.removeDomEventHandler = function (domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.removeEventListener(type, cb);
-  }
+  };
 
   window.utils.isLuhnChecked = function (cardNumber) {
     var noSpaces = window.utils.trimAll(cardNumber.toString());
@@ -366,16 +366,16 @@
   window.utils.listMin = function (list) {
     var result = Math.min.apply(null, list);
     return result;
-  }
+  };
 
   window.utils.listMax = function (list) {
     var result = Math.max.apply(null, list);
     return result;
-  }
+  };
 
   window.utils.getMovementX = function (begin, end) {
     var value = end.x - begin.x;
     return value;
-  }
+  };
 
 })();
