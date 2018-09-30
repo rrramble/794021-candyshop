@@ -186,6 +186,11 @@
     node.addEventListener(type, cb);
   };
 
+  window.utils.removeDomEventHandler = function (domNode, htmlSelector, cb, type) {
+    var node = domNode.querySelector(htmlSelector);
+    node.removeEventListener(type, cb);
+  }
+
   window.utils.isLuhnChecked = function (cardNumber) {
     var noSpaces = window.utils.trimAll(cardNumber.toString());
     if (noSpaces.length !== 16) {
