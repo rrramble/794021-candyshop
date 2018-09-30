@@ -15,11 +15,6 @@
 
   var Filter = {
     MAIN_SELECTOR: '.catalog__filter.range',
-    RANGE_MIN_BTN_CLASS: 'range__btn--left',
-    RANGE_MAX_BTN_CLASS: 'range__btn--right',
-    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
-    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
-    RANGE_BTN_PARENT_SELECTOR: '.range__filter'
   };
 
   var Order = {
@@ -111,6 +106,7 @@
       GOODS_IN_TROLLEY_COUNT);
    */
 
+  var filter = new window.Filter();
   setInterfaceHandlers();
   return;
 
@@ -125,7 +121,7 @@
 
     window.utils.setDomEventHandler(
         document, Filter.MAIN_SELECTOR,
-        filterHandler,
+        filter.eventHandler,
         'mouseup'
     );
 
@@ -425,47 +421,6 @@
     window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
-  }
-
-
-  /*
-   *
-   */
-
-  function filterHandler(evt) {
-    switch (true) {
-      case (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)):
-        updateSliderPositionValue();
-        break;
-
-      case (evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS)):
-        updateSliderPositionValue();
-        break;
-    }
-  }
-
-
-  /*
-   *
-   */
-
-  function updateSliderPositionValue() {
-    var minSliderValue = getMinSliderValue();
-    var maxSliderValue = getMaxSliderValue();
-    window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, minSliderValue);
-    window.utils.setDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR, maxSliderValue);
-
-    function getMinSliderValue() {
-      var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
-      var width = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
-      return window.utils.intPercent(parentWidth, width);
-    }
-
-    function getMaxSliderValue() {
-      var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
-      var width = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
-      return window.utils.intPercent(parentWidth, parentWidth - width);
-    }
   }
 
 })();
