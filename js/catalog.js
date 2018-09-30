@@ -29,6 +29,22 @@
       return this.getItem(id).favorite;
     };
 
+    this.getPrices = function () {
+      return this.getGoods().map(function(item) {
+          return item.price;
+      });
+    }
+
+    this.getMinPrice = function (id) {
+      var value = window.utils.listMin(this.getPrices());
+      return value;
+    }
+
+    this.getMaxPrice = function (id) {
+      var value = window.utils.listMax(this.getPrices());
+      return value;
+    }
+
     this.putItem = function (id, amount) {
       this.getItem(id).amount += amount;
     };
