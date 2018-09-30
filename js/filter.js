@@ -18,7 +18,13 @@
     down: false
   };
 
-  window.Filter = function() {
+  var price = {};
+
+  window.Filter = function(minPrice, maxPrice) {
+    price.min = minPrice;
+    price.max = maxPrice;
+    updateSliderPositionValue('min');
+    updateSliderPositionValue('max');
 
     this.eventHandlerMouseDown = function (evt) {
       var sliderClass = getSliderClass(evt);
@@ -73,14 +79,18 @@
 
       function getMinSliderValue() {
         var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
-        var width = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
-        return window.utils.intPercent(parentWidth, width);
+        var width = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
+        var percent = window.utils.intPercent(parentWidth, width);
+        var value = window.utils.percentToIntValue(percent, price.min, price.max);
+        return value;
       }
 
       function getMaxSliderValue() {
         var parentWidth = window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
         var width = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
-        return window.utils.intPercent(parentWidth, parentWidth - width);
+        var percent = window.utils.intPercent(parentWidth, parentWidth - width);
+        var value = window.utils.percentToIntValue(percent, price.min, price.max);
+        return value;
       }
     }
 

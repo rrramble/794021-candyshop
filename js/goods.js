@@ -107,7 +107,7 @@
       GOODS_IN_TROLLEY_COUNT);
    */
 
-  var filter = new window.Filter();
+  var filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
   setInterfaceHandlers();
   return;
 
