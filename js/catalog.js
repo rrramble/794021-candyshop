@@ -35,12 +35,12 @@
       });
     };
 
-    this.getMinPrice = function (id) {
+    this.getMinPrice = function () {
       var value = window.utils.listMin(this.getPrices());
       return value;
     };
 
-    this.getMaxPrice = function (id) {
+    this.getMaxPrice = function () {
       var value = window.utils.listMax(this.getPrices());
       return value;
     };
