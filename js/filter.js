@@ -102,7 +102,7 @@
       return window.utils.percentToIntValue(percent, Price.min, Price.max);
     }
 
-    function isMinButtonClass (evt) {
+    function isMinButtonClass(evt) {
       return evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS);
     }
 
