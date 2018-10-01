@@ -137,10 +137,7 @@
     if (value < from) {
       return from;
     }
-    if (value > upTo) {
-      return upTo;
-    }
-    return value;
+    return value > upTo ? upTo : value;
   };
 
   window.utils.setDomId = function (node, htmlSelector, data) {
@@ -155,15 +152,8 @@
 
   window.utils.setDomImage = function (node, htmlSelector, imageUrl, imageAlt) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var actualUrl = imageUrl;
-    if (!imageUrl) {
-      actualUrl = '';
-    }
-    subNode.src = actualUrl;
-
-    if (imageAlt) {
-      subNode.alt = imageAlt;
-    }
+    subNode.src = imageUrl ? imageUrl : '';
+    subNode.alt = imageAlt ? imageAlt : '';
   };
 
   window.utils.setDomValue = function (node, selector, data) {
@@ -305,20 +295,14 @@
   };
 
   window.utils.intPercent = function (base, part) {
-    var percent = base !== 0 ? part / base * 100 : 0;
-    if (percent > 100) {
-      percent = 100;
-    }
+    var percent = base === 0 ? 0 : part / base * 100;
+    percent = window.utils.setWithinRange(percent, 0, 100);
     return percent.toFixed(0);
   };
 
   window.utils.percentToIntValue = function (percent, min, max) {
     var value = (max - min) * percent / 100 + min;
-    if (value < min) {
-      value = min;
-    } else if (value > max) {
-      value = max;
-    }
+    value = window.utils.setWithinRange(value, min, max);
     return value.toFixed(0);
   };
 
