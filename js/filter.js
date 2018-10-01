@@ -18,8 +18,8 @@
   };
 
   var Price = {
-  	min: 0,
-  	max: 0
+    min: 0,
+    max: 0
   };
 
   var Pin = {
@@ -36,14 +36,7 @@
     this.mouseDownHandler = function (evt) {
       evt.preventDefault();
       Pin.mouseStartX = evt.clientX;
-      Pin.htmlClass = getPinClass(evt);
-      if (Pin.htmlClass === Filter.RANGE_MIN_BTN_CLASS) {
-        Pin.isMin = true;
-      } else if (Pin.htmlClass === Filter.RANGE_MAX_BTN_CLASS) {
-        Pin.isMin = false;
-      } else {
-        return;
-      }
+      Pin.isMin = isMinButtonClass(evt);
 
       document.addEventListener('mouseup', mouseUpHandler);
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -109,13 +102,8 @@
       return window.utils.percentToIntValue(percent, Price.min, Price.max);
     }
 
-    function getPinClass(evt) {
-      if (evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS)) {
-        return Filter.RANGE_MIN_BTN_CLASS;
-      }
-      if (evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS)) {
-        return Filter.RANGE_MAX_BTN_CLASS;
-      }
+    function isMinButtonClass (evt) {
+      return evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS);
     }
 
     function getSliderWidth() {
