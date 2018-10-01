@@ -133,6 +133,16 @@
     return (value >= from && value <= to);
   };
 
+  window.utils.setWithinRange = function (value, from, upTo) {
+    if (value < from) {
+      return from;
+    }
+    if (value > upTo) {
+      return upTo;
+    }
+    return value;
+  };
+
   window.utils.setDomId = function (node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.id = data;
@@ -184,6 +194,11 @@
   window.utils.setDomEventHandler = function (domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.addEventListener(type, cb);
+  };
+
+  window.utils.removeDomEventHandler = function (domNode, htmlSelector, cb, type) {
+    var node = domNode.querySelector(htmlSelector);
+    node.removeEventListener(type, cb);
   };
 
   window.utils.isLuhnChecked = function (cardNumber) {
@@ -271,10 +286,22 @@
     return window.utils.omitPx(leftPx);
   };
 
+  window.utils.setHtmlClassLeftProperty = function (value, htmlClass, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlClassToSelector(htmlClass);
+    baseNode.querySelector(selector).style.left = value + 'px';
+  };
+
   window.utils.getHtmlClassRightProperty = function (htmlClass, node) {
     var selector = window.utils.htmlClassToSelector(htmlClass);
     var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
     return window.utils.omitPx(rightPx);
+  };
+
+  window.utils.setHtmlClassRightProperty = function (value, htmlClass, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlClassToSelector(htmlClass);
+    baseNode.querySelector(selector).style.right = value + 'px';
   };
 
   window.utils.intPercent = function (base, part) {
@@ -283,6 +310,16 @@
       percent = 100;
     }
     return percent.toFixed(0);
+  };
+
+  window.utils.percentToIntValue = function (percent, min, max) {
+    var value = (max - min) * percent / 100 + min;
+    if (value < min) {
+      value = min;
+    } else if (value > max) {
+      value = max;
+    }
+    return value.toFixed(0);
   };
 
   window.utils.disableButton = function (selector, node) {
@@ -324,6 +361,21 @@
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
     childNode.disabled = shouldBeBlocked;
+  };
+
+  window.utils.listMin = function (list) {
+    var result = Math.min.apply(null, list);
+    return result;
+  };
+
+  window.utils.listMax = function (list) {
+    var result = Math.max.apply(null, list);
+    return result;
+  };
+
+  window.utils.getMovementX = function (begin, end) {
+    var value = end.x - begin.x;
+    return value;
   };
 
 })();
