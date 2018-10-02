@@ -90,31 +90,52 @@
    * Main code
    */
 
-  var catalog = new window.Catalog(window.mockGoods.get);
-  var trolley = new window.Trolley(catalog);
-  var dom = new window.Dom(
-      catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
-      trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
-  );
-  dom.renderCatalogDom();
-  dom.renderTrolleyDom();
-
+  // Genereate mock goods
   /*
-  var GOODS_IN_TROLLEY_COUNT = 3;
-  putRandomGoodsInTrolley(
-      catalog, catalogDom.updateView,
-      trolley, trolleyDom.updateView,
-      GOODS_IN_TROLLEY_COUNT);
-   */
+  window.mockGoods.get(onSuccess, function(text) {
+    console.log(text);
+  });
+  */
 
-  var filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
-  setInterfaceHandlers();
+  window.Backend.get(onSuccess, function(text) {
+    console.log(text);
+  });
+
   return;
 
   /*
    * End of main code
    */
 
+
+  var catalog;
+  var trolley;
+  var dom;
+  var filter;
+
+  function onSuccess(data) {
+    catalog = new window.Catalog(function() {
+      return data;
+    });
+    trolley = new window.Trolley(catalog);
+    dom = new window.Dom(
+        catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
+        trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
+    );
+    dom.renderCatalogDom();
+    dom.renderTrolleyDom();
+
+    /*
+    var GOODS_IN_TROLLEY_COUNT = 3;
+    putRandomGoodsInTrolley(
+        catalog, catalogDom.updateView,
+        trolley, trolleyDom.updateView,
+        GOODS_IN_TROLLEY_COUNT);
+     */
+
+    filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
+    setInterfaceHandlers();
+  }
 
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
