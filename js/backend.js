@@ -66,7 +66,7 @@
     }
   };
 
-  function processXhrResult (result, onLoad, onError) {
+  function processXhrResult(result, onLoad, onError) {
     if (window.utils.HttpCode.isSuccess(result.status)) {
       onLoad(result.response);
     } else {
