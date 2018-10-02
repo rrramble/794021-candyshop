@@ -362,4 +362,12 @@
     return value;
   };
 
+  window.utils.HttpCode = {
+    successCodes: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226],
+
+    isSuccess: function (code) {
+      return this.successCodes.includes(parseInt(code, 10));
+    }
+  };
+
 })();
