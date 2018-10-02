@@ -101,7 +101,7 @@
   */
 
   window.Backend.get(onSuccessDownload, function (text) {
-  	return text;
+    return text;
   });
 
   return;
