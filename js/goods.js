@@ -34,7 +34,7 @@
     PHONE_MIN_LENGTH: 10,
     PHONE_MAX_LENGTH: 22,
 
-    EMAIL_SELECTOR: '#contact-data__email',
+    EMAIL_SELECTOR: '#contact-data__email'
   };
 
   var Payment = {

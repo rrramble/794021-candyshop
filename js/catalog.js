@@ -7,7 +7,7 @@
 
 (function () {
 
-  var IMG_PATH = '/img/cards/';
+  var IMG_PATH = 'img/cards/';
 
   window.Catalog = function (loadGoods) {
 
@@ -67,7 +67,7 @@
       this.goods[id].favorite = !this.getItem(id).favorite;
     };
 
-    this.optimize = function () {
+    this.tuneData = function () {
       this.goods.forEach(function (item, index) {
         item.picture = IMG_PATH + item.picture;
         item.id = index;
@@ -76,7 +76,7 @@
 
     // Costructor of the class
     this.goods = loadGoods();
-    this.optimize();
+    this.tuneData();
   };
 
 })();
