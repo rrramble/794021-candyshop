@@ -65,34 +65,34 @@
   ];
 
   var PICTURES = [
-    'img/cards/gum-cedar.jpg',
-    'img/cards/gum-chile.jpg',
-    'img/cards/gum-eggplant.jpg',
-    'img/cards/gum-mustard.jpg',
-    'img/cards/gum-portwine.jpg',
-    'img/cards/gum-wasabi.jpg',
-    'img/cards/ice-cucumber.jpg',
-    'img/cards/ice-eggplant.jpg',
-    'img/cards/ice-garlic.jpg',
-    'img/cards/ice-italian.jpg',
-    'img/cards/ice-mushroom.jpg',
-    'img/cards/ice-pig.jpg',
-    'img/cards/marmalade-beer.jpg',
-    'img/cards/marmalade-caviar.jpg',
-    'img/cards/marmalade-corn.jpg',
-    'img/cards/marmalade-new-year.jpg',
-    'img/cards/marmalade-sour.jpg',
-    'img/cards/marshmallow-bacon.jpg',
-    'img/cards/marshmallow-beer.jpg',
-    'img/cards/marshmallow-shrimp.jpg',
-    'img/cards/marshmallow-spicy.jpg',
-    'img/cards/marshmallow-wine.jpg',
-    'img/cards/soda-bacon.jpg',
-    'img/cards/soda-celery.jpg',
-    'img/cards/soda-cob.jpg',
-    'img/cards/soda-garlic.jpg',
-    'img/cards/soda-peanut-grapes.jpg',
-    'img/cards/soda-russian.jpg'
+    'gum-cedar.jpg',
+    'gum-chile.jpg',
+    'gum-eggplant.jpg',
+    'gum-mustard.jpg',
+    'gum-portwine.jpg',
+    'gum-wasabi.jpg',
+    'ice-cucumber.jpg',
+    'ice-eggplant.jpg',
+    'ice-garlic.jpg',
+    'ice-italian.jpg',
+    'ice-mushroom.jpg',
+    'ice-pig.jpg',
+    'marmalade-beer.jpg',
+    'marmalade-caviar.jpg',
+    'marmalade-corn.jpg',
+    'marmalade-new-year.jpg',
+    'marmalade-sour.jpg',
+    'marshmallow-bacon.jpg',
+    'marshmallow-beer.jpg',
+    'marshmallow-shrimp.jpg',
+    'marshmallow-spicy.jpg',
+    'marshmallow-wine.jpg',
+    'soda-bacon.jpg',
+    'soda-celery.jpg',
+    'soda-cob.jpg',
+    'soda-garlic.jpg',
+    'soda-peanut-grapes.jpg',
+    'soda-russian.jpg'
   ];
 
   var CONTENTS = [
@@ -123,20 +123,21 @@
 
   window.mockGoods = {};
 
-  window.mockGoods.get = function () {
+  window.mockGoods.get = function (onLoad) {
     var goods = [];
     for (var i = 0; i < MOCK_GOODS_COUNT; i++) {
       var commodity = fulfillCommodity({});
       commodity.id = i;
       goods.push(commodity);
     }
-    return goods;
+    onLoad(goods);
+    return;
   };
 
-
   /*
-   * Miscelaneous
+   * End of main code
    */
+
 
   function fulfillCommodity(commodity) {
     commodity.name = window.utils.getRandomItemFromList(NAMES);
