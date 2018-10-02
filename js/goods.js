@@ -100,8 +100,7 @@
   });
   */
 
-  window.Backend.get(onSuccessDownload, function(text) {
-    console.log(text);
+  window.Backend.get(onSuccessDownload, function (text) {
   });
 
   return;
@@ -117,7 +116,7 @@
   var filter;
 
   function onSuccessDownload(data) {
-    catalog = new window.Catalog(function() {
+    catalog = new window.Catalog(function () {
       return data;
     });
     trolley = new window.Trolley(catalog);
@@ -212,9 +211,9 @@
 
   }
 
-    function makeOrderFormData() {
-      return document.querySelector(Order.MAIN_SELECTOR);
-    }
+  function makeOrderFormData() {
+    return document.querySelector(Order.MAIN_SELECTOR);
+  }
 
   /*
    * Contacts handler and checking

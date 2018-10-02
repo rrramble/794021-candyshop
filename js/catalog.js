@@ -68,11 +68,11 @@
     };
 
     this.optimize = function () {
-      this.goods.forEach(function(item, index) {
+      this.goods.forEach(function (item, index) {
         item.picture = IMG_PATH + item.picture;
         item.id = index;
       });
-    }
+    };
 
     // Costructor of the class
     this.goods = loadGoods();

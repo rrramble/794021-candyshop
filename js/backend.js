@@ -21,7 +21,7 @@
   };
 
   window.Backend = {};
-  window.Backend.get = function(onLoad, onError) {
+  window.Backend.get = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.addEventListener('load', onEndLoading);
     xhr.addEventListener('error', onLoadingError);
@@ -38,7 +38,7 @@
 
     function onEndLoading() {
       if (window.utils.isInRangeUpTo(xhr.status, 200, 299)) {
-        onLoad(xhr.response)
+        onLoad(xhr.response);
       } else {
         onError(xhr.status + '. ' + xhr.statusText);
       }
@@ -71,7 +71,7 @@
 
     function onEndLoading() {
       if (window.utils.isInRangeUpTo(xhr.status, 200, 299)) {
-        onLoad(xhr.response)
+        onLoad(xhr.response);
       } else {
         onError(xhr.status + '. ' + xhr.statusText);
       }
