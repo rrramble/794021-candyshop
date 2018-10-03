@@ -118,12 +118,14 @@
 
 
   /*
-  * Main
-  */
+   * Main code
+   */
 
-  window.mockGoods = {};
+  window.mockGoods = {
+  	get: get
+  };
 
-  window.mockGoods.get = function (onLoad) {
+  function get(onLoad) {
     var goods = [];
     for (var i = 0; i < MOCK_GOODS_COUNT; i++) {
       var commodity = fulfillCommodity({});
@@ -132,7 +134,7 @@
     }
     onLoad(goods);
     return;
-  };
+  }
 
   /*
    * End of main code
