@@ -23,14 +23,14 @@
   window.Backend = {};
 
   window.Backend.get = function (onLoad, onError) {
-    processXhr(Host.Download, onLoad, onError)
+    processXhr(Host.Download, onLoad, onError);
   };
 
   window.Backend.put = function (data, onLoad, onError) {
-    processXhr(Host.Upload, onLoad, onError, data)
+    processXhr(Host.Upload, onLoad, onError, data);
   };
 
-  function processXhr (connection, onLoad, onError, data) {
+  function processXhr(connection, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
 
     xhr.addEventListener('load', function () {
@@ -54,11 +54,11 @@
     try {
       var formData = data ? new FormData(data) : undefined;
       xhr.send(formData);
-    } catch(err) {
+    } catch (err) {
       onError(err.name + ' ' + err.message);
     }
 
-  };
+  }
 
   function processResult(result, onLoad, onError) {
     if (window.utils.HttpCode.isSuccess(result.status)) {
@@ -66,6 +66,6 @@
     } else {
       onError(result.status + '. ' + result.statusText);
     }
-  };
+  }
 
 })();
