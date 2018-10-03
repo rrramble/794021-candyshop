@@ -100,9 +100,7 @@
   });
   */
 
-  window.Backend.get(onSuccessDownload, function (text) {
-    return text;
-  });
+  window.Backend.get(onSuccessDownload, onErrorDownloadUpload);
 
   return;
 
@@ -198,18 +196,17 @@
 
     evt.preventDefault();
     window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorUpload);
+  }
 
-    function onSuccessUpload() {
-      resetOrderForm();
-      var modalNode = document.querySelector(Order.MODAL_SUCCESS_SELECTOR);
-      modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-    }
+  function onSuccessUpload() {
+    resetOrderForm();
+    var modalNode = document.querySelector(Order.MODAL_SUCCESS_SELECTOR);
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+  }
 
-    function onErrorUpload() {
-      var modalNode = document.querySelector(Order.MODAL_ERROR_SELECTOR);
-      modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-    }
-
+  function onErrorDownloadUpload() {
+    var modalNode = document.querySelector(Order.MODAL_ERROR_SELECTOR);
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
   }
 
   function makeOrderFormData() {
