@@ -20,13 +20,16 @@
     }
   };
 
-  window.Backend = {};
+  window.Backend = {
+  	get: exportGet,
+  	put: exportPut
+  };
 
-  window.Backend.get = function (onLoad, onError) {
+  function exportGet(onLoad, onError) {
     processXhr(Host.Download, onLoad, onError);
   };
 
-  window.Backend.put = function (data, onLoad, onError) {
+  function exportPut (data, onLoad, onError) {
     processXhr(Host.Upload, onLoad, onError, data);
   };
 
