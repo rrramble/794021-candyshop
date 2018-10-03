@@ -21,57 +21,51 @@
   };
 
   window.Backend = {};
+
   window.Backend.get = function (onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener('load', function () {
-      processXhrResult(xhr, onLoad, onError);
-    });
-    xhr.addEventListener('error', onLoadingError);
-    xhr.addEventListener('timeout', onLoadingTimeout);
-
-    xhr.responseType = Host.Download.RESPONSE_TYPE;
-    xhr.open(Host.Download.METHOD, Host.Download.URL);
-    xhr.send();
-    return;
-
-    function onLoadingError() {
-      onError('Downloading error.');
-    }
-
-    function onLoadingTimeout() {
-      onError('Downloading timeout error.');
-    }
+    processXhr(Host.Download, onLoad, onError)
   };
 
   window.Backend.put = function (data, onLoad, onError) {
-    var formData = new FormData(data);
-
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener('load', function () {
-      processXhrResult(xhr, onLoad, onError);
-    });
-    xhr.addEventListener('error', onLoadingError);
-    xhr.addEventListener('timeout', onLoadingTimeout);
-
-    xhr.open(Host.Upload.METHOD, Host.Upload.URL);
-    xhr.send(formData);
-    return;
-
-    function onLoadingError() {
-      onError('Uploading error.');
-    }
-
-    function onLoadingTimeout() {
-      onError('Uploading timeout error.');
-    }
+    processXhr(Host.Upload, onLoad, onError, data)
   };
 
-  function processXhrResult(result, onLoad, onError) {
+  function processXhr (connection, onLoad, onError, data) {
+    var xhr = new XMLHttpRequest();
+
+    xhr.addEventListener('load', function () {
+      processResult(xhr, onLoad, onError);
+    });
+    xhr.addEventListener('error', function () {
+      processResult(xhr, onLoad, onError);
+    });
+    xhr.addEventListener('timeout', function () {
+      processResult(xhr, onLoad, onError);
+    });
+
+    if (connection.RESPONSE_TYPE) {
+      xhr.responseType = connection.RESPONSE_TYPE;
+    }
+    if (connection.TIMEOUT) {
+      xhr.timeout = connection.TIMEOUT;
+    }
+
+    xhr.open(connection.METHOD, connection.URL);
+    try {
+      var formData = data ? new FormData(data) : undefined;
+      xhr.send(formData);
+    } catch(err) {
+      onError(err.name + ' ' + err.message);
+    }
+
+  };
+
+  function processResult(result, onLoad, onError) {
     if (window.utils.HttpCode.isSuccess(result.status)) {
       onLoad(result.response);
     } else {
       onError(result.status + '. ' + result.statusText);
     }
-  }
+  };
 
 })();
