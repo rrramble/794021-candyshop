@@ -21,17 +21,17 @@
   };
 
   window.Backend = {
-  	get: get,
-  	put: put
+    get: get,
+    put: put
   };
 
   function get(onLoad, onError) {
     processXhr(Host.Download, onLoad, onError);
-  };
+  }
 
-  function put (data, onLoad, onError) {
+  function put(data, onLoad, onError) {
     processXhr(Host.Upload, onLoad, onError, data);
-  };
+  }
 
   function processXhr(connection, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();

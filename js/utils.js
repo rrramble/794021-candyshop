@@ -76,7 +76,7 @@
     getMovementX: getMovementX,
 
     HttpCode: HttpCode
-  }
+  };
 
   function getDomObjectsByClassName(objectClass) {
     var domId = window.utils.htmlClassToSelector(objectClass);
@@ -265,8 +265,8 @@
     }
     var numbers = noSpaces.split('');
     var semiDoubled = numbers.map(semiDouble);
-    var sum = semiDoubled.reduce(window.utils.sum, 0);
-    return (sum % 10 === 0);
+    var total = semiDoubled.reduce(window.utils.sum, 0);
+    return (total % 10 === 0);
 
     function semiDouble(char, index) {
       var digit = parseInt(char, 10);
@@ -372,7 +372,7 @@
     return value.toFixed(0);
   }
 
-  function disableButton (selector, node) {
+  function disableButton(selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = true;
   }
