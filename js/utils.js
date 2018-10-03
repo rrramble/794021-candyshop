@@ -8,29 +8,97 @@
 
   var SELECTOR_HIDDEN = '.visually-hidden';
 
-  window.utils = {};
+  var HttpCode = {
+    successCodes: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226],
+    isSuccess: function (code) {
+      return this.successCodes.includes(parseInt(code, 10));
+    }
+  };
 
-  window.utils.getDomObjectsByClassName = function (objectClass) {
+  window.utils = {
+    getDomObjectsByClassName: getDomObjectsByClassName,
+    removeCssClass: removeCssClass,
+    addCssClass: addCssClass,
+    randomInRange: randomInRange,
+    randomInRangeUpTo: randomInRangeUpTo,
+    getRandomItemFromList: getRandomItemFromList,
+    getRandomListFromList: getRandomListFromList,
+    htmlClassFromSelector: htmlClassFromSelector,
+    showHtmlSelector: showHtmlSelector,
+    hideHtmlSelector: hideHtmlSelector,
+    htmlClassToSelector: htmlClassToSelector,
+    querySelectorIncludingSelf: querySelectorIncludingSelf,
+    htmlSelectorToClass: htmlSelectorToClass,
+    isNumber: isNumber,
+    isChecked: isChecked,
+    htmlIdToHtmlSelector: htmlIdToHtmlSelector,
+    isInRange: isInRange,
+    isInRangeUpTo: isInRangeUpTo,
+    setWithinRange: setWithinRange,
+
+    setDomId: setDomId,
+    setDomTextContent: setDomTextContent,
+    setDomImage: setDomImage,
+    setDomValue: setDomValue,
+    getDomValue: getDomValue,
+    setDomName: setDomName,
+    replaceDomItem: replaceDomItem,
+    setDomEventHandler: setDomEventHandler,
+    removeDomEventHandler: removeDomEventHandler,
+
+    isLuhnChecked: isLuhnChecked,
+    isCardDateChecked: isCardDateChecked,
+    isCvcChecked: isCvcChecked,
+    isCacrdholderNameChecked: isCacrdholderNameChecked,
+    isEven: isEven,
+    sum: sum,
+    trimAll: trimAll,
+    trimSpaces: trimSpaces,
+    omitPx: omitPx,
+
+    getHtmlSelectorProperty: getHtmlSelectorProperty,
+    getHtmlSelectorWidth: getHtmlSelectorWidth,
+    getHtmlClassLeftProperty: getHtmlClassLeftProperty,
+    setHtmlClassLeftProperty: setHtmlClassLeftProperty,
+    getHtmlClassRightProperty: getHtmlClassRightProperty,
+    setHtmlClassRightProperty: setHtmlClassRightProperty,
+
+    intPercent: intPercent,
+    percentToIntValue: percentToIntValue,
+    disableButton: disableButton,
+    enableButton: enableButton,
+    setInputToBeRequired: setInputToBeRequired,
+    setDomValid: setDomValid,
+    setHtmlTagAttribute: setHtmlTagAttribute,
+    blockInput: blockInput,
+    listMin: listMin,
+    listMax: listMax,
+    getMovementX: getMovementX,
+
+    HttpCode: HttpCode
+  };
+
+  function getDomObjectsByClassName(objectClass) {
     var domId = window.utils.htmlClassToSelector(objectClass);
     var domObjects = document.querySelectorAll(domId);
     return domObjects;
-  };
+  }
 
-  window.utils.removeCssClass = function (objectClass, classToBeRemoved) {
+  function removeCssClass(objectClass, classToBeRemoved) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
     for (var i = 0; i < domObjects.length; i++) {
       domObjects[i].classList.remove(classToBeRemoved);
     }
-  };
+  }
 
-  window.utils.addCssClass = function (objectClass, classToBeAdded) {
+  function addCssClass(objectClass, classToBeAdded) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
     for (var i = 0; i < domObjects.length; i++) {
       domObjects[i].classList.add(classToBeAdded);
     }
-  };
+  }
 
-  window.utils.randomInRange = function (from, to) {
+  function randomInRange(from, to) {
     var result = Math.floor(Math.random(to - from) * to + from);
     if (result < from) {
       result = from;
@@ -38,23 +106,22 @@
       result = to - 1;
     }
     return result;
-  };
+  }
 
-  window.utils.randomInRangeUpTo = function (from, upTo) {
+  function randomInRangeUpTo(from, upTo) {
     var to = upTo + 1;
     return window.utils.randomInRange(from, to);
-  };
+  }
 
-  window.utils.getRandomItemFromList = function (list) {
+  function getRandomItemFromList(list) {
     if (list.length === 0) {
       return list;
     }
-
     var index = window.utils.randomInRange(0, list.length);
     return list[index];
-  };
+  }
 
-  window.utils.getRandomListFromList = function (list) {
+  function getRandomListFromList(list) {
     if (list.length === 0) {
       return list;
     }
@@ -67,33 +134,33 @@
       newList = list[0];
     }
     return newList;
-  };
+  }
 
-  window.utils.htmlClassFromSelector = function (htmlSelector) {
+  function htmlClassFromSelector(htmlSelector) {
     var firstChar = htmlSelector[0];
     if (firstChar === '.') {
       return htmlSelector.slice(1);
     }
     return undefined;
-  };
+  }
 
-  window.utils.showHtmlSelector = function (node, htmlSelector) {
+  function showHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
     el.classList.remove(className);
-  };
+  }
 
-  window.utils.hideHtmlSelector = function (node, htmlSelector) {
+  function hideHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
     el.classList.add(className);
-  };
+  }
 
-  window.utils.htmlClassToSelector = function (htmlClass) {
+  function htmlClassToSelector(htmlClass) {
     return '.' + htmlClass;
-  };
+  }
 
-  window.utils.querySelectorIncludingSelf = function (dom, selector) {
+  function querySelectorIncludingSelf(dom, selector) {
     var classes = dom.classList;
     if (classes) {
       var className = window.utils.htmlSelectorToClass(selector);
@@ -102,76 +169,76 @@
       }
     }
     return dom.querySelector(selector);
-  };
+  }
 
-  window.utils.htmlSelectorToClass = function (htmlSelector) {
+  function htmlSelectorToClass(htmlSelector) {
     return htmlSelector.slice(1);
-  };
+  }
 
-  window.utils.isNumber = function (n) {
+  function isNumber(n) {
     if (isNaN(n)) {
       return false;
     }
     return !isNaN(parseFloat(n)) && isFinite(n);
-  };
+  }
 
-  window.utils.isChecked = function (htmlSelector, node) {
+  function isChecked(htmlSelector, node) {
     var baseNode = node ? node : document;
     var result = baseNode.querySelector(htmlSelector).checked;
     return result;
-  };
+  }
 
-  window.utils.htmlIdToHtmlSelector = function (id) {
+  function htmlIdToHtmlSelector(id) {
     return '#' + id;
-  };
+  }
 
-  window.utils.isInRange = function (value, from, to) {
+  function isInRange(value, from, to) {
     return (value >= from && value < to);
-  };
+  }
 
-  window.utils.isInRangeUpTo = function (value, from, to) {
+  function isInRangeUpTo(value, from, to) {
     return (value >= from && value <= to);
-  };
+  }
 
-  window.utils.setWithinRange = function (value, from, upTo) {
+  function setWithinRange(value, from, upTo) {
     if (value < from) {
       return from;
     }
     return value > upTo ? upTo : value;
-  };
+  }
 
-  window.utils.setDomId = function (node, htmlSelector, data) {
+  function setDomId(node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.id = data;
-  };
+  }
 
-  window.utils.setDomTextContent = function (node, htmlSelector, data) {
+  function setDomTextContent(node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.textContent = data;
-  };
+  }
 
-  window.utils.setDomImage = function (node, htmlSelector, imageUrl, imageAlt) {
+  function setDomImage(node, htmlSelector, imageUrl, imageAlt) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.src = imageUrl ? imageUrl : '';
     subNode.alt = imageAlt ? imageAlt : '';
-  };
+  }
 
-  window.utils.setDomValue = function (node, selector, data) {
+  function setDomValue(node, selector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     subNode.value = data;
-  };
+  }
 
-  window.utils.getDomValue = function (node, selector) {
+  function getDomValue(node, selector) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     return subNode.value;
-  };
+  }
 
-  window.utils.setDomName = function (node, selector, data) {
+  function setDomName(node, selector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     subNode.name = data;
-  };
+  }
 
-  window.utils.replaceDomItem = function (mainDomObject, oldChildSelector, newChildNode) {
+  function replaceDomItem(mainDomObject, oldChildSelector, newChildNode) {
     var startDomObject = mainDomObject;
     if (!mainDomObject) {
       startDomObject = document;
@@ -179,27 +246,27 @@
     var parentNode = startDomObject.querySelector(oldChildSelector).parentNode;
     var oldChildNode = parentNode.querySelector(oldChildSelector);
     parentNode.replaceChild(newChildNode, oldChildNode);
-  };
+  }
 
-  window.utils.setDomEventHandler = function (domNode, htmlSelector, cb, type) {
+  function setDomEventHandler(domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.addEventListener(type, cb);
-  };
+  }
 
-  window.utils.removeDomEventHandler = function (domNode, htmlSelector, cb, type) {
+  function removeDomEventHandler(domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.removeEventListener(type, cb);
-  };
+  }
 
-  window.utils.isLuhnChecked = function (cardNumber) {
+  function isLuhnChecked(cardNumber) {
     var noSpaces = window.utils.trimAll(cardNumber.toString());
     if (noSpaces.length !== 16) {
       return false;
     }
     var numbers = noSpaces.split('');
     var semiDoubled = numbers.map(semiDouble);
-    var sum = semiDoubled.reduce(window.utils.sum, 0);
-    return (sum % 10 === 0);
+    var total = semiDoubled.reduce(window.utils.sum, 0);
+    return (total % 10 === 0);
 
     function semiDouble(char, index) {
       var digit = parseInt(char, 10);
@@ -209,10 +276,9 @@
       }
       return digit;
     }
+  }
 
-  };
-
-  window.utils.isCardDateChecked = function (cardDate) {
+  function isCardDateChecked(cardDate) {
     var noFillings = window.utils.trimSpaces(cardDate);
     var month = noFillings.slice(0, 2);
     var divider = noFillings.slice(2, 3);
@@ -220,108 +286,108 @@
     return window.utils.isInRangeUpTo(month, 1, 12) &&
       window.utils.isInRangeUpTo(year, 18, 50) &&
       !window.utils.isNumber(divider);
-  };
+  }
 
-  window.utils.isCvcChecked = function (cvc) {
+  function isCvcChecked(cvc) {
     var noFillings = window.utils.trimAll(cvc) / 1;
     var number = noFillings.toFixed(0);
     var result = window.utils.isInRangeUpTo(number, 0, 999) &&
       number.length === 3;
     return result;
-  };
+  }
 
-  window.utils.isCacrdholderNameChecked = function (fullName) {
+  function isCacrdholderNameChecked(fullName) {
     var noFillings = window.utils.trimAll(fullName);
     return noFillings.length > 0;
-  };
+  }
 
-  window.utils.isEven = function (a) {
+  function isEven(a) {
     return a % 2 === 0;
-  };
+  }
 
-  window.utils.sum = function (a, b) {
+  function sum(a, b) {
     return b ? a + b : a;
-  };
+  }
 
-  window.utils.trimAll = function (s) {
+  function trimAll(s) {
     var noSpaces = s.replace(/\s/g, '');
     var noFillings = noSpaces.replace('.', '').replace('-', '').replace('_', '');
     return noFillings;
-  };
+  }
 
-  window.utils.trimSpaces = function (s) {
+  function trimSpaces(s) {
     var noSpaces = s.replace(/\s/g, '');
     return noSpaces;
-  };
+  }
 
-  window.utils.omitPx = function (px) {
+  function omitPx(px) {
     return parseFloat(px.toString());
-  };
+  }
 
-  window.utils.getHtmlSelectorProperty = function (property, htmlSelector, node) {
+  function getHtmlSelectorProperty(property, htmlSelector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(htmlSelector);
     var result = window.getComputedStyle(childNode).getPropertyValue(property);
     return result;
-  };
+  }
 
-  window.utils.getHtmlSelectorWidth = function (htmlSelector, node) {
+  function getHtmlSelectorWidth(htmlSelector, node) {
     var resultPx = window.utils.getHtmlSelectorProperty('width', htmlSelector, node);
     return window.utils.omitPx(resultPx);
-  };
+  }
 
-  window.utils.getHtmlClassLeftProperty = function (htmlClass, node) {
+  function getHtmlClassLeftProperty(htmlClass, node) {
     var selector = window.utils.htmlClassToSelector(htmlClass);
     var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
     return window.utils.omitPx(leftPx);
-  };
+  }
 
-  window.utils.setHtmlClassLeftProperty = function (value, htmlClass, node) {
+  function setHtmlClassLeftProperty(value, htmlClass, node) {
     var baseNode = node ? node : document;
     var selector = window.utils.htmlClassToSelector(htmlClass);
     baseNode.querySelector(selector).style.left = value + 'px';
-  };
+  }
 
-  window.utils.getHtmlClassRightProperty = function (htmlClass, node) {
+  function getHtmlClassRightProperty(htmlClass, node) {
     var selector = window.utils.htmlClassToSelector(htmlClass);
     var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
     return window.utils.omitPx(rightPx);
-  };
+  }
 
-  window.utils.setHtmlClassRightProperty = function (value, htmlClass, node) {
+  function setHtmlClassRightProperty(value, htmlClass, node) {
     var baseNode = node ? node : document;
     var selector = window.utils.htmlClassToSelector(htmlClass);
     baseNode.querySelector(selector).style.right = value + 'px';
-  };
+  }
 
-  window.utils.intPercent = function (base, part) {
+  function intPercent(base, part) {
     var percent = base === 0 ? 0 : part / base * 100;
     percent = window.utils.setWithinRange(percent, 0, 100);
     return percent.toFixed(0);
-  };
+  }
 
-  window.utils.percentToIntValue = function (percent, min, max) {
+  function percentToIntValue(percent, min, max) {
     var value = (max - min) * percent / 100 + min;
     value = window.utils.setWithinRange(value, min, max);
     return value.toFixed(0);
-  };
+  }
 
-  window.utils.disableButton = function (selector, node) {
+  function disableButton(selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = true;
-  };
+  }
 
-  window.utils.enableButton = function (selector, node) {
+  function enableButton(selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = false;
-  };
+  }
 
-  window.utils.setInputToBeRequired = function (isToBeRequired, selector, node) {
+  function setInputToBeRequired(isToBeRequired, selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).required = isToBeRequired;
-  };
+  }
 
-  window.utils.setDomValid = function (shouldBeValid, selector, node) {
+  function setDomValid(shouldBeValid, selector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
     if (shouldBeValid) {
@@ -329,9 +395,9 @@
     } else {
       childNode.setCustomValidity('Некорретные данные');
     }
-  };
+  }
 
-  window.utils.setHtmlTagAttribute = function (shouldBeSet, parameter, value, selector, node) {
+  function setHtmlTagAttribute(shouldBeSet, parameter, value, selector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
     if (shouldBeSet) {
@@ -339,27 +405,27 @@
     } else {
       childNode.removeAttribute(parameter);
     }
-  };
+  }
 
-  window.utils.blockInput = function (shouldBeBlocked, selector, node) {
+  function blockInput(shouldBeBlocked, selector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
     childNode.disabled = shouldBeBlocked;
-  };
+  }
 
-  window.utils.listMin = function (list) {
+  function listMin(list) {
     var result = Math.min.apply(null, list);
     return result;
-  };
+  }
 
-  window.utils.listMax = function (list) {
+  function listMax(list) {
     var result = Math.max.apply(null, list);
     return result;
-  };
+  }
 
-  window.utils.getMovementX = function (begin, end) {
+  function getMovementX(begin, end) {
     var value = end.x - begin.x;
     return value;
-  };
+  }
 
 })();

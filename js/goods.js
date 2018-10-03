@@ -20,7 +20,10 @@
 
   var Order = {
     MAIN_SELECTOR: '.buy form',
-    SUBMIT_BTN_SELECTOR: '.buy__submit-btn'
+    SUBMIT_BTN_SELECTOR: '.buy__submit-btn',
+    MODAL_ERROR_SELECTOR: '.modal--error',
+    MODAL_SUCCESS_SELECTOR: '.modal--success',
+    MODAL_HIDDEN_CLASS: 'modal--hidden'
   };
 
   var Contacts = {
@@ -31,10 +34,10 @@
     PHONE_MIN_LENGTH: 10,
     PHONE_MAX_LENGTH: 22,
 
-    EMAIL_SELECTOR: '#contact-data__email',
+    EMAIL_SELECTOR: '#contact-data__email'
   };
 
-  var PAYMENT = {
+  var Payment = {
     MAIN_SELECTOR: '.payment',
     METHOD_SELECTOR: '.payment__method',
 
@@ -90,31 +93,42 @@
    * Main code
    */
 
-  var catalog = new window.Catalog(window.mockGoods.get);
-  var trolley = new window.Trolley(catalog);
-  var dom = new window.Dom(
-      catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
-      trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
-  );
-  dom.renderCatalogDom();
-  dom.renderTrolleyDom();
-
+  // Genereate mock goods
   /*
-  var GOODS_IN_TROLLEY_COUNT = 3;
-  putRandomGoodsInTrolley(
-      catalog, catalogDom.updateView,
-      trolley, trolleyDom.updateView,
-      GOODS_IN_TROLLEY_COUNT);
-   */
+  window.mockGoods.get(onSuccess, function(text) {
+    console.log(text);
+  });
+  */
 
-  var filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
-  setInterfaceHandlers();
+  window.Backend.get(onSuccessDownload, onErrorDownloadUpload);
+
   return;
 
   /*
    * End of main code
    */
 
+
+  var catalog;
+  var trolley;
+  var dom;
+  var filter;
+
+  function onSuccessDownload(data) {
+    catalog = new window.Catalog(function () {
+      return data;
+    });
+    trolley = new window.Trolley(catalog);
+    dom = new window.Dom(
+        catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
+        trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
+    );
+    dom.renderCatalogDom();
+    dom.renderTrolleyDom();
+
+    filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
+    setInterfaceHandlers();
+  }
 
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
@@ -139,7 +153,7 @@
     );
 
     window.utils.setDomEventHandler(
-        document, PAYMENT.METHOD_SELECTOR,
+        document, Payment.METHOD_SELECTOR,
         paymentTypeHandler,
         'click'
     );
@@ -164,7 +178,7 @@
 
     window.utils.setDomEventHandler(
         document, Order.MAIN_SELECTOR,
-        checkOrderFormValidity,
+        onSubmitOrder,
         'submit'
     );
 
@@ -175,10 +189,28 @@
    * Overall order form checking
    */
 
-  function checkOrderFormValidity() {
+  function onSubmitOrder(evt) {
     contactsCheckHandler();
     paymentCheckHandler();
     deliveryCheckHandler();
+
+    evt.preventDefault();
+    window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
+  }
+
+  function onSuccessUpload() {
+    resetOrderForm();
+    var modalNode = document.querySelector(Order.MODAL_SUCCESS_SELECTOR);
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+  }
+
+  function onErrorDownloadUpload() {
+    var modalNode = document.querySelector(Order.MODAL_ERROR_SELECTOR);
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+  }
+
+  function makeOrderFormData() {
+    return document.querySelector(Order.MAIN_SELECTOR);
   }
 
   /*
@@ -211,6 +243,7 @@
     }
 
     function isEmailValid() {
+      // Thanks to www.StackOverflow.com
       var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
       var se = /^[\w\.\-_]{1,}@[\w\.\-]{6,}/;
       return se.test(value);
@@ -223,6 +256,24 @@
     window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
   }
 
+  function resetOrderForm() {
+    window.utils.setDomValue(document, Contacts.NAME_SELECTOR, '');
+    window.utils.setDomValue(document, Contacts.PHONE_SELECTOR, '');
+    window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
+
+    window.utils.setDomValue(document, Payment.CARD_NUMBER_INPUT_SELECTOR, '');
+    window.utils.setDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR, '');
+    window.utils.setDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR, '');
+    window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
+
+    window.utils.setDomValue(document, Delivery.Courier.STREET_SELECTOR, '');
+    window.utils.setDomValue(document, Delivery.Courier.HOUSE_SELECTOR, '');
+    window.utils.setDomValue(document, Delivery.Courier.FLOOR_SELECTOR, '');
+    window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
+
+    resetContactsValidity();
+  }
+
 
   /*
    * Payment handler and checking
@@ -230,10 +281,10 @@
 
   function paymentTypeHandler() {
     switch (true) {
-      case (window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
+      case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
         adjustFormForPayment('card');
         break;
-      case (window.utils.isChecked(PAYMENT.CASH_LABEL_SELECTOR)):
+      case (window.utils.isChecked(Payment.CASH_LABEL_SELECTOR)):
         adjustFormForPayment('cash');
         break;
     }
@@ -241,96 +292,96 @@
 
   function adjustFormForPayment(type) {
     if (type === 'card') {
-      window.utils.showHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
-      window.utils.hideHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
+      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
+      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
       setFieldsForCardPayment(true);
     } else {
-      window.utils.hideHtmlSelector(document, PAYMENT.CARD_FORM_SELECTOR);
-      window.utils.showHtmlSelector(document, PAYMENT.CASH_PAYMENT_MESSAGE_SELECTOR);
+      window.utils.hideHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
+      window.utils.showHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
       setFieldsForCardPayment(false);
       resetCardValidity();
     }
   }
 
   function setFieldsForCardPayment(isToBeSet) {
-    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_NUMBER_MIN_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_NUMBER_MAX_LENGTH, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
 
-    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_DATE_MIN_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_DATE_MAX_LENGTH, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_DATE_MIN_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_DATE_MAX_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
 
-    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_CVC_MIN_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', PAYMENT.CARD_CVC_MAX_LENGTH, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_CVC_MAX_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
 
-    window.utils.setInputToBeRequired(isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', PAYMENT.CARD_HOLDER_MIN_WIDTH, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_HOLDER_MIN_WIDTH, Payment.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.blockInput(!isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
   }
 
   function paymentCheckHandler() {
     switch (true) {
-      case (!window.utils.isChecked(PAYMENT.CARD_LABEL_SELECTOR)):
+      case (!window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
         resetCardValidity();
         break;
       case (!isCardNumberValid()):
-        window.utils.setDomValid(false, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        window.utils.setDomValid(false, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardDateValid()):
-        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(false, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(false, Payment.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardCvcValid()):
-        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-        window.utils.setDomValid(false, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomValid(false, Payment.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardholderNameValid()):
-        window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-        window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-        window.utils.setDomValid(false, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_INVALID_MESSAGE);
+        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomValid(false, Payment.CARD_HOLDER_INPUT_SELECTOR);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       default:
-        window.utils.setDomTextContent(document, PAYMENT.CARD_VALIDITY_SELECTOR, PAYMENT.CARD_VALID_MESSAGE);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_VALID_MESSAGE);
         resetCardValidity();
     }
 
     function isCardNumberValid() {
-      var cardNumber = window.utils.getDomValue(document, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
+      var cardNumber = window.utils.getDomValue(document, Payment.CARD_NUMBER_INPUT_SELECTOR);
       return window.utils.isLuhnChecked(cardNumber);
     }
 
     function isCardDateValid() {
-      var cardDate = window.utils.getDomValue(document, PAYMENT.CARD_DATE_INPUT_SELECTOR);
+      var cardDate = window.utils.getDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR);
       return window.utils.isCardDateChecked(cardDate);
     }
 
     function isCardCvcValid() {
-      var cvc = window.utils.getDomValue(document, PAYMENT.CARD_CVC_INPUT_SELECTOR);
+      var cvc = window.utils.getDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR);
       return window.utils.isCvcChecked(cvc);
     }
 
     function isCardholderNameValid() {
-      var cardholder = window.utils.getDomValue(document, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+      var cardholder = window.utils.getDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR);
       return window.utils.isCacrdholderNameChecked(cardholder);
     }
   }
 
   function resetCardValidity() {
-    window.utils.setDomValid(true, PAYMENT.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setDomValid(true, PAYMENT.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setDomValid(true, PAYMENT.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setDomValid(true, PAYMENT.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
   }
 
   function setContactsToBeRequired(isToBeSet) {
