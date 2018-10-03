@@ -133,7 +133,6 @@
       goods.push(commodity);
     }
     onLoad(goods);
-    return;
   }
 
   /*
