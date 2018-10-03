@@ -122,7 +122,7 @@
    */
 
   window.mockGoods = {
-  	get: get
+    get: get
   };
 
   function get(onLoad) {
