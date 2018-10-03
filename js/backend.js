@@ -21,15 +21,15 @@
   };
 
   window.Backend = {
-  	get: exportGet,
-  	put: exportPut
+  	get: get,
+  	put: put
   };
 
-  function exportGet(onLoad, onError) {
+  function get(onLoad, onError) {
     processXhr(Host.Download, onLoad, onError);
   };
 
-  function exportPut (data, onLoad, onError) {
+  function put (data, onLoad, onError) {
     processXhr(Host.Upload, onLoad, onError, data);
   };
 
