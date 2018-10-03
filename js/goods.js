@@ -195,7 +195,7 @@
     deliveryCheckHandler();
 
     evt.preventDefault();
-    window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorUpload);
+    window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
   }
 
   function onSuccessUpload() {
