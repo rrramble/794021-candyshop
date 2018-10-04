@@ -115,9 +115,4 @@
 
   };
 
-
-  function CatalogFilter() {
-
-  }
-
 })();

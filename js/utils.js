@@ -31,6 +31,7 @@
     htmlSelectorToClass: htmlSelectorToClass,
     isNumber: isNumber,
     isChecked: isChecked,
+    isHtmlIdChecked: isHtmlIdChecked,
     htmlIdToHtmlSelector: htmlIdToHtmlSelector,
     isInRange: isInRange,
     isInRangeUpTo: isInRangeUpTo,
@@ -74,6 +75,7 @@
     listMin: listMin,
     listMax: listMax,
     getMovementX: getMovementX,
+    isKeyInObjectOfList: isKeyInObjectOfList,
 
     HttpCode: HttpCode
   };
@@ -186,6 +188,12 @@
     var baseNode = node ? node : document;
     var result = baseNode.querySelector(htmlSelector).checked;
     return result;
+  }
+
+  function isHtmlIdChecked(htmlId, node) {
+    var baseNode = node ? node : document;
+    var htmlSelector = window.utils.htmlIdToHtmlSelector(htmlId);
+    return baseNode.querySelector(htmlSelector).checked;
   }
 
   function htmlIdToHtmlSelector(id) {
@@ -426,6 +434,12 @@
   function getMovementX(begin, end) {
     var value = end.x - begin.x;
     return value;
+  }
+
+  function isKeyInObjectOfList(key, list) {
+    return list.some(function(item) {
+      return key in item;
+    });
   }
 
 })();

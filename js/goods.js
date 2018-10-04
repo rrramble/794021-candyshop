@@ -13,10 +13,28 @@
   var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
   var TROLLEY_HTML_SELECTOR = '.goods__cards';
 
+
+  var FilterForm = {
+    MAIN_SELECTOR: '.catalog__sidebar form',
+    CATEGORIES: [
+      {'filter-icecream': 'Мороженое'},
+      {'filter-soda': 'Газировка'},
+      {'filter-gum': 'Жвачка'},
+      {'filter-marmalade': 'Мармелад'},
+      {'filter-marshmallows': 'Зефир'}
+    ],
+    INGREDIENTS: [
+      {'filter-sugar-free': 'sugar'},
+      {'filter-vegetarian': 'vegetarian'},
+      {'filter-gluten-free': 'gluten'}
+    ],
+  }
+
   var FilterRange = {
     MIN_RANGE_SELECTOR: '.range__btn--left',
     MAX_RANGE_SELECTOR: '.range__btn--right'
   };
+
 
   var Order = {
     MAIN_SELECTOR: '.buy form',
@@ -112,7 +130,7 @@
   var catalog;
   var trolley;
   var dom;
-  var filter;
+  var filterRange;
 
   function onSuccessDownload(data) {
     catalog = new window.Catalog(function () {
@@ -126,7 +144,7 @@
     dom.renderCatalogDom();
     dom.renderTrolleyDom();
 
-    filter = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
+    filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
   }
 
@@ -135,14 +153,20 @@
     setContactsToBeRequired(true);
 
     window.utils.setDomEventHandler(
+        document, FilterForm.MAIN_SELECTOR,
+        filterFormHandler,
+        'change'
+    );
+
+    window.utils.setDomEventHandler(
         document, FilterRange.MIN_RANGE_SELECTOR,
-        filter.mouseDownHandler,
+        filterRange.mouseDownHandler,
         'mousedown'
     );
 
     window.utils.setDomEventHandler(
         document, FilterRange.MAX_RANGE_SELECTOR,
-        filter.mouseDownHandler,
+        filterRange.mouseDownHandler,
         'mousedown'
     );
 
@@ -480,5 +504,42 @@
     window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
+
+
+  /*
+   *
+   */
+
+  function filterFormHandler(evt) {
+    if (isCategoryOrIngredientsChanged(evt)) {
+      dom.toggleCategory(getCategoryStatuses(), getIngredientsStatuses());
+    }
+
+    function isCategoryOrIngredientsChanged(evt) {
+      var nodeId = evt.srcElement.id;
+      if (window.utils.isKeyInObjectOfList(nodeId, FilterForm.CATEGORIES) ||
+          window.utils.isKeyInObjectOfList(nodeId, FilterForm.INGREDIENTS)) {
+        return true;
+      }
+      return false;
+    }
+
+    function getCategoryStatuses() {
+      return FilterForm.CATEGORIES.filter(function(item) {
+        for (var key in item) {
+          return window.utils.isHtmlIdChecked(key);
+        }
+      });
+    }
+
+    function getIngredientsStatuses() {
+      return FilterForm.INGREDIENTS.filter(function(item) {
+        for (var key in item) {
+          return window.utils.isHtmlIdChecked(key);
+        }
+      });
+    }
+
+  }; // filterFormHandler
 
 })();

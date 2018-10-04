@@ -262,6 +262,9 @@
       return result;
     };
 
+    this.toggleCategory = function (category, ingredients) {
+      console.log();
+    }
 
     /*
      * Constructor body
