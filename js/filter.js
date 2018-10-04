@@ -27,7 +27,11 @@
     isMin: true
   };
 
-  window.Filter = function (minPrice, maxPrice) {
+  window.Filter = {
+    Range: Range
+  }
+
+  function Range(minPrice, maxPrice) {
     Price.min = minPrice;
     Price.max = maxPrice;
     updateSliderValue(Pin.isMin);
@@ -110,5 +114,10 @@
     }
 
   };
+
+
+  function CatalogFilter() {
+
+  }
 
 })();

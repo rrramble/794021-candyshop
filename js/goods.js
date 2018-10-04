@@ -126,7 +126,7 @@
     dom.renderCatalogDom();
     dom.renderTrolleyDom();
 
-    filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
+    filter = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
   }
 
