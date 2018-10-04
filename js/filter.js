@@ -70,14 +70,13 @@
         newX = window.utils.setWithinRange(newX, 0, maxPinLeftShift);
         window.utils.setHtmlClassLeftProperty(newX, Filter.RANGE_MIN_BTN_CLASS);
         window.utils.setHtmlClassLeftProperty(newX, Filter.FILL_LINE_CLASS);
-        Pin.mouseStartX += dX;
       } else {
         newX = maxPinRightShift - dX;
         newX = window.utils.setWithinRange(newX, 0, width - minPinLeftShift);
         window.utils.setHtmlClassRightProperty(newX, Filter.RANGE_MAX_BTN_CLASS);
         window.utils.setHtmlClassRightProperty(newX, Filter.FILL_LINE_CLASS);
-        Pin.mouseStartX += dX;
       }
+      Pin.mouseStartX += dX;
       updateSliderValue(isMinPin);
     }
 
