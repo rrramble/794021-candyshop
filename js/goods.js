@@ -19,14 +19,14 @@
     CATEGORIES: [
       {'filter-icecream': 'Мороженое'},
       {'filter-soda': 'Газировка'},
-      {'filter-gum': 'Жвачка'},
+      {'filter-gum': 'Жевательная резинка'},
       {'filter-marmalade': 'Мармелад'},
       {'filter-marshmallows': 'Зефир'}
     ],
     INGREDIENTS: [
-      {'filter-sugar-free': 'sugar'},
+      {'filter-sugar-free': 'sugar-free'},
       {'filter-vegetarian': 'vegetarian'},
-      {'filter-gluten-free': 'gluten'}
+      {'filter-gluten-free': 'gluten-free'}
     ],
   }
 
@@ -141,8 +141,6 @@
         catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
         trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
     );
-    dom.renderCatalogDom();
-    dom.renderTrolleyDom();
 
     filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
@@ -512,7 +510,10 @@
 
   function filterFormHandler(evt) {
     if (isCategoryOrIngredientsChanged(evt)) {
-      dom.toggleCategory(getCategoryStatuses(), getIngredientsStatuses());
+      dom.applyFilter(
+          getCheckedInputs(FilterForm.CATEGORIES),
+          getCheckedInputs(FilterForm.INGREDIENTS)
+      );
     }
 
     function isCategoryOrIngredientsChanged(evt) {
@@ -524,20 +525,15 @@
       return false;
     }
 
-    function getCategoryStatuses() {
-      return FilterForm.CATEGORIES.filter(function(item) {
-        for (var key in item) {
-          return window.utils.isHtmlIdChecked(key);
+    function getCheckedInputs(listOfInputs) {
+      return listOfInputs.reduce(function(accu, item) {
+        var htmlId = Object.keys(item)[0];
+        var value = item[htmlId];
+        if (window.utils.isHtmlIdChecked(htmlId)) {
+          accu.push(value);
         }
-      });
-    }
-
-    function getIngredientsStatuses() {
-      return FilterForm.INGREDIENTS.filter(function(item) {
-        for (var key in item) {
-          return window.utils.isHtmlIdChecked(key);
-        }
-      });
+        return accu;
+      }, []);
     }
 
   }; // filterFormHandler

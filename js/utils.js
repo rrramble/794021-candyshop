@@ -25,7 +25,9 @@
     getRandomListFromList: getRandomListFromList,
     htmlClassFromSelector: htmlClassFromSelector,
     showHtmlSelector: showHtmlSelector,
+    displayInitialHtmlSelector: displayInitialHtmlSelector,
     hideHtmlSelector: hideHtmlSelector,
+    displayNoneHtmlSelector: displayNoneHtmlSelector,
     htmlClassToSelector: htmlClassToSelector,
     querySelectorIncludingSelf: querySelectorIncludingSelf,
     htmlSelectorToClass: htmlSelectorToClass,
@@ -46,6 +48,7 @@
     replaceDomItem: replaceDomItem,
     setDomEventHandler: setDomEventHandler,
     removeDomEventHandler: removeDomEventHandler,
+    removeFirstDomSelector: removeFirstDomSelector,
 
     isLuhnChecked: isLuhnChecked,
     isCardDateChecked: isCardDateChecked,
@@ -152,10 +155,20 @@
     el.classList.remove(className);
   }
 
+  function displayInitialHtmlSelector(node, htmlSelector) {
+    var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    el.style.display = 'initial';
+  }
+
   function hideHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
     el.classList.add(className);
+  }
+
+  function displayNoneHtmlSelector(node, htmlSelector) {
+    var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    el.style.display = 'none';
   }
 
   function htmlClassToSelector(htmlClass) {
@@ -264,6 +277,14 @@
   function removeDomEventHandler(domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.removeEventListener(type, cb);
+  }
+
+  function removeFirstDomSelector(selector, domNode) {
+    var baseNode = domNode ? domNode : document;
+    var node = baseNode.querySelector(selector);
+    if (node) {
+      node.remove();
+    }
   }
 
   function isLuhnChecked(cardNumber) {
