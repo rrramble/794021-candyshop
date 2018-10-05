@@ -15,19 +15,7 @@
 
 
   var FilterForm = {
-    MAIN_SELECTOR: '.catalog__sidebar form',
-    CATEGORIES: [
-      {'filter-icecream': 'Мороженое'},
-      {'filter-soda': 'Газировка'},
-      {'filter-gum': 'Жвачка'},
-      {'filter-marmalade': 'Мармелад'},
-      {'filter-marshmallows': 'Зефир'}
-    ],
-    INGREDIENTS: [
-      {'filter-sugar-free': 'sugar'},
-      {'filter-vegetarian': 'vegetarian'},
-      {'filter-gluten-free': 'gluten'}
-    ],
+    MAIN_SELECTOR: '.catalog__sidebar form'
   }
 
   var FilterRange = {
@@ -141,8 +129,6 @@
         catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
         trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
     );
-    dom.renderCatalogDom();
-    dom.renderTrolleyDom();
 
     filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
@@ -212,6 +198,10 @@
   /*
    * Overall order form checking
    */
+
+  function filterFormHandler(evt) {
+    dom.filterFormHandler(evt);
+  }
 
   function onSubmitOrder(evt) {
     contactsCheckHandler();
@@ -510,36 +500,16 @@
    *
    */
 
-  function filterFormHandler(evt) {
-    if (isCategoryOrIngredientsChanged(evt)) {
-      dom.toggleCategory(getCategoryStatuses(), getIngredientsStatuses());
-    }
 
-    function isCategoryOrIngredientsChanged(evt) {
-      var nodeId = evt.srcElement.id;
-      if (window.utils.isKeyInObjectOfList(nodeId, FilterForm.CATEGORIES) ||
-          window.utils.isKeyInObjectOfList(nodeId, FilterForm.INGREDIENTS)) {
-        return true;
-      }
-      return false;
-    }
+  function fulfillFilterAmount () {
+    Categories.INGREDIENTS.forEach(function(item) {
+      var htmlId = Object.keys(item)[0];
+      var ingredient = item[htmlId];
+      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + Categories.CATEGORIES_VALUE_SELECTOR;
+      var valueFormatted = '(' + catalog.getIngredientAmount(ingredient) + ')';
+      window.utils.setDomTextContent(document, selector, valueFormatted);
+    });
+  }
 
-    function getCategoryStatuses() {
-      return FilterForm.CATEGORIES.filter(function(item) {
-        for (var key in item) {
-          return window.utils.isHtmlIdChecked(key);
-        }
-      });
-    }
-
-    function getIngredientsStatuses() {
-      return FilterForm.INGREDIENTS.filter(function(item) {
-        for (var key in item) {
-          return window.utils.isHtmlIdChecked(key);
-        }
-      });
-    }
-
-  }; // filterFormHandler
 
 })();

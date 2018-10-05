@@ -64,13 +64,59 @@
     };
 
     this.toggleFavorite = function (id) {
-      this.goods[id].favorite = !this.getItem(id).favorite;
+      this.getItem(id).favorite = !this.getItem(id).favorite;
     };
+
+    this.filterItem = function (id) {
+      this.getItem(id).filtered = true;
+    }
+
+    this.unfilterItem = function (id) {
+      this.getItem(id).filtered = false;
+    }
+
+    this.isFiltered = function (id) {
+      return this.getItem(id).filtered;
+    }
+
+    this.getCategoryAmount = function (category) {
+      return this.getGoods().reduce(function(accu, item) {
+        item.kind === category ? ++accu : accu;
+      }, 0);
+    }
+
+    this.canBeFiltered = function (id, categories, ingredients) {
+      var item = this.getItem(id);
+      if (categories.length > 0 && !categories.includes(item.kind)) {
+        return true;
+      }
+      if (ingredients.includes('sugar-free') && item.nutritionFacts.sugar) {
+        return true;
+      }
+      if (ingredients.includes('gluten-free') && item.nutritionFacts.gluten) {
+        return true;
+      }
+      if (ingredients.includes('vegetarian') && !item.nutritionFacts.vegetarian) {
+        return true;
+      }
+      return false;
+    }
+
+    this.applyFilter = function (categories, ingredients) {
+      for (var i = 0; i < this.getCount(); i++) {
+        if (this.canBeFiltered(i, categories, ingredients)) {
+          this.filterItem(i)
+        } else {
+          this.unfilterItem(i);
+        }
+      }
+    }
 
     this.tuneData = function () {
       this.goods.forEach(function (item, index) {
         item.picture = IMG_PATH + item.picture;
         item.id = index;
+        item.filtered = false;
       });
     };
 
