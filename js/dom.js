@@ -32,6 +32,7 @@
       {'filter-vegetarian': 'vegetarian'},
       {'filter-gluten-free': 'gluten-free'}
     ],
+    INGREDIENTS_VALUE_SELECTOR: '.input-btn__item-count'
   }
 
   window.Dom = function (
@@ -434,6 +435,15 @@
       var valueFormatted = '(' + obj.catalog.getCategoryAmount(commodityCategory) + ')';
       window.utils.setDomTextContent(document, selector, valueFormatted);
     });
+
+    FilterForm.INGREDIENTS.forEach(function(item) {
+      var htmlId = Object.keys(item)[0];
+      var commodityCategory = item[htmlId];
+      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + FilterForm.INGREDIENTS_VALUE_SELECTOR;
+      var valueFormatted = '(' + obj.catalog.getIngredientsAmount(commodityCategory) + ')';
+      window.utils.setDomTextContent(document, selector, valueFormatted);
+    });
+
   }
 
 })();
