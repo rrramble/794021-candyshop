@@ -287,7 +287,6 @@
       this.renderCatalogDom();
     };
 
-
   /*
    * Filter form handler
    */
