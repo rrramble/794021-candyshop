@@ -360,6 +360,7 @@
 
     this.renderCatalogDom();
     this.renderTrolleyDom();
+    fulfillFilterAmount(this);
 
     return this;
 
@@ -420,5 +421,20 @@
       return false;
     }
   };
+
+
+  /*
+   *
+   */
+
+  function fulfillFilterAmount (obj) {
+    FilterForm.CATEGORIES.forEach(function(item) {
+      var htmlId = Object.keys(item)[0];
+      var commodityCategory = item[htmlId];
+      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + FilterForm.CATEGORIES_VALUE_SELECTOR;
+      var valueFormatted = '(' + obj.catalog.getCategoryAmount(commodityCategory) + ')';
+      window.utils.setDomTextContent(document, selector, valueFormatted);
+    });
+  }
 
 })();

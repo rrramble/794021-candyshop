@@ -81,7 +81,7 @@
 
     this.getCategoryAmount = function (category) {
       return this.getGoods().reduce(function(accu, item) {
-        item.kind === category ? ++accu : accu;
+        return item.kind === category ? ++accu : accu;
       }, 0);
     }
 

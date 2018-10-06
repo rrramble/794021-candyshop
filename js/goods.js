@@ -495,21 +495,4 @@
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
 
-
-  /*
-   *
-   */
-
-
-  function fulfillFilterAmount () {
-    Categories.INGREDIENTS.forEach(function(item) {
-      var htmlId = Object.keys(item)[0];
-      var ingredient = item[htmlId];
-      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + Categories.CATEGORIES_VALUE_SELECTOR;
-      var valueFormatted = '(' + catalog.getIngredientAmount(ingredient) + ')';
-      window.utils.setDomTextContent(document, selector, valueFormatted);
-    });
-  }
-
-
 })();
