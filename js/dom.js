@@ -34,6 +34,9 @@
     ],
     FAVORITE: [
       {'filter-favorite': 'favorite'}
+    ],
+    IN_STOCK: [
+      {'filter-availability': 'in-stock'}
     ]
   }
 
@@ -438,6 +441,7 @@
     updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryAmount.bind(obj.catalog));
     updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsAmount.bind(obj.catalog));
     obj.updateFavoriteAmount();
+    updateFilterAmount(FilterForm.IN_STOCK, FilterForm.VALUE_SELECTOR, obj.catalog.getInStockCount.bind(obj.catalog));
   }
 
   function updateFilterAmount (list, valueSelector, getAmount) {

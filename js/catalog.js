@@ -54,6 +54,12 @@
       return this.getGoods().length;
     };
 
+    this.getInStockCount = function () {
+      return this.getGoods().reduce(function(accu, item) {
+        return item.amount > 0 ? ++accu : accu;
+      }, 0);
+    };
+
     this.getFavoriteStatus = function (id) {
       return this.getItem(id).favorite;
     };
