@@ -465,7 +465,7 @@
   }
 
   function isKeyInObjectOfList(key, list) {
-    return list.some(function(item) {
+    return list.some(function (item) {
       return key in item;
     });
   }

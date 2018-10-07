@@ -29,7 +29,7 @@
 
   window.Filter = {
     Range: Range
-  }
+  };
 
   function Range(minPrice, maxPrice) {
     Price.min = minPrice;
@@ -113,6 +113,6 @@
       return window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
     }
 
-  };
+  }
 
 })();

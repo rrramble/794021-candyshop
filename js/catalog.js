@@ -24,20 +24,20 @@
     };
 
     this.getCategoryCount = function (category) {
-      return this.getGoods().reduce(function(accu, item) {
+      return this.getGoods().reduce(function (accu, item) {
         return item.kind === category ? ++accu : accu;
       }, 0);
-    }
+    };
 
     this.getUnfilteredCount = function () {
-      var filteredCount = this.getGoods().reduce(function(accu, item) {
+      var filteredCount = this.getGoods().reduce(function (accu, item) {
         return item.filtered ? ++accu : accu;
       }, 0);
       return this.getCount() - filteredCount;
-    }
+    };
 
     this.getIngredientsCount = function (ingredient) {
-      return this.getGoods().reduce(function(accu, item) {
+      return this.getGoods().reduce(function (accu, item) {
         if (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) {
           accu++;
         }
@@ -49,20 +49,20 @@
         }
         return accu;
       }, 0);
-    }
+    };
 
     this.getFavoriteCount = function () {
-      return this.getGoods().reduce(function(accu, item) {
+      return this.getGoods().reduce(function (accu, item) {
         return item.favorite ? ++accu : accu;
       }, 0);
-    }
+    };
 
     this.getCount = function () {
       return this.getGoods().length;
     };
 
     this.getInStockCount = function () {
-      return this.getGoods().reduce(function(accu, item) {
+      return this.getGoods().reduce(function (accu, item) {
         return item.amount > 0 ? ++accu : accu;
       }, 0);
     };
@@ -109,15 +109,15 @@
 
     this.filterItem = function (id) {
       this.getItem(id).filtered = true;
-    }
+    };
 
     this.unfilterItem = function (id) {
       this.getItem(id).filtered = false;
-    }
+    };
 
     this.isFiltered = function (id) {
       return this.getItem(id).filtered;
-    }
+    };
 
     this.canBeFiltered = function (id, categories, ingredients, favorite, inStock) {
       var item = this.getItem(id);
@@ -132,17 +132,17 @@
         return true;
       }
       return false;
-    }
+    };
 
     this.applyFilter = function (categories, ingredients, favorite, inStock) {
       for (var i = 0; i < this.getCount(); i++) {
         if (this.canBeFiltered(i, categories, ingredients, favorite, inStock)) {
-          this.filterItem(i)
+          this.filterItem(i);
         } else {
           this.unfilterItem(i);
         }
       }
-    }
+    };
 
     this.tuneData = function () {
       this.goods.forEach(function (item, index) {

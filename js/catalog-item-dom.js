@@ -7,14 +7,14 @@
 (function () {
 
   var COMMODITY_HTML_ID_HEAD = 'commodity';
-    var Selector = {
-      MAIN_SELECTOR: '.catalog__card',
-      NAME: '.card__title',
-      IMAGE: '.card__img',
-      PRICE: '.card__price',
-      CURRENCY: '.card__currency',
-      WEIGHT: '.card__weight'
-    };
+  var Selector = {
+    MAIN_SELECTOR: '.catalog__card',
+    NAME: '.card__title',
+    IMAGE: '.card__img',
+    PRICE: '.card__price',
+    CURRENCY: '.card__currency',
+    WEIGHT: '.card__weight'
+  };
 
   window.CatalogItemDom = function (commodity, templateNode) {
     // Constructor body
@@ -119,18 +119,6 @@
         favorite.classList.remove('card__btn-favorite--selected');
       }
     }
-
-/*
-    function setFiltered(node, filter) {
-      if (filter) {
-        window.utils.hideHtmlSelector(node, Selector.MAIN_SELECTOR);
-        // window.utils.displayNoneHtmlSelector(node, Selector.MAIN_SELECTOR);
-      } else {
-        window.utils.showHtmlSelector(node, Selector.MAIN_SELECTOR);
-        // window.utils.displayInitialHtmlSelector(node, Selector.MAIN_SELECTOR);
-      }
-    }
-*/
 
   };
 
