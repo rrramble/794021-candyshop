@@ -435,8 +435,8 @@
    */
 
   function fulfillFilterAmount (obj) {
-    updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsAmount.bind(obj.catalog));
     updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryAmount.bind(obj.catalog));
+    updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsAmount.bind(obj.catalog));
     obj.updateFavoriteAmount();
   }
 
