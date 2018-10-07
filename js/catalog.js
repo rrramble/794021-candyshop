@@ -128,7 +128,7 @@
         ingredients.includes('sugar-free') && item.nutritionFacts.sugar ||
         ingredients.includes('gluten-free') && item.nutritionFacts.gluten ||
         ingredients.includes('vegetarian') && !item.nutritionFacts.vegetarian ||
-        !window.utils.inRangeUpTo(item.price, min, max)
+        !window.utils.isInRangeUpTo(item.price, min, max)
       ) {
         return true;
       }

@@ -140,13 +140,13 @@
 
     window.utils.setDomEventHandler(
         document, FilterForm.MAIN_SELECTOR,
-        filterFormHandler,
+        filterFormInputHandler,
         'change'
     );
 
     window.utils.setDomEventHandler(
         document, FilterRange.MAIN_SELECTOR,
-        filterRange.mouseDownHandler,
+        filterFormRangeHandler,
         'mousedown'
     );
 
@@ -193,10 +193,14 @@
    * Overall order form checking
    */
 
-  function filterFormHandler(evt) {
+  function filterFormInputHandler(evt) {
     window.utils.debounce(function () {
       dom.filterFormHandler(evt.srcElement.id);
     }, DEBOUNCE_TIME);
+  }
+
+  function filterFormRangeHandler(evt) {
+    filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
   }
 
   function onSubmitOrder(evt) {

@@ -34,34 +34,42 @@
   function Range(minPrice, maxPrice) {
     Price.min = minPrice;
     Price.max = maxPrice;
-    updateSliderValue(Pin.isMin);
-    updateSliderValue(!Pin.isMin);
+    updatePinAndSliderPosition(Pin.isMin);
+    updatePinAndSliderPosition(!Pin.isMin);
 
-    this.mouseDownHandler = function (evt) {
+    this.mouseDownHandler = function (evt, funcCb) {
       evt.preventDefault();
       if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {
         return;
       }
+      this.funcCb = funcCb;
       Pin.isMin = isMinRangePinPressed(evt);
       Pin.mouseStartX = evt.clientX;
 
-      document.addEventListener('mouseup', mouseUpHandler);
+      document.addEventListener('mouseup', mouseUpHandler.bind(this));
       document.addEventListener('mousemove', mouseMoveHandler);
     };
 
     function mouseUpHandler(evt) {
       evt.preventDefault();
-      document.removeEventListener('mouseup', mouseUpHandler);
       document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler.bind(this));
+      if (this.funcCb) {
+        this.funcCb();
+      }
     }
 
     function mouseMoveHandler(evt) {
       evt.preventDefault();
-      updateSliderPosition(Pin.isMin, evt);
+      updatePinAndSliderPosition(Pin.isMin, evt);
     }
 
-    function updateSliderPosition(isMinPin, evt) {
-      var dX = evt.clientX - Pin.mouseStartX;
+    function updatePinAndSliderPosition(isMinPin, evt) {
+      if (evt) {
+        var dX = evt.clientX - Pin.mouseStartX;
+      } else {
+        dX = isMinPin ? -Infinity : +Infinity;
+      }
       if (dX === 0) {
         return;
       }
@@ -84,10 +92,10 @@
         window.utils.setHtmlClassRightProperty(newX, Filter.FILL_LINE_CLASS);
       }
       Pin.mouseStartX += dX;
-      updateSliderValue(isMinPin);
+      updateTextValue(isMinPin);
     }
 
-    function updateSliderValue(isMinPin) {
+    function updateTextValue(isMinPin) {
       var value = calculateSliderValue(isMinPin);
       if (isMinPin) {
         window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, value);

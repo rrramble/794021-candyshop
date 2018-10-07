@@ -42,9 +42,12 @@
 
     setDomId: setDomId,
     setDomTextContent: setDomTextContent,
+    getDomTextContent: getDomTextContent,
+
     setDomImage: setDomImage,
     setDomValue: setDomValue,
     getDomValue: getDomValue,
+
     setDomName: setDomName,
     replaceDomItem: replaceDomItem,
     setDomEventHandler: setDomEventHandler,
@@ -243,6 +246,11 @@
   function setDomTextContent(node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.textContent = data;
+  }
+
+  function getDomTextContent(node, htmlSelector) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    return subNode.textContent;
   }
 
   function setDomImage(node, htmlSelector, imageUrl, imageAlt) {

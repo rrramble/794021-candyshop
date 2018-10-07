@@ -43,6 +43,11 @@
     ]
   };
 
+  var Filter = {
+    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
+    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
+  };
+
   window.Dom = function (
       catalog, catalogHtmlTemplateSelector, catalogParentHtmlSelector,
       trolley, trolleyHtmlTemplateSelector, trolleyParentHtmlSelector
@@ -312,14 +317,16 @@
       this.renderCatalogDom();
     };
 
+
     /*
      * Filter form handler
      */
+
     this.filterFormHandler = function (htmlId) {
-      if (
+      if (htmlId && (
         isSectionChecked(htmlId, FilterForm.FAVORITE) ||
         isSectionChecked(htmlId, FilterForm.IN_STOCK)
-      ) {
+      )) {
         uncheckFilterInputsExcept(htmlId);
       }
 
@@ -363,6 +370,14 @@
           }
           window.utils.setInputHtmlIdCheck(id);
         });
+      }
+
+      function getInputRangeValue(whichPin) {
+        if (whichPin === 'min') {
+          return window.utils.getDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR);
+        } else {
+          return window.utils.getDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR);
+        }
       }
 
     }; // filterFormHandler
