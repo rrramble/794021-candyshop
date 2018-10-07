@@ -34,6 +34,7 @@
     isNumber: isNumber,
     isChecked: isChecked,
     isHtmlIdChecked: isHtmlIdChecked,
+    setInputHtmlIdCheck: setInputHtmlIdCheck,
     htmlIdToHtmlSelector: htmlIdToHtmlSelector,
     isInRange: isInRange,
     isInRangeUpTo: isInRangeUpTo,
@@ -201,6 +202,11 @@
     var baseNode = node ? node : document;
     var result = baseNode.querySelector(htmlSelector).checked;
     return result;
+  }
+
+  function setInputHtmlIdCheck(htmlId, shouldBeSet) {
+    var htmlSelector = window.utils.htmlIdToHtmlSelector(htmlId);
+    document.querySelector(htmlSelector).checked = shouldBeSet;
   }
 
   function isHtmlIdChecked(htmlId, node) {

@@ -112,26 +112,24 @@
       return this.getItem(id).filtered;
     }
 
-    this.canBeFiltered = function (id, categories, ingredients) {
+    this.canBeFiltered = function (id, categories, ingredients, favorite, inStock) {
       var item = this.getItem(id);
-      if (categories.length > 0 && !categories.includes(item.kind)) {
-        return true;
-      }
-      if (ingredients.includes('sugar-free') && item.nutritionFacts.sugar) {
-        return true;
-      }
-      if (ingredients.includes('gluten-free') && item.nutritionFacts.gluten) {
-        return true;
-      }
-      if (ingredients.includes('vegetarian') && !item.nutritionFacts.vegetarian) {
+      if (
+        inStock.includes('in-stock') && item.amount <= 0 ||
+        favorite.includes('favorite') && !item.favorite ||
+        categories.length > 0 && !categories.includes(item.kind) ||
+        ingredients.includes('sugar-free') && item.nutritionFacts.sugar ||
+        ingredients.includes('gluten-free') && item.nutritionFacts.gluten ||
+        ingredients.includes('vegetarian') && !item.nutritionFacts.vegetarian
+      ) {
         return true;
       }
       return false;
     }
 
-    this.applyFilter = function (categories, ingredients) {
+    this.applyFilter = function (categories, ingredients, favorite, inStock) {
       for (var i = 0; i < this.getCount(); i++) {
-        if (this.canBeFiltered(i, categories, ingredients)) {
+        if (this.canBeFiltered(i, categories, ingredients, favorite, inStock)) {
           this.filterItem(i)
         } else {
           this.unfilterItem(i);

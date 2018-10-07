@@ -293,8 +293,8 @@
       return result;
     };
 
-    this.applyFilter = function (category, ingredients) {
-      this.catalog.applyFilter(category, ingredients);
+    this.applyFilter = function (category, ingredients, favorite, inStock) {
+      this.catalog.applyFilter(category, ingredients, favorite, inStock);
       this.renderCatalogDom();
     };
 
@@ -302,20 +302,23 @@
    * Filter form handler
    */
   this.filterFormHandler = function (evt) {
-    if (isCategoryOrIngredientsChanged(evt)) {
-      this.applyFilter(
-          getCheckedInputs(FilterForm.CATEGORIES),
-          getCheckedInputs(FilterForm.INGREDIENTS)
-      );
+    if (
+        window.utils.isHtmlIdChecked(Object.keys(FilterForm.FAVORITE[0])) ||
+        window.utils.isHtmlIdChecked(Object.keys(FilterForm.IN_STOCK[0]))
+    ) {
+      uncheckFilterInputs(evt.srcElement.id);
     }
 
-    function isCategoryOrIngredientsChanged(evt) {
-      var nodeId = evt.srcElement.id;
-      if (window.utils.isKeyInObjectOfList(nodeId, FilterForm.CATEGORIES) ||
-          window.utils.isKeyInObjectOfList(nodeId, FilterForm.INGREDIENTS)) {
-        return true;
-      }
-      return false;
+    this.applyFilter(
+        getCheckedInputs(FilterForm.CATEGORIES),
+        getCheckedInputs(FilterForm.INGREDIENTS),
+        getCheckedInputs(FilterForm.FAVORITE),
+        getCheckedInputs(FilterForm.IN_STOCK)
+    );
+    return;
+
+    function isSectionChecked(id, section) {
+      return window.utils.isKeyInObjectOfList(id, section);
     }
 
     function getCheckedInputs(listOfInputs) {
@@ -327,6 +330,21 @@
         }
         return accu;
       }, []);
+    }
+
+    function uncheckFilterInputs (exceptionId) {
+      uncheckSectionInputs(FilterForm.CATEGORIES, exceptionId);
+      uncheckSectionInputs(FilterForm.INGREDIENTS, exceptionId);
+      uncheckSectionInputs(FilterForm.FAVORITE, exceptionId);
+      uncheckSectionInputs(FilterForm.IN_STOCK, exceptionId);
+    }
+
+    function uncheckSectionInputs (formList, exceptionId) {
+      formList.forEach(function(item) {
+        var htmlId = Object.keys(item)[0];
+        if (exceptionId === htmlId) return;
+        window.utils.setInputHtmlIdCheck(htmlId);
+      });
     }
 
   }; // filterFormHandler
