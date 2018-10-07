@@ -202,7 +202,7 @@
 
   function filterFormHandler(evt) {
     window.utils.debounce(function () {
-      dom.filterFormHandler(evt.srcElement.id)
+      dom.filterFormHandler(evt.srcElement.id);
     }, DEBOUNCE_TIME);
   }
 

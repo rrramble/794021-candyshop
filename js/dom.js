@@ -317,8 +317,8 @@
      */
     this.filterFormHandler = function (htmlId) {
       if (
-          window.utils.isKeyInObjectOfList(htmlId, FilterForm.FAVORITE) ||
-          window.utils.isKeyInObjectOfList(htmlId, FilterForm.IN_STOCK)
+        isSectionChecked(htmlId, FilterForm.FAVORITE) ||
+        isSectionChecked(htmlId, FilterForm.IN_STOCK)
       ) {
         uncheckFilterInputsExcept(htmlId);
       }
@@ -337,9 +337,9 @@
 
       function getCheckedInputs(listOfInputs) {
         return listOfInputs.reduce(function (accu, item) {
-          var htmlId = Object.keys(item)[0];
-          var value = item[htmlId];
-          if (window.utils.isHtmlIdChecked(htmlId)) {
+          var id = Object.keys(item)[0];
+          var value = item[id];
+          if (window.utils.isHtmlIdChecked(id)) {
             accu.push(value);
           }
           return accu;
@@ -355,11 +355,11 @@
 
       function uncheckSectionInputs(formList, exceptionId) {
         formList.forEach(function (item) {
-          var htmlId = Object.keys(item)[0];
-          if (exceptionId === htmlId || exceptionId.includes(htmlId)) {
+          var id = Object.keys(item)[0];
+          if (exceptionId === id || exceptionId.includes(id)) {
             return;
           }
-          window.utils.setInputHtmlIdCheck(htmlId);
+          window.utils.setInputHtmlIdCheck(id);
         });
       }
 
