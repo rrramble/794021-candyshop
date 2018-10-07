@@ -7,6 +7,7 @@
 
 (function () {
 
+  var DEBOUNCE_TIME = 500;
   var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
   var GOODS_HTML_SELECTOR = '.catalog__cards';
 
@@ -199,8 +200,9 @@
    * Overall order form checking
    */
 
-  function filterFormHandler(evt) {
-    dom.filterFormHandler(evt);
+  function filterFormHandler() {
+    window.utils.debounce(
+      dom.filterFormHandler.bind(dom), DEBOUNCE_TIME);
   }
 
   function onSubmitOrder(evt) {

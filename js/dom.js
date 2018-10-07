@@ -316,12 +316,13 @@
   /*
    * Filter form handler
    */
-  this.filterFormHandler = function (evt) {
-    if (
-        window.utils.isHtmlIdChecked(Object.keys(FilterForm.FAVORITE[0])) ||
-        window.utils.isHtmlIdChecked(Object.keys(FilterForm.IN_STOCK[0]))
-    ) {
-      uncheckFilterInputs(evt.srcElement.id);
+  this.filterFormHandler = function () {
+    var htmlIdFavorite = Object.keys(FilterForm.FAVORITE[0]);
+    var htmlIdInStock = Object.keys(FilterForm.IN_STOCK[0]);
+    if (window.utils.isHtmlIdChecked(htmlIdFavorite)) {
+      uncheckFilterInputs(htmlIdFavorite);
+    } else if (window.utils.isHtmlIdChecked(htmlIdInStock)) {
+      uncheckFilterInputs(htmlIdInStock);
     }
 
     this.applyFilter(

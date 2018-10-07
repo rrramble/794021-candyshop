@@ -80,6 +80,7 @@
     listMax: listMax,
     getMovementX: getMovementX,
     isKeyInObjectOfList: isKeyInObjectOfList,
+    debounce: debounce,
 
     HttpCode: HttpCode
   };
@@ -467,6 +468,14 @@
     return list.some(function(item) {
       return key in item;
     });
+  }
+
+  var _lastTimeout;
+  function debounce(func, arg, intervalMilliseconds) {
+    if (_lastTimeout) {
+      window.clearTimeout(_lastTimeout);
+    }
+    _lastTimeout = window.setTimeout(func, arg, intervalMilliseconds);
   }
 
 })();
