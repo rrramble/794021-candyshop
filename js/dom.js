@@ -32,8 +32,9 @@
       {'filter-vegetarian': 'vegetarian'},
       {'filter-gluten-free': 'gluten-free'}
     ],
-    FAVORITE:
+    FAVORITE: [
       {'filter-favorite': 'favorite'}
+    ]
   }
 
   window.Dom = function (
@@ -111,8 +112,13 @@
       this.catalog.toggleFavorite(commodityId);
       var favoriteStatus = this.catalog.getFavoriteStatus(commodityId);
       this.updateCommodityView(commodityId);
+      this.updateFavoriteAmount();
       return favoriteStatus;
     };
+
+    this.updateFavoriteAmount = function () {
+      updateFilterAmount(FilterForm.FAVORITE, FilterForm.VALUE_SELECTOR, this.catalog.getFavoriteAmount.bind(this.catalog));
+    }
 
     this.commodityCb = function (evt) {
       var commodityId = findParentCommodityId(evt);
@@ -429,31 +435,19 @@
    */
 
   function fulfillFilterAmount (obj) {
-    ///// Optimize these for DRY
+    updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsAmount.bind(obj.catalog));
+    updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryAmount.bind(obj.catalog));
+    obj.updateFavoriteAmount();
+  }
 
-    FilterForm.CATEGORIES.forEach(function(item) {
+  function updateFilterAmount (list, valueSelector, getAmount) {
+    list.forEach(function(item) {
       var htmlId = Object.keys(item)[0];
-      var commodityCategory = item[htmlId];
-      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + FilterForm.VALUE_SELECTOR;
-      var valueFormatted = '(' + obj.catalog.getCategoryAmount(commodityCategory) + ')';
+      var category = item[htmlId];
+      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + valueSelector;
+      var valueFormatted = '(' + getAmount(category) + ')';
       window.utils.setDomTextContent(document, selector, valueFormatted);
     });
-
-    FilterForm.INGREDIENTS.forEach(function(item) {
-      var htmlId = Object.keys(item)[0];
-      var commodityCategory = item[htmlId];
-      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + FilterForm.VALUE_SELECTOR;
-      var valueFormatted = '(' + obj.catalog.getIngredientsAmount(commodityCategory) + ')';
-      window.utils.setDomTextContent(document, selector, valueFormatted);
-    });
-
-    /*
-    var htmlId = Object.keys(FilterForm.FAVORITE)[0];
-    var commodityCategory = FilterForm.FAVORITE[htmlId];
-    var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + FilterForm.VALUE_SELECTOR;
-    var valueFormatted = '(' + obj.catalog.getIngredientsAmount(commodityCategory) + ')';
-    window.utils.setDomTextContent(document, selector, valueFormatted);
-    */
   }
 
 })();

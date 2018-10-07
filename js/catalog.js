@@ -23,6 +23,33 @@
       return this.getItem(id).amount;
     };
 
+    this.getCategoryAmount = function (category) {
+      return this.getGoods().reduce(function(accu, item) {
+        return item.kind === category ? ++accu : accu;
+      }, 0);
+    }
+
+    this.getIngredientsAmount = function (ingredient) {
+      return this.getGoods().reduce(function(accu, item) {
+        if (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) {
+          accu++;
+        }
+        if (ingredient === 'gluten-free' && !item.nutritionFacts.gluten) {
+          accu++;
+        }
+        if (ingredient === 'vegetarian' && item.nutritionFacts.vegetarian) {
+          accu++;
+        }
+        return accu;
+      }, 0);
+    }
+
+    this.getFavoriteAmount = function () {
+      return this.getGoods().reduce(function(accu, item) {
+        return item.favorite ? ++accu : accu;
+      }, 0);
+    }
+
     this.getCount = function () {
       return this.getGoods().length;
     };
@@ -79,27 +106,6 @@
       return this.getItem(id).filtered;
     }
 
-    this.getCategoryAmount = function (category) {
-      return this.getGoods().reduce(function(accu, item) {
-        return item.kind === category ? ++accu : accu;
-      }, 0);
-    }
-
-    this.getIngredientsAmount = function (ingredient) {
-      return this.getGoods().reduce(function(accu, item) {
-        if (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) {
-          accu++;
-        }
-        if (ingredient === 'gluten-free' && !item.nutritionFacts.gluten) {
-          accu++;
-        }
-        if (ingredient === 'vegetarian' && item.nutritionFacts.vegetarian) {
-          accu++;
-        }
-        return accu;
-      }, 0);
-    }
-
     this.canBeFiltered = function (id, categories, ingredients) {
       var item = this.getItem(id);
       if (categories.length > 0 && !categories.includes(item.kind)) {
@@ -134,6 +140,7 @@
         item.filtered = false;
       });
     };
+
 
     // Costructor of the class
     this.goods = loadGoods();
