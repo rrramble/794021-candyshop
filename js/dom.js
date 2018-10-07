@@ -307,8 +307,8 @@
       return result;
     };
 
-    this.applyFilter = function (category, ingredients, favorite, inStock) {
-      this.catalog.applyFilter(category, ingredients, favorite, inStock);
+    this.applyFilter = function (category, ingredients, favorite, inStock, min, max) {
+      this.catalog.applyFilter(category, ingredients, favorite, inStock, min, max);
       this.renderCatalogDom();
     };
 
@@ -327,7 +327,9 @@
           getCheckedInputs(FilterForm.CATEGORIES),
           getCheckedInputs(FilterForm.INGREDIENTS),
           getCheckedInputs(FilterForm.FAVORITE),
-          getCheckedInputs(FilterForm.IN_STOCK)
+          getCheckedInputs(FilterForm.IN_STOCK),
+          getInputRangeValue('min'),
+          getInputRangeValue('max')
       );
       return;
 

@@ -39,8 +39,11 @@
 
     this.mouseDownHandler = function (evt) {
       evt.preventDefault();
+      if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {
+        return;
+      }
+      Pin.isMin = isMinRangePinPressed(evt);
       Pin.mouseStartX = evt.clientX;
-      Pin.isMin = isMinButtonClass(evt);
 
       document.addEventListener('mouseup', mouseUpHandler);
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -105,8 +108,12 @@
       return window.utils.percentToIntValue(percent, Price.min, Price.max);
     }
 
-    function isMinButtonClass(evt) {
+    function isMinRangePinPressed(evt) {
       return evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS);
+    }
+
+    function isMaxRangePinPressed(evt) {
+      return evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS);
     }
 
     function getSliderWidth() {

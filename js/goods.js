@@ -20,8 +20,7 @@
   };
 
   var FilterRange = {
-    MIN_RANGE_SELECTOR: '.range__btn--left',
-    MAX_RANGE_SELECTOR: '.range__btn--right'
+    MAIN_SELECTOR: '.range__filter'
   };
 
 
@@ -146,13 +145,7 @@
     );
 
     window.utils.setDomEventHandler(
-        document, FilterRange.MIN_RANGE_SELECTOR,
-        filterRange.mouseDownHandler,
-        'mousedown'
-    );
-
-    window.utils.setDomEventHandler(
-        document, FilterRange.MAX_RANGE_SELECTOR,
+        document, FilterRange.MAIN_SELECTOR,
         filterRange.mouseDownHandler,
         'mousedown'
     );
