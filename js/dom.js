@@ -16,7 +16,6 @@
   var DECREASE_TROLLEY_HTML_CLASS = 'card-order__btn--decrease';
   var TROLLEY_AMOUNT_HTML_CLASS = 'card-order__count';
   var DELETE_TROLLEY_HTML_CLASS = 'card-order__close';
-  var COMMODITY_SELECTOR = '.catalog__card';
 
   var EMPTY_FILTER_TEMPLATE_SELECTOR = '#empty-filters';
   var EMPTY_FILTER_SELECTOR = '.catalog__empty-filter';
@@ -42,7 +41,7 @@
     IN_STOCK: [
       {'filter-availability': 'in-stock'}
     ]
-  }
+  };
 
   window.Dom = function (
       catalog, catalogHtmlTemplateSelector, catalogParentHtmlSelector,
@@ -125,7 +124,7 @@
 
     this.updateFavoriteAmount = function () {
       updateFilterAmount(FilterForm.FAVORITE, FilterForm.VALUE_SELECTOR, this.catalog.getFavoriteCount.bind(this.catalog));
-    }
+    };
 
     this.commodityCb = function (evt) {
       var commodityId = findParentCommodityId(evt);
@@ -264,12 +263,12 @@
 
       // make new DOM of goods
       var tempNode = document.createDocumentFragment();
-      this.catalogNodes.forEach(function(item, i) {
+      this.catalogNodes.forEach(function (item) {
         tempNode.appendChild(item);
       });
 
       // remove old drawn goods
-      this.catalog.getGoods().forEach(function(item, i) {
+      this.catalog.getGoods().forEach(function (item, i) {
         window.utils.removeFirstDomSelector(commodityIdToCommodityHtmlSelector(i));
       });
 
@@ -291,7 +290,7 @@
 
     this.createCatalogNodes = function () {
       var template = this.catalogHtmlTemplate;
-      var result = this.catalog.getGoods().reduce(function(accu, item) {
+      var result = this.catalog.getGoods().reduce(function (accu, item) {
         if (!item.filtered) {
           accu.push(new window.CatalogItemDom(item, template));
         }
@@ -313,58 +312,58 @@
       this.renderCatalogDom();
     };
 
-  /*
-   * Filter form handler
-   */
-  this.filterFormHandler = function () {
-    var htmlIdFavorite = Object.keys(FilterForm.FAVORITE[0]);
-    var htmlIdInStock = Object.keys(FilterForm.IN_STOCK[0]);
-    if (window.utils.isHtmlIdChecked(htmlIdFavorite)) {
-      uncheckFilterInputs(htmlIdFavorite);
-    } else if (window.utils.isHtmlIdChecked(htmlIdInStock)) {
-      uncheckFilterInputs(htmlIdInStock);
-    }
+    /*
+     * Filter form handler
+     */
+    this.filterFormHandler = function (htmlId) {
+      if (
+          window.utils.isKeyInObjectOfList(htmlId, FilterForm.FAVORITE) ||
+          window.utils.isKeyInObjectOfList(htmlId, FilterForm.IN_STOCK)
+      ) {
+        uncheckFilterInputsExcept(htmlId);
+      }
 
-    this.applyFilter(
-        getCheckedInputs(FilterForm.CATEGORIES),
-        getCheckedInputs(FilterForm.INGREDIENTS),
-        getCheckedInputs(FilterForm.FAVORITE),
-        getCheckedInputs(FilterForm.IN_STOCK)
-    );
-    return;
+      this.applyFilter(
+          getCheckedInputs(FilterForm.CATEGORIES),
+          getCheckedInputs(FilterForm.INGREDIENTS),
+          getCheckedInputs(FilterForm.FAVORITE),
+          getCheckedInputs(FilterForm.IN_STOCK)
+      );
+      return;
 
-    function isSectionChecked(id, section) {
-      return window.utils.isKeyInObjectOfList(id, section);
-    }
+      function isSectionChecked(id, section) {
+        return window.utils.isKeyInObjectOfList(id, section);
+      }
 
-    function getCheckedInputs(listOfInputs) {
-      return listOfInputs.reduce(function(accu, item) {
-        var htmlId = Object.keys(item)[0];
-        var value = item[htmlId];
-        if (window.utils.isHtmlIdChecked(htmlId)) {
-          accu.push(value);
-        }
-        return accu;
-      }, []);
-    }
+      function getCheckedInputs(listOfInputs) {
+        return listOfInputs.reduce(function (accu, item) {
+          var htmlId = Object.keys(item)[0];
+          var value = item[htmlId];
+          if (window.utils.isHtmlIdChecked(htmlId)) {
+            accu.push(value);
+          }
+          return accu;
+        }, []);
+      }
 
-    function uncheckFilterInputs (exceptionId) {
-      uncheckSectionInputs(FilterForm.CATEGORIES, exceptionId);
-      uncheckSectionInputs(FilterForm.INGREDIENTS, exceptionId);
-      uncheckSectionInputs(FilterForm.FAVORITE, exceptionId);
-      uncheckSectionInputs(FilterForm.IN_STOCK, exceptionId);
-    }
+      function uncheckFilterInputsExcept(exceptionId) {
+        uncheckSectionInputs(FilterForm.CATEGORIES, exceptionId);
+        uncheckSectionInputs(FilterForm.INGREDIENTS, exceptionId);
+        uncheckSectionInputs(FilterForm.FAVORITE, exceptionId);
+        uncheckSectionInputs(FilterForm.IN_STOCK, exceptionId);
+      }
 
-    function uncheckSectionInputs (formList, exceptionId) {
-      formList.forEach(function(item) {
-        var htmlId = Object.keys(item)[0];
-        if (exceptionId === htmlId) return;
-        window.utils.setInputHtmlIdCheck(htmlId);
-      });
-    }
+      function uncheckSectionInputs(formList, exceptionId) {
+        formList.forEach(function (item) {
+          var htmlId = Object.keys(item)[0];
+          if (exceptionId === htmlId || exceptionId.includes(htmlId)) {
+            return;
+          }
+          window.utils.setInputHtmlIdCheck(htmlId);
+        });
+      }
 
-  }; // filterFormHandler
-
+    }; // filterFormHandler
 
 
     /*
@@ -477,15 +476,15 @@
    *
    */
 
-  function fulfillFilterAmount (obj) {
+  function fulfillFilterAmount(obj) {
     updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryCount.bind(obj.catalog));
     updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsCount.bind(obj.catalog));
     obj.updateFavoriteAmount();
     updateFilterAmount(FilterForm.IN_STOCK, FilterForm.VALUE_SELECTOR, obj.catalog.getInStockCount.bind(obj.catalog));
   }
 
-  function updateFilterAmount (list, valueSelector, getAmount) {
-    list.forEach(function(item) {
+  function updateFilterAmount(list, valueSelector, getAmount) {
+    list.forEach(function (item) {
       var htmlId = Object.keys(item)[0];
       var category = item[htmlId];
       var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + valueSelector;

@@ -17,7 +17,7 @@
 
   var FilterForm = {
     MAIN_SELECTOR: '.catalog__sidebar form'
-  }
+  };
 
   var FilterRange = {
     MIN_RANGE_SELECTOR: '.range__btn--left',
@@ -200,9 +200,10 @@
    * Overall order form checking
    */
 
-  function filterFormHandler() {
-    window.utils.debounce(
-      dom.filterFormHandler.bind(dom), DEBOUNCE_TIME);
+  function filterFormHandler(evt) {
+    window.utils.debounce(function () {
+      dom.filterFormHandler(evt.srcElement.id)
+    }, DEBOUNCE_TIME);
   }
 
   function onSubmitOrder(evt) {
