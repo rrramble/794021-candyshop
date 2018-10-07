@@ -9,6 +9,7 @@
   var COMMODITY_HTML_SELECTOR_HEAD = '#commodity';
   var TROLLEY_HTML_SELECTOR_HEAD = '#trolley-commodity';
 
+  var CATALOG_WRAPPER_SELECTOR = '.catalog__cards-wrap';
   var ADD_TO_TROLLEY_HTML_CLASS = 'card__btn';
   var ADD_TO_FAVORITE_HTML_CLASS = 'card__btn-favorite';
   var INCREASE_TROLLEY_HTML_CLASS = 'card-order__btn--increase';
@@ -16,6 +17,9 @@
   var TROLLEY_AMOUNT_HTML_CLASS = 'card-order__count';
   var DELETE_TROLLEY_HTML_CLASS = 'card-order__close';
   var COMMODITY_SELECTOR = '.catalog__card';
+
+  var EMPTY_FILTER_TEMPLATE_SELECTOR = '#empty-filters';
+  var EMPTY_FILTER_SELECTOR = '.catalog__empty-filter';
 
   var FilterForm = {
     MAIN_SELECTOR: '.catalog__sidebar form',
@@ -120,7 +124,7 @@
     };
 
     this.updateFavoriteAmount = function () {
-      updateFilterAmount(FilterForm.FAVORITE, FilterForm.VALUE_SELECTOR, this.catalog.getFavoriteAmount.bind(this.catalog));
+      updateFilterAmount(FilterForm.FAVORITE, FilterForm.VALUE_SELECTOR, this.catalog.getFavoriteCount.bind(this.catalog));
     }
 
     this.commodityCb = function (evt) {
@@ -227,6 +231,12 @@
         window.utils.addCssClass('catalog__cards', 'catalog__cards--load');
         window.utils.showHtmlSelector(document, '.catalog__load');
       }
+      if (this.catalog.getUnfilteredCount() <= 0) {
+        window.utils.showHtmlSelector(document, EMPTY_FILTER_SELECTOR);
+      } else {
+        window.utils.hideHtmlSelector(document, EMPTY_FILTER_SELECTOR);
+      }
+
     };
 
     this.checkAndRenderTrolleyPlaceholder = function () {
@@ -251,14 +261,19 @@
 
     this.renderCatalogDom = function () {
       this.catalogNodes = this.createCatalogNodes();
-      this.catalog.getGoods().forEach(function(item, i) {
-        window.utils.removeFirstDomSelector(commodityIdToCommodityHtmlSelector(i));
-      });
 
+      // make new DOM of goods
       var tempNode = document.createDocumentFragment();
       this.catalogNodes.forEach(function(item, i) {
         tempNode.appendChild(item);
       });
+
+      // remove old drawn goods
+      this.catalog.getGoods().forEach(function(item, i) {
+        window.utils.removeFirstDomSelector(commodityIdToCommodityHtmlSelector(i));
+      });
+
+      // Render new DOM of goods
       document.querySelector(this.catalogParentHtmlSelector).appendChild(tempNode);
       this.checkAndRenderCatalogPlaceholder();
     };
@@ -386,6 +401,11 @@
         'change'
     );
 
+    var fragmentNode = document.createDocumentFragment();
+    var templateNode = document.querySelector(EMPTY_FILTER_TEMPLATE_SELECTOR).content.cloneNode(true);
+    fragmentNode.appendChild(templateNode);
+    document.querySelector(CATALOG_WRAPPER_SELECTOR).appendChild(fragmentNode);
+
     this.renderCatalogDom();
     this.renderTrolleyDom();
     fulfillFilterAmount(this);
@@ -456,8 +476,8 @@
    */
 
   function fulfillFilterAmount (obj) {
-    updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryAmount.bind(obj.catalog));
-    updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsAmount.bind(obj.catalog));
+    updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryCount.bind(obj.catalog));
+    updateFilterAmount(FilterForm.INGREDIENTS, FilterForm.VALUE_SELECTOR, obj.catalog.getIngredientsCount.bind(obj.catalog));
     obj.updateFavoriteAmount();
     updateFilterAmount(FilterForm.IN_STOCK, FilterForm.VALUE_SELECTOR, obj.catalog.getInStockCount.bind(obj.catalog));
   }

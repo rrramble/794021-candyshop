@@ -23,13 +23,20 @@
       return this.getItem(id).amount;
     };
 
-    this.getCategoryAmount = function (category) {
+    this.getCategoryCount = function (category) {
       return this.getGoods().reduce(function(accu, item) {
         return item.kind === category ? ++accu : accu;
       }, 0);
     }
 
-    this.getIngredientsAmount = function (ingredient) {
+    this.getUnfilteredCount = function () {
+      var filteredCount = this.getGoods().reduce(function(accu, item) {
+        return item.filtered ? ++accu : accu;
+      }, 0);
+      return this.getCount() - filteredCount;
+    }
+
+    this.getIngredientsCount = function (ingredient) {
       return this.getGoods().reduce(function(accu, item) {
         if (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) {
           accu++;
@@ -44,7 +51,7 @@
       }, 0);
     }
 
-    this.getFavoriteAmount = function () {
+    this.getFavoriteCount = function () {
       return this.getGoods().reduce(function(accu, item) {
         return item.favorite ? ++accu : accu;
       }, 0);
