@@ -401,6 +401,7 @@
         'change'
     );
 
+    // Draw a section 'Find no goods fitting selected filters'
     var fragmentNode = document.createDocumentFragment();
     var templateNode = document.querySelector(EMPTY_FILTER_TEMPLATE_SELECTOR).content.cloneNode(true);
     fragmentNode.appendChild(templateNode);
