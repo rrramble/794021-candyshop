@@ -55,7 +55,7 @@
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler.bind(this));
       if (this.funcCb) {
-        this.funcCb();
+        this.funcCb(evt);
       }
     }
 

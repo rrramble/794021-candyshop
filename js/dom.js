@@ -40,7 +40,8 @@
     ],
     IN_STOCK: [
       {'filter-availability': 'in-stock'}
-    ]
+    ],
+    SHOW_ALL_HTML_CLASS: 'catalog__submit'
   };
 
   var Filter = {
@@ -322,12 +323,17 @@
      * Filter form handler
      */
 
-    this.filterFormHandler = function (htmlId) {
-      if (htmlId && (
-        isSectionChecked(htmlId, FilterForm.FAVORITE) ||
-        isSectionChecked(htmlId, FilterForm.IN_STOCK)
-      )) {
-        uncheckFilterInputsExcept(htmlId);
+    this.filterFormHandler = function (evt) {
+      var htmlId = evt.srcElement.id;
+      switch (true) {
+        case 
+            isSectionChecked(htmlId, FilterForm.FAVORITE) ||
+            isSectionChecked(htmlId, FilterForm.IN_STOCK):  
+          uncheckFilterInputsExcept(htmlId);
+          break;
+        case isShowAllPressed(evt):
+          uncheckFilterInputsExcept();
+          break;
       }
 
       this.applyFilter(
@@ -378,6 +384,10 @@
         } else {
           return window.utils.getDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR);
         }
+      }
+
+      function isShowAllPressed(evt) {
+        return evt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
       }
 
     }; // filterFormHandler

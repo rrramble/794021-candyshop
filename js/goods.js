@@ -195,7 +195,7 @@
 
   function filterFormInputHandler(evt) {
     window.utils.debounce(function () {
-      dom.filterFormHandler(evt.srcElement.id);
+      dom.filterFormHandler(evt);
     }, DEBOUNCE_TIME);
   }
 
