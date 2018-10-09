@@ -37,6 +37,11 @@
     updatePinAndSliderPosition(Pin.isMin);
     updatePinAndSliderPosition(!Pin.isMin);
 
+    this.reset = function () {
+      updatePinAndSliderPosition(true);
+      updatePinAndSliderPosition(false);
+    }
+
     this.mouseDownHandler = function (evt, funcCb) {
       evt.preventDefault();
       if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {

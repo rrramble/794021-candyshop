@@ -380,7 +380,7 @@
      * Filter form handler
      */
 
-    this.filterFormHandler = function (evt) {
+    this.filterFormHandler = function (evt, resetPriceRangeCb) {
       switch (true) {
         case isShowAllPressed(evt):
           evt.preventDefault();
@@ -414,6 +414,10 @@
           disableInputs(FilterForm.INGREDIENTS, false);
           disableButtons(FilterForm.RANGE_PINS, false);
           break;
+      }
+      
+      if (resetPriceRangeCb) {
+        resetPriceRangeCb();
       }
       this.applyFilter();
       return;

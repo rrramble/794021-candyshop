@@ -245,7 +245,7 @@
 
   function filterSubmitHandler(evt) {
     evt.preventDefault();
-    dom.filterFormHandler(evt);
+    dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
   }
 
   function filterFormRangeHandler(evt) {
