@@ -79,6 +79,7 @@
     METHOD_SELECTOR: '.deliver__toggle',
     SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
+    isByCourier: true,
 
     Store: {
       MAIN_SELECTOR: '.deliver__store',
@@ -404,16 +405,16 @@
   function deliveryTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        adjustFormForDelivery('courier');
+        adjustFormForDelivery(Delivery.isByCourier);
         break;
       case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
-        adjustFormForDelivery('takeout');
+        adjustFormForDelivery(!Delivery.isByCourier);
         break;
     }
   }
 
-  function adjustFormForDelivery(type) {
-    if (type === 'courier') {
+  function adjustFormForDelivery(isByCourier) {
+    if (isByCourier) {
       window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
 
