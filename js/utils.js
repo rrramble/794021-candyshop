@@ -32,6 +32,7 @@
     querySelectorIncludingSelf: querySelectorIncludingSelf,
     htmlSelectorToClass: htmlSelectorToClass,
     isNumber: isNumber,
+
     isChecked: isChecked,
     isHtmlIdChecked: isHtmlIdChecked,
     setInputHtmlIdCheck: setInputHtmlIdCheck,
@@ -73,8 +74,13 @@
 
     intPercent: intPercent,
     percentToIntValue: percentToIntValue,
+
     disableButton: disableButton,
     enableButton: enableButton,
+    disableHtmlSelectorButton: disableHtmlSelectorButton,
+    isHtmlIdInputDisabled: isHtmlIdInputDisabled,
+    disableHtmlIdInput: disableHtmlIdInput,
+
     setInputToBeRequired: setInputToBeRequired,
     setDomValid: setDomValid,
     setHtmlTagAttribute: setHtmlTagAttribute,
@@ -208,15 +214,16 @@
     return result;
   }
 
+  function isHtmlIdChecked(htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var result = baseNode.querySelector(selector).checked;
+    return result;
+  }
+
   function setInputHtmlIdCheck(htmlId, shouldBeSet) {
     var htmlSelector = window.utils.htmlIdToHtmlSelector(htmlId);
     document.querySelector(htmlSelector).checked = shouldBeSet;
-  }
-
-  function isHtmlIdChecked(htmlId, node) {
-    var baseNode = node ? node : document;
-    var htmlSelector = window.utils.htmlIdToHtmlSelector(htmlId);
-    return baseNode.querySelector(htmlSelector).checked;
   }
 
   function htmlIdToHtmlSelector(id) {
@@ -424,6 +431,24 @@
   function enableButton(selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = false;
+  }
+
+  function disableHtmlSelectorButton(shoudBeDisabled, selector, node) {
+    var baseNode = node ? node : document;
+    baseNode.querySelector(selector).disabled = shoudBeDisabled;
+  }
+
+  function disableHtmlIdInput(shouldBeBlocked, htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var childNode = baseNode.querySelector(selector);
+    childNode.disabled = shouldBeBlocked;
+  }
+
+  function isHtmlIdInputDisabled (htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    return baseNode.querySelector(selector).disabled;
   }
 
   function setInputToBeRequired(isToBeRequired, selector, node) {

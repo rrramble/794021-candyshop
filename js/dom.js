@@ -41,6 +41,10 @@
     IN_STOCK: [
       {'filter-availability': 'in-stock'}
     ],
+    RANGE_PINS: [
+      {'.range__btn--left': ''},
+      {'.range__btn--right': ''}
+    ],
     SHOW_ALL_HTML_CLASS: 'catalog__submit'
   };
 
@@ -325,15 +329,21 @@
 
     this.filterFormHandler = function (evt) {
       var htmlId = evt.srcElement.id;
-      switch (true) {
-        case 
-            isSectionChecked(htmlId, FilterForm.FAVORITE) ||
-            isSectionChecked(htmlId, FilterForm.IN_STOCK):  
-          uncheckFilterInputsExcept(htmlId);
-          break;
-        case isShowAllPressed(evt):
-          uncheckFilterInputsExcept();
-          break;
+
+      if (isFavoritePressed(evt) && isFavoriteChecked(evt)) {
+        uncheckSectionInputs(FilterForm.IN_STOCK);
+        disableInputs(FilterForm.CATEGORIES, true);
+        disableInputs(FilterForm.INGREDIENTS, true);
+        disableButtons(FilterForm.RANGE_PINS, true);
+      } else if (isInStockPressed(evt) && isInStockChecked(evt)) {
+        uncheckSectionInputs(FilterForm.FAVORITE);
+        disableInputs(FilterForm.CATEGORIES, true);
+        disableInputs(FilterForm.INGREDIENTS, true);
+        disableButtons(FilterForm.RANGE_PINS, true);
+      } else if (isFavoritePressed(evt) || isInStockPressed(evt)){
+        disableInputs(FilterForm.CATEGORIES, false);
+        disableInputs(FilterForm.INGREDIENTS, false);
+        disableButtons(FilterForm.RANGE_PINS, false);
       }
 
       this.applyFilter(
@@ -346,15 +356,38 @@
       );
       return;
 
-      function isSectionChecked(id, section) {
-        return window.utils.isKeyInObjectOfList(id, section);
+      function isFavoritePressed(evt) {
+        var key = Object.keys(FilterForm.FAVORITE[0])[0];
+        return evt.srcElement.id === key;
+      }
+
+      function isFavoriteChecked(evt) {
+        return isSectionChecked(FilterForm.FAVORITE);
+      }
+
+      function isInStockPressed(evt) {
+        var key = Object.keys(FilterForm.IN_STOCK[0])[0];
+        return evt.srcElement.id === key;
+      }
+
+      function isInStockChecked(evt) {
+        return isSectionChecked(FilterForm.IN_STOCK);
+      }
+
+
+      function isSectionChecked(section) {
+        var id = Object.keys(section[0])[0];
+        return window.utils.isHtmlIdChecked(id);
       }
 
       function getCheckedInputs(listOfInputs) {
         return listOfInputs.reduce(function (accu, item) {
           var id = Object.keys(item)[0];
           var value = item[id];
-          if (window.utils.isHtmlIdChecked(id)) {
+          if (
+              !window.utils.isHtmlIdInputDisabled(id) &&
+              window.utils.isHtmlIdChecked(id)
+          ) {
             accu.push(value);
           }
           return accu;
@@ -371,10 +404,24 @@
       function uncheckSectionInputs(formList, exceptionId) {
         formList.forEach(function (item) {
           var id = Object.keys(item)[0];
-          if (exceptionId === id || exceptionId.includes(id)) {
+          if (exceptionId && (exceptionId === id || exceptionId.includes(id))) {
             return;
           }
           window.utils.setInputHtmlIdCheck(id);
+        });
+      }
+
+      function disableInputs(inputs, shouldBeDisabled) {
+        inputs.forEach(function (input) {
+          var id = Object.keys(input)[0];
+          window.utils.disableHtmlIdInput(shouldBeDisabled, id);
+        });
+      }
+
+      function disableButtons(buttons, shouldBeDisabled) {
+        buttons.forEach(function (button) {
+          var selector = Object.keys(button)[0];
+          window.utils.disableHtmlSelectorButton(shouldBeDisabled, selector);
         });
       }
 
