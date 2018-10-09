@@ -415,7 +415,7 @@
           disableButtons(FilterForm.RANGE_PINS, false);
           break;
       }
-      
+
       if (resetPriceRangeCb) {
         resetPriceRangeCb();
       }

@@ -40,7 +40,7 @@
     this.reset = function () {
       updatePinAndSliderPosition(true);
       updatePinAndSliderPosition(false);
-    }
+    };
 
     this.mouseDownHandler = function (evt, funcCb) {
       evt.preventDefault();
