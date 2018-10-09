@@ -82,7 +82,52 @@
 
     Store: {
       MAIN_SELECTOR: '.deliver__store',
+      LIST_OF_SUBWAYS_SELECTOR: '.deliver__stores',
+      MAP_SELECTOR: '.deliver__store-map-img'
     },
+    Map: {
+      'store-academicheskaya': {
+        'name': 'Академическая',
+        'filename': 'academicheskaya.jpg'
+      },
+      'store-vasileostrovskaya': {
+        'name': 'Василеостровская',
+        'filename': 'vasileostrovskaya.jpg'
+      },
+      'store-rechka': {
+        'name': 'Черная речка',
+        'filename': 'rechka.jpg'
+      },
+      'store-petrogradskaya': {
+        'name': 'Петроградская',
+        'filename': 'petrogradskaya.jpg'
+      },
+      'store-proletarskaya': {
+        'name': 'Пролетарская',
+        'filename': 'proletarskaya.jpg'
+      },
+      'store-vostaniya': {
+        'name': 'Площадь Восстания',
+        'filename': 'vostaniya.jpg'
+      },
+      'store-prosvesheniya': {
+        'name': 'Проспект Просвещения',
+        'filename': 'prosvesheniya.jpg'
+      },
+      'store-frunzenskaya': {
+        'name': 'Фрунзенская',
+        'filename': 'frunzenskaya.jpg'
+      },
+      'store-chernishevskaya': {
+        'name': 'Чернышевская',
+        'filename': 'chernishevskaya.jpg'
+      },
+      'store-tehinstitute': {
+        'name': 'Технологический институт',
+        'filename': 'tehinstitute.jpg'
+      }
+    },
+    MAP_PATH: 'img/map/',
 
     Courier: {
       MAIN_SELECTOR: '.deliver__courier',
@@ -92,19 +137,6 @@
       ROOM_SELECTOR: '#deliver__room'
     },
 
-    Map: {
-      'store-academicheskaya': 'Академическая',
-      'store-vasileostrovskaya': 'Василеостровская',
-      'store-rechka': 'Черная речка',
-      'store-petrogradskaya': 'Петроградская',
-      'store-proletarskaya': 'Пролетарская',
-      'store-vostaniya': 'Площадь Восстания',
-      'store-prosvesheniya': 'Проспект Просвещения',
-      'store-frunzenskaya': 'Фрунзенская',
-      'store-chernishevskaya': 'Чернышевская',
-      'store-tehinstitute': 'Технологический институт'
-    },
-    MAP_PATH: 'img/map/'
   };
 
 
@@ -300,16 +332,16 @@
   function paymentTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
-        adjustFormForPayment('card');
+        adjustFormForPaymentByCard(true);
         break;
       case (window.utils.isChecked(Payment.CASH_LABEL_SELECTOR)):
-        adjustFormForPayment('cash');
+        adjustFormForPaymentByCard(false);
         break;
     }
   }
 
-  function adjustFormForPayment(type) {
-    if (type === 'card') {
+  function adjustFormForPaymentByCard(byCard) {
+    if (byCard) {
       window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
       window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
       setFieldsForCardPayment(true);
@@ -427,29 +459,29 @@
     }
   }
 
-  function adjustFormForDeliveryByCourier(isByCourier) {
-    window.utils.setInputToBeRequired(isByCourier, Delivery.Courier.STREET_SELECTOR);
-    window.utils.setInputToBeRequired(isByCourier, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.setInputToBeRequired(isByCourier, Delivery.Courier.ROOM_SELECTOR);
+  function adjustFormForDeliveryByCourier(byCourier) {
+    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
 
-    window.utils.disableHtmlSelector(!isByCourier, Delivery.Courier.STREET_SELECTOR);
-    window.utils.disableHtmlSelector(!isByCourier, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.disableHtmlSelector(!isByCourier, Delivery.Courier.ROOM_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
 
-    if (isByCourier) {
+    if (byCourier) {
       window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
     } else {
       window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
-      resetContactsValidity();
+      resetDeliveryValidity();
     }
   }
 
-  function deliveryCheckHandler() {
+  function deliveryCheckHandler(evt) {
     switch (true) {
-      case (!window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        resetDeliveryValidity();
+      case (Delivery.Map.hasOwnProperty(evt.srcElement.id)):
+        setSubwayMap(evt);
         break;
       case (!isStreetValid()):
         window.utils.setDomValid(false, Delivery.Courier.STREET_SELECTOR);
@@ -495,6 +527,14 @@
     window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
+  }
+
+  function setSubwayMap(evt) {
+    var htmlId = evt.srcElement.id;
+    var altText = Delivery.Map[htmlId].name;
+    var fileName = Delivery.Map[htmlId].filename;
+    var mapFullUrl = Delivery.MAP_PATH + fileName;
+    window.utils.setDomImage(document, Delivery.Store.MAP_SELECTOR, mapFullUrl, altText);
   }
 
 })();
