@@ -15,7 +15,8 @@
 
 
   var FilterForm = {
-    MAIN_SELECTOR: '.catalog__sidebar form'
+    MAIN_SELECTOR: '.catalog__sidebar form',
+    SHOW_ALL_HTML_SELECTOR: '.catalog__submit',
   };
 
   var FilterRange = {
@@ -178,8 +179,14 @@
 
     window.utils.setDomEventHandler(
         document, FilterForm.MAIN_SELECTOR,
-        filterFormInputHandler,
+        filterInputHandler,
         'change'
+    );
+
+    window.utils.setDomEventHandler(
+        document, FilterForm.SHOW_ALL_HTML_SELECTOR,
+        filterSubmitHandler,
+        'click'
     );
 
     window.utils.setDomEventHandler(
@@ -223,7 +230,6 @@
         onSubmitOrder,
         'submit'
     );
-
   }
 
 
@@ -231,10 +237,15 @@
    * Overall order form checking
    */
 
-  function filterFormInputHandler(evt) {
+  function filterInputHandler(evt) {
     window.utils.debounce(function () {
       dom.filterFormHandler(evt);
     }, DEBOUNCE_TIME);
+  }
+
+  function filterSubmitHandler(evt) {
+    evt.preventDefault();
+    dom.filterFormHandler(evt);
   }
 
   function filterFormRangeHandler(evt) {

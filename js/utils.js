@@ -79,6 +79,7 @@
     enableButton: enableButton,
     disableHtmlSelector: disableHtmlSelector,
     isHtmlIdInputDisabled: isHtmlIdInputDisabled,
+    isHtmlSelectorDisabled: isHtmlSelectorDisabled,
     disableHtmlId: disableHtmlId,
 
     setInputToBeRequired: setInputToBeRequired,
@@ -452,6 +453,11 @@
     var baseNode = node ? node : document;
     var selector = window.utils.htmlIdToHtmlSelector(htmlId);
     return baseNode.querySelector(selector).disabled;
+  }
+
+  function isHtmlSelectorDisabled(htmlSelector, node) {
+    var baseNode = node ? node : document;
+    return baseNode.querySelector(htmlSelector).disabled;
   }
 
   function setInputToBeRequired(isToBeRequired, selector, node) {

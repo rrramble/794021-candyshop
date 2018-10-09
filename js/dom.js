@@ -335,6 +335,9 @@
 
     this.filterFormHandler = function (evt) {
       switch (true) {
+        case isShowAllPressed(evt):
+          evt.preventDefault();
+          break;
         case isFavoritePressed(evt) && isFavoriteChecked():
           evt.preventDefault();
           uncheckSectionInputs(FilterForm.IN_STOCK);
@@ -362,11 +365,15 @@
           getCheckedInputs(FilterForm.INGREDIENTS),
           getCheckedInputs(FilterForm.FAVORITE),
           getCheckedInputs(FilterForm.IN_STOCK),
-          getInputRangeValue('min'),
-          getInputRangeValue('max'),
+          getMinPinInputRangeValue(true),
+          getMinPinInputRangeValue(false),
           getSortingType()
       );
       return;
+
+      function isShowAllPressed(ownEvt) {
+        return ownEvt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
+      }
 
       function isFavoritePressed(ownEvt) {
         var key = Object.keys(FilterForm.FAVORITE[0])[0];
@@ -430,12 +437,18 @@
         });
       }
 
-      function getInputRangeValue(whichPin) {
-        if (whichPin === 'min') {
-          return window.utils.getDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR);
+      function getMinPinInputRangeValue(isMin) {
+        if (isMin) {
+          var textSelector = Filter.MIN_RANGE_BTN_TEXT_SELECTOR;
+          var pinSelector = Object.keys(FilterForm.RANGE_PINS[0])[0];
         } else {
-          return window.utils.getDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR);
+          textSelector = Filter.MAX_RANGE_BTN_TEXT_SELECTOR;
+          pinSelector = Object.keys(FilterForm.RANGE_PINS[1])[0];
         }
+        if (window.utils.isHtmlSelectorDisabled(pinSelector)) {
+          return isMin ? -Infinity : +Infinity;
+        }
+        return window.utils.getDomTextContent(document, textSelector);
       }
 
       function getSortingType() {
