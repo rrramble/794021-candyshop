@@ -248,10 +248,8 @@
     }
 
     function isEmailValid() {
-      // Thanks to www.StackOverflow.com
-      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
-      var se = /^[\w\.\-_]{1,}@[\w\.\-]{6,}/;
-      return se.test(value);
+      var email = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      return window.utils.isEmailValid(email);
     }
   }
 
