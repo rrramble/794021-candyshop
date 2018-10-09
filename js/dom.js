@@ -419,14 +419,14 @@
       function disableInputs(inputs, shouldBeDisabled) {
         inputs.forEach(function (input) {
           var id = Object.keys(input)[0];
-          window.utils.disableHtmlIdInput(shouldBeDisabled, id);
+          window.utils.disableHtmlId(shouldBeDisabled, id);
         });
       }
 
       function disableButtons(buttons, shouldBeDisabled) {
         buttons.forEach(function (button) {
           var selector = Object.keys(button)[0];
-          window.utils.disableHtmlSelectorButton(shouldBeDisabled, selector);
+          window.utils.disableHtmlSelector(shouldBeDisabled, selector);
         });
       }
 

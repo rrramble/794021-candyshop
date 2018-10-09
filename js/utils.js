@@ -77,9 +77,9 @@
 
     disableButton: disableButton,
     enableButton: enableButton,
-    disableHtmlSelectorButton: disableHtmlSelectorButton,
+    disableHtmlSelector: disableHtmlSelector,
     isHtmlIdInputDisabled: isHtmlIdInputDisabled,
-    disableHtmlIdInput: disableHtmlIdInput,
+    disableHtmlId: disableHtmlId,
 
     setInputToBeRequired: setInputToBeRequired,
     setDomValid: setDomValid,
@@ -436,12 +436,12 @@
     baseNode.querySelector(selector).disabled = false;
   }
 
-  function disableHtmlSelectorButton(shoudBeDisabled, selector, node) {
+  function disableHtmlSelector(shoudBeDisabled, selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = shoudBeDisabled;
   }
 
-  function disableHtmlIdInput(shouldBeBlocked, htmlId, node) {
+  function disableHtmlId(shouldBeBlocked, htmlId, node) {
     var baseNode = node ? node : document;
     var selector = window.utils.htmlIdToHtmlSelector(htmlId);
     var childNode = baseNode.querySelector(selector);

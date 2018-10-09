@@ -79,7 +79,6 @@
     METHOD_SELECTOR: '.deliver__toggle',
     SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
-    isByCourier: true,
 
     Store: {
       MAIN_SELECTOR: '.deliver__store',
@@ -129,6 +128,7 @@
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
     setContactsToBeRequired(true);
+    deliveryTypeHandler();
 
     window.utils.setDomEventHandler(
         document, FilterForm.MAIN_SELECTOR,
@@ -405,31 +405,29 @@
   function deliveryTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        adjustFormForDelivery(Delivery.isByCourier);
+        adjustFormForDeliveryByCourier(true);
         break;
       case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
-        adjustFormForDelivery(!Delivery.isByCourier);
+        adjustFormForDeliveryByCourier(false);
         break;
     }
   }
 
-  function adjustFormForDelivery(isByCourier) {
+  function adjustFormForDeliveryByCourier(isByCourier) {
+    window.utils.setInputToBeRequired(isByCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setInputToBeRequired(isByCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setInputToBeRequired(isByCourier, Delivery.Courier.ROOM_SELECTOR);
+
+    window.utils.disableHtmlSelector(!isByCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.disableHtmlSelector(!isByCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.disableHtmlSelector(!isByCourier, Delivery.Courier.ROOM_SELECTOR);
+
     if (isByCourier) {
       window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
-
-      window.utils.setInputToBeRequired(true, Delivery.Courier.STREET_SELECTOR);
-      window.utils.setInputToBeRequired(true, Delivery.Courier.HOUSE_SELECTOR);
-      window.utils.setInputToBeRequired(true, Delivery.Courier.ROOM_SELECTOR);
-
     } else {
       window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
-
-      window.utils.setInputToBeRequired(false, Delivery.Courier.STREET_SELECTOR);
-      window.utils.setInputToBeRequired(false, Delivery.Courier.HOUSE_SELECTOR);
-      window.utils.setInputToBeRequired(false, Delivery.Courier.ROOM_SELECTOR);
-
       resetContactsValidity();
     }
   }
