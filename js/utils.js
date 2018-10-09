@@ -89,7 +89,9 @@
     listMax: listMax,
     getMovementX: getMovementX,
     isKeyInObjectOfList: isKeyInObjectOfList,
+    
     debounce: debounce,
+    isClassIncludesKey: isClassIncludesKey,
 
     HttpCode: HttpCode
   };
@@ -501,6 +503,13 @@
     return list.some(function (item) {
       return key in item;
     });
+  }
+
+  function isClassIncludesKey(aClass, searchedKey) {
+    if (aClass.hasOwnProperty) {
+      return aClass.hasOwnProperty(searchedKey);
+    }
+    return aClass.__proto__.hasOwnProperty(searchedKey);
   }
 
   var _lastTimeout;

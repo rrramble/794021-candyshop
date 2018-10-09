@@ -8,6 +8,12 @@
 (function () {
 
   var IMG_PATH = 'img/cards/';
+  var Sorting = {
+    'popular': sortDefault,
+    'cheap': sortCheap,
+    'expensive': sortExpensive,
+    'rating': sortRating
+  };
 
   window.Catalog = function (loadGoods) {
 
@@ -135,7 +141,8 @@
       return false;
     };
 
-    this.applyFilter = function (categories, ingredients, favorite, inStock, min, max) {
+    this.applyFilter = function (categories, ingredients, favorite, inStock, min, max, sortingType) {
+      this.sort(sortingType);
       for (var i = 0; i < this.getCount(); i++) {
         if (this.canBeFiltered(i, categories, ingredients, favorite, inStock, min, max)) {
           this.filterItem(i);
@@ -143,6 +150,19 @@
           this.unfilterItem(i);
         }
       }
+    };
+
+    this.sort = function (sortingType) {
+      if (
+        this.sortingType === sortingType ||
+        !window.utils.isClassIncludesKey(Sorting, sortingType)
+      ) {
+        return;
+      };
+      
+      this.sortingType = sortingType;
+      var sortingFunction = Sorting[sortingType];
+      this.goods.sort(sortingFunction);
     };
 
     this.tuneData = function () {
@@ -157,6 +177,29 @@
     // Costructor of the class
     this.goods = loadGoods();
     this.tuneData();
+    return;
   };
+
+  function sortDefault(first, second) {
+    return first.id - second.id;
+  }
+
+  function sortCheap(first, second) {
+    return first.price - second.price;
+  }
+
+  function sortExpensive(first, second) {
+    return second.price - first.price;
+  }
+
+  function sortRating(first, second) {
+    if (second.rating.value > first.rating.value) {
+      return 1;
+    }
+    if (first.rating.value > second.rating.value) {
+      return -1;
+    }
+    return second.rating.number - first.rating.number;
+  }
 
 })();

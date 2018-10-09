@@ -15,7 +15,7 @@
   var INCREASE_TROLLEY_HTML_CLASS = 'card-order__btn--increase';
   var DECREASE_TROLLEY_HTML_CLASS = 'card-order__btn--decrease';
   var TROLLEY_AMOUNT_HTML_CLASS = 'card-order__count';
-  var DELETE_TROLLEY_HTML_CLASS = 'card-order__close';
+  var DELETE_FROM_TROLLEY_HTML_CLASS = 'card-order__close';
 
   var EMPTY_FILTER_TEMPLATE_SELECTOR = '#empty-filters';
   var EMPTY_FILTER_SELECTOR = '.catalog__empty-filter';
@@ -42,10 +42,16 @@
       {'filter-availability': 'in-stock'}
     ],
     RANGE_PINS: [
-      {'.range__btn--left': ''},
-      {'.range__btn--right': ''}
+      {'.range__btn--left': 'left'},
+      {'.range__btn--right': 'right'}
     ],
-    SHOW_ALL_HTML_CLASS: 'catalog__submit'
+    SHOW_ALL_HTML_CLASS: 'catalog__submit',
+    SORTING_TYPES: [
+      {'filter-popular': 'popular'},
+      {'filter-expensive': 'expensive'},
+      {'filter-cheep': 'cheap'},
+      {'filter-rating': 'rating'}
+    ]
   };
 
   var Filter = {
@@ -151,7 +157,7 @@
         case (evt.target.classList.contains(DECREASE_TROLLEY_HTML_CLASS)):
           this.takeFromTrolley(commodityId);
           break;
-        case (evt.target.classList.contains(DELETE_TROLLEY_HTML_CLASS)):
+        case (evt.target.classList.contains(DELETE_FROM_TROLLEY_HTML_CLASS)):
           event.preventDefault();
           this.takeFromTrolley(commodityId, this.trolley.getAmount(commodityId));
           break;
@@ -317,8 +323,8 @@
       return result;
     };
 
-    this.applyFilter = function (category, ingredients, favorite, inStock, min, max) {
-      this.catalog.applyFilter(category, ingredients, favorite, inStock, min, max);
+    this.applyFilter = function (category, ingredients, favorite, inStock, min, max, sortingType) {
+      this.catalog.applyFilter(category, ingredients, favorite, inStock, min, max, sortingType);
       this.renderCatalogDom();
     };
 
@@ -328,20 +334,27 @@
      */
 
     this.filterFormHandler = function (evt) {
-      if (isFavoritePressed(evt) && isFavoriteChecked()) {
-        uncheckSectionInputs(FilterForm.IN_STOCK);
-        disableInputs(FilterForm.CATEGORIES, true);
-        disableInputs(FilterForm.INGREDIENTS, true);
-        disableButtons(FilterForm.RANGE_PINS, true);
-      } else if (isInStockPressed(evt) && isInStockChecked()) {
-        uncheckSectionInputs(FilterForm.FAVORITE);
-        disableInputs(FilterForm.CATEGORIES, true);
-        disableInputs(FilterForm.INGREDIENTS, true);
-        disableButtons(FilterForm.RANGE_PINS, true);
-      } else if (isFavoritePressed(evt) || isInStockPressed(evt)) {
-        disableInputs(FilterForm.CATEGORIES, false);
-        disableInputs(FilterForm.INGREDIENTS, false);
-        disableButtons(FilterForm.RANGE_PINS, false);
+      switch (true) {
+        case isFavoritePressed(evt) && isFavoriteChecked():
+          evt.preventDefault();
+          uncheckSectionInputs(FilterForm.IN_STOCK);
+          disableInputs(FilterForm.CATEGORIES, true);
+          disableInputs(FilterForm.INGREDIENTS, true);
+          disableButtons(FilterForm.RANGE_PINS, true);
+          break;
+        case (isInStockPressed(evt) && isInStockChecked()):
+          evt.preventDefault();
+          uncheckSectionInputs(FilterForm.FAVORITE);
+          disableInputs(FilterForm.CATEGORIES, true);
+          disableInputs(FilterForm.INGREDIENTS, true);
+          disableButtons(FilterForm.RANGE_PINS, true);
+          break;
+        case isFavoritePressed(evt) || isInStockPressed(evt):
+          evt.preventDefault();
+          disableInputs(FilterForm.CATEGORIES, false);
+          disableInputs(FilterForm.INGREDIENTS, false);
+          disableButtons(FilterForm.RANGE_PINS, false);
+          break;
       }
 
       this.applyFilter(
@@ -350,7 +363,8 @@
           getCheckedInputs(FilterForm.FAVORITE),
           getCheckedInputs(FilterForm.IN_STOCK),
           getInputRangeValue('min'),
-          getInputRangeValue('max')
+          getInputRangeValue('max'),
+          getSortingType()
       );
       return;
 
@@ -422,6 +436,16 @@
         } else {
           return window.utils.getDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR);
         }
+      }
+
+      function getSortingType() {
+        var result = FilterForm.SORTING_TYPES.reduce(function (currentType, item) {
+          var htmlId = Object.keys(item)[0];
+          var type = item[htmlId];
+          currentType = window.utils.isHtmlIdChecked(htmlId) ? type : currentType;
+          return currentType;
+        }, '');
+        return result;
       }
 
     }; // this.filterFormHandler
