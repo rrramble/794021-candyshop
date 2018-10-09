@@ -76,7 +76,7 @@
 
   var Delivery = {
     MAIN_SELECTOR: '.deliver',
-    METHOD_SELECTOR: '.deliver__toggle',
+    TYPE_SELECTOR: '.deliver__toggle',
     SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
 
@@ -90,7 +90,21 @@
       HOUSE_SELECTOR: '#deliver__house',
       FLOOR_SELECTOR: '#deliver__floor',
       ROOM_SELECTOR: '#deliver__room'
-    }
+    },
+
+    Map: {
+      'store-academicheskaya': 'Академическая',
+      'store-vasileostrovskaya': 'Василеостровская',
+      'store-rechka': 'Черная речка',
+      'store-petrogradskaya': 'Петроградская',
+      'store-proletarskaya': 'Пролетарская',
+      'store-vostaniya': 'Площадь Восстания',
+      'store-prosvesheniya': 'Проспект Просвещения',
+      'store-frunzenskaya': 'Фрунзенская',
+      'store-chernishevskaya': 'Чернышевская',
+      'store-tehinstitute': 'Технологический институт'
+    },
+    MAP_PATH: 'img/map/'
   };
 
 
@@ -161,9 +175,9 @@
     );
 
     window.utils.setDomEventHandler(
-        document, Delivery.MAIN_SELECTOR,
+        document, Delivery.TYPE_SELECTOR,
         deliveryTypeHandler,
-        'click'
+        'change'
     );
 
     window.utils.setDomEventHandler(
