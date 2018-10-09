@@ -323,9 +323,56 @@
       return result;
     };
 
-    this.applyFilter = function (category, ingredients, favorite, inStock, min, max, sortingType) {
-      this.catalog.applyFilter(category, ingredients, favorite, inStock, min, max, sortingType);
+    this.applyFilter = function () {
+      this.catalog.applyFilter(
+          getCheckedInputs(FilterForm.CATEGORIES),
+          getCheckedInputs(FilterForm.INGREDIENTS),
+          getCheckedInputs(FilterForm.FAVORITE),
+          getCheckedInputs(FilterForm.IN_STOCK),
+          getMinPinInputRangeValue(true),
+          getMinPinInputRangeValue(false),
+          getSortingType()
+      );
       this.renderCatalogDom();
+
+      function getCheckedInputs(listOfInputs) {
+        return listOfInputs.reduce(function (accu, item) {
+          var id = Object.keys(item)[0];
+          var value = item[id];
+          if (
+            !window.utils.isHtmlIdInputDisabled(id) &&
+            window.utils.isHtmlIdChecked(id)
+          ) {
+            accu.push(value);
+          }
+          return accu;
+        }, []);
+      }
+
+      function getMinPinInputRangeValue(isMin) {
+        if (isMin) {
+          var textSelector = Filter.MIN_RANGE_BTN_TEXT_SELECTOR;
+          var pinSelector = Object.keys(FilterForm.RANGE_PINS[0])[0];
+        } else {
+          textSelector = Filter.MAX_RANGE_BTN_TEXT_SELECTOR;
+          pinSelector = Object.keys(FilterForm.RANGE_PINS[1])[0];
+        }
+        if (window.utils.isHtmlSelectorDisabled(pinSelector)) {
+          return isMin ? -Infinity : +Infinity;
+        }
+        return window.utils.getDomTextContent(document, textSelector);
+      }
+
+      function getSortingType() {
+        var result = FilterForm.SORTING_TYPES.reduce(function (currentType, item) {
+          var htmlId = Object.keys(item)[0];
+          var type = item[htmlId];
+          currentType = window.utils.isHtmlIdChecked(htmlId) ? type : currentType;
+          return currentType;
+        }, '');
+        return result;
+      }
+
     };
 
 
@@ -337,6 +384,15 @@
       switch (true) {
         case isShowAllPressed(evt):
           evt.preventDefault();
+          uncheckSectionInputs(FilterForm.CATEGORIES);
+          uncheckSectionInputs(FilterForm.INGREDIENTS);
+          uncheckSectionInputs(FilterForm.IN_STOCK);
+          uncheckSectionInputs(FilterForm.FAVORITE);
+          disableInputs(FilterForm.CATEGORIES, false);
+          disableInputs(FilterForm.INGREDIENTS, false);
+          disableButtons(FilterForm.RANGE_PINS, false);
+          // reset range-pins !!!!!!
+          setSortingByPopular();
           break;
         case isFavoritePressed(evt) && isFavoriteChecked():
           evt.preventDefault();
@@ -359,16 +415,7 @@
           disableButtons(FilterForm.RANGE_PINS, false);
           break;
       }
-
-      this.applyFilter(
-          getCheckedInputs(FilterForm.CATEGORIES),
-          getCheckedInputs(FilterForm.INGREDIENTS),
-          getCheckedInputs(FilterForm.FAVORITE),
-          getCheckedInputs(FilterForm.IN_STOCK),
-          getMinPinInputRangeValue(true),
-          getMinPinInputRangeValue(false),
-          getSortingType()
-      );
+      this.applyFilter();
       return;
 
       function isShowAllPressed(ownEvt) {
@@ -399,20 +446,6 @@
         return window.utils.isHtmlIdChecked(id);
       }
 
-      function getCheckedInputs(listOfInputs) {
-        return listOfInputs.reduce(function (accu, item) {
-          var id = Object.keys(item)[0];
-          var value = item[id];
-          if (
-            !window.utils.isHtmlIdInputDisabled(id) &&
-            window.utils.isHtmlIdChecked(id)
-          ) {
-            accu.push(value);
-          }
-          return accu;
-        }, []);
-      }
-
       function uncheckSectionInputs(formList, exceptionId) {
         formList.forEach(function (item) {
           var id = Object.keys(item)[0];
@@ -437,28 +470,9 @@
         });
       }
 
-      function getMinPinInputRangeValue(isMin) {
-        if (isMin) {
-          var textSelector = Filter.MIN_RANGE_BTN_TEXT_SELECTOR;
-          var pinSelector = Object.keys(FilterForm.RANGE_PINS[0])[0];
-        } else {
-          textSelector = Filter.MAX_RANGE_BTN_TEXT_SELECTOR;
-          pinSelector = Object.keys(FilterForm.RANGE_PINS[1])[0];
-        }
-        if (window.utils.isHtmlSelectorDisabled(pinSelector)) {
-          return isMin ? -Infinity : +Infinity;
-        }
-        return window.utils.getDomTextContent(document, textSelector);
-      }
-
-      function getSortingType() {
-        var result = FilterForm.SORTING_TYPES.reduce(function (currentType, item) {
-          var htmlId = Object.keys(item)[0];
-          var type = item[htmlId];
-          currentType = window.utils.isHtmlIdChecked(htmlId) ? type : currentType;
-          return currentType;
-        }, '');
-        return result;
+      function setSortingByPopular() {
+        var htmlId = Object.keys(FilterForm.SORTING_TYPES[0])[0];
+        window.utils.setInputHtmlIdCheck(htmlId, true);
       }
 
     }; // this.filterFormHandler
