@@ -1,8 +1,7 @@
 'use strict';
 
 /*
- * Текст задания:
- * https://up.htmlacademy.ru/javascript/15/tasks/16
+ * Main module:
  */
 
 (function () {
@@ -99,15 +98,7 @@
    * Main code
    */
 
-  // Genereate mock goods
-  /*
-  window.mockGoods.get(onSuccess, function(text) {
-    console.log(text);
-  });
-  */
-
   window.Backend.get(onSuccessDownload, onErrorDownloadUpload);
-
   return;
 
   /*

@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Make DOM from the catalog of goods and the trolley
+ * Class for Range filter
  */
 
 (function () {
@@ -56,7 +56,7 @@
           funcCb(ownEvt);
         }
       }
-    }; // this.mouseDownHandler
+    };
 
 
     function mouseMoveHandler(evt) {

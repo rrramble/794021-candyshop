@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Make DOM from the catalog of goods and the trolley
+ * Make DOM from the catalog/trolley content
  */
 
 (function () {

@@ -158,8 +158,8 @@
         !window.utils.isClassIncludesKey(Sorting, sortingType)
       ) {
         return;
-      };
-      
+      }
+
       this.sortingType = sortingType;
       var sortingFunction = Sorting[sortingType];
       this.goods.sort(sortingFunction);

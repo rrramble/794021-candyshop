@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Miscelaneous non-task-oriented functions
+ * Miscelaneous not task-oriented functions
  */
 
 (function () {
@@ -89,7 +89,7 @@
     listMax: listMax,
     getMovementX: getMovementX,
     isKeyInObjectOfList: isKeyInObjectOfList,
-    
+
     debounce: debounce,
     isClassIncludesKey: isClassIncludesKey,
 
@@ -509,7 +509,7 @@
     if (aClass.hasOwnProperty) {
       return aClass.hasOwnProperty(searchedKey);
     }
-    return aClass.__proto__.hasOwnProperty(searchedKey);
+    return aClass.prototype.hasOwnProperty(searchedKey);
   }
 
   var _lastTimeout;
