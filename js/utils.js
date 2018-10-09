@@ -445,7 +445,7 @@
     childNode.disabled = shouldBeBlocked;
   }
 
-  function isHtmlIdInputDisabled (htmlId, node) {
+  function isHtmlIdInputDisabled(htmlId, node) {
     var baseNode = node ? node : document;
     var selector = window.utils.htmlIdToHtmlSelector(htmlId);
     return baseNode.querySelector(selector).disabled;

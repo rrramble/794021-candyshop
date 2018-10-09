@@ -328,19 +328,17 @@
      */
 
     this.filterFormHandler = function (evt) {
-      var htmlId = evt.srcElement.id;
-
-      if (isFavoritePressed(evt) && isFavoriteChecked(evt)) {
+      if (isFavoritePressed(evt) && isFavoriteChecked()) {
         uncheckSectionInputs(FilterForm.IN_STOCK);
         disableInputs(FilterForm.CATEGORIES, true);
         disableInputs(FilterForm.INGREDIENTS, true);
         disableButtons(FilterForm.RANGE_PINS, true);
-      } else if (isInStockPressed(evt) && isInStockChecked(evt)) {
+      } else if (isInStockPressed(evt) && isInStockChecked()) {
         uncheckSectionInputs(FilterForm.FAVORITE);
         disableInputs(FilterForm.CATEGORIES, true);
         disableInputs(FilterForm.INGREDIENTS, true);
         disableButtons(FilterForm.RANGE_PINS, true);
-      } else if (isFavoritePressed(evt) || isInStockPressed(evt)){
+      } else if (isFavoritePressed(evt) || isInStockPressed(evt)) {
         disableInputs(FilterForm.CATEGORIES, false);
         disableInputs(FilterForm.INGREDIENTS, false);
         disableButtons(FilterForm.RANGE_PINS, false);
@@ -356,21 +354,21 @@
       );
       return;
 
-      function isFavoritePressed(evt) {
+      function isFavoritePressed(ownEvt) {
         var key = Object.keys(FilterForm.FAVORITE[0])[0];
-        return evt.srcElement.id === key;
+        return ownEvt.srcElement.id === key;
       }
 
-      function isFavoriteChecked(evt) {
+      function isFavoriteChecked() {
         return isSectionChecked(FilterForm.FAVORITE);
       }
 
-      function isInStockPressed(evt) {
+      function isInStockPressed(ownEvt) {
         var key = Object.keys(FilterForm.IN_STOCK[0])[0];
-        return evt.srcElement.id === key;
+        return ownEvt.srcElement.id === key;
       }
 
-      function isInStockChecked(evt) {
+      function isInStockChecked() {
         return isSectionChecked(FilterForm.IN_STOCK);
       }
 
@@ -385,20 +383,13 @@
           var id = Object.keys(item)[0];
           var value = item[id];
           if (
-              !window.utils.isHtmlIdInputDisabled(id) &&
-              window.utils.isHtmlIdChecked(id)
+            !window.utils.isHtmlIdInputDisabled(id) &&
+            window.utils.isHtmlIdChecked(id)
           ) {
             accu.push(value);
           }
           return accu;
         }, []);
-      }
-
-      function uncheckFilterInputsExcept(exceptionId) {
-        uncheckSectionInputs(FilterForm.CATEGORIES, exceptionId);
-        uncheckSectionInputs(FilterForm.INGREDIENTS, exceptionId);
-        uncheckSectionInputs(FilterForm.FAVORITE, exceptionId);
-        uncheckSectionInputs(FilterForm.IN_STOCK, exceptionId);
       }
 
       function uncheckSectionInputs(formList, exceptionId) {
@@ -433,11 +424,7 @@
         }
       }
 
-      function isShowAllPressed(evt) {
-        return evt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
-      }
-
-    }; // filterFormHandler
+    }; // this.filterFormHandler
 
 
     /*
