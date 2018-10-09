@@ -42,22 +42,22 @@
       if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {
         return;
       }
-      this.funcCb = funcCb;
       Pin.isMin = isMinRangePinPressed(evt);
       Pin.mouseStartX = evt.clientX;
 
-      document.addEventListener('mouseup', mouseUpHandler.bind(this));
+      document.addEventListener('mouseup', mouseUpHandler);
       document.addEventListener('mousemove', mouseMoveHandler);
-    };
 
-    function mouseUpHandler(evt) {
-      evt.preventDefault();
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler.bind(this));
-      if (this.funcCb) {
-        this.funcCb(evt);
+      function mouseUpHandler(ownEvt) {
+        ownEvt.preventDefault();
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        if (funcCb) {
+          funcCb(ownEvt);
+        }
       }
-    }
+    }; // this.mouseDownHandler
+
 
     function mouseMoveHandler(evt) {
       evt.preventDefault();
