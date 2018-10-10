@@ -33,6 +33,7 @@
   };
 
   var Contacts = {
+    MAIN_SELECTOR: '.contact-data',
     NAME_SELECTOR: '#contact-data__name',
     NAME_MIN_LENGTH: 1,
 
@@ -78,7 +79,7 @@
   var Delivery = {
     MAIN_SELECTOR: '.deliver',
     TYPE_SELECTOR: '.deliver__toggle',
-    SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
+    SELF_TAKE_OUT_ID: 'deliver__store',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
 
     Store: {
@@ -195,11 +196,8 @@
         'mousedown'
     );
 
-    window.utils.setDomEventHandler(
-        document, Order.MAIN_SELECTOR,
-        contactsCheckHandler,
-        'change'
-    );
+    document.querySelector(Contacts.MAIN_SELECTOR).
+      addEventListener('change', contactsCheckHandler);
 
     window.utils.setDomEventHandler(
         document, Payment.METHOD_SELECTOR,
@@ -220,16 +218,13 @@
     );
 
     window.utils.setDomEventHandler(
-        document, Delivery.MAIN_SELECTOR,
-        deliveryCheckHandler,
+        document, Delivery.Store.MAIN_SELECTOR,
+        deliveryChangeAndCheck,
         'change'
     );
 
-    window.utils.setDomEventHandler(
-        document, Order.MAIN_SELECTOR,
-        onSubmitOrder,
-        'submit'
-    );
+    document.querySelector(Order.MAIN_SELECTOR).
+      addEventListener('submit', onSubmitOrder);
   }
 
 
@@ -253,11 +248,11 @@
   }
 
   function onSubmitOrder(evt) {
+    evt.preventDefault();
     contactsCheckHandler();
     paymentCheckHandler();
-    deliveryCheckHandler();
+    deliveryChangeAndCheck();
 
-    evt.preventDefault();
     window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
   }
 
@@ -464,7 +459,7 @@
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
         adjustFormForDeliveryByCourier(true);
         break;
-      case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
+      case (isTakeoutSelected()):
         adjustFormForDeliveryByCourier(false);
         break;
     }
@@ -489,9 +484,9 @@
     }
   }
 
-  function deliveryCheckHandler(evt) {
+  function deliveryChangeAndCheck(evt) {
     switch (true) {
-      case (Delivery.Map.hasOwnProperty(evt.srcElement.id)):
+      case (isTakeoutSelected() && evt):
         setSubwayMap(evt);
         break;
       case (!isStreetValid()):
@@ -531,6 +526,10 @@
       var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
       return window.utils.isNumber(value);
     }
+  }
+
+  function isTakeoutSelected() {
+    return window.utils.isHtmlIdChecked(Delivery.SELF_TAKE_OUT_ID);
   }
 
   function resetDeliveryValidity() {
