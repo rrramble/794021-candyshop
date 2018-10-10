@@ -7,6 +7,8 @@
 (function () {
 
   var DEBOUNCE_TIME = 500;
+  var ESC_KEY_CODE = 27;
+  
   var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
   var GOODS_HTML_SELECTOR = '.catalog__cards';
 
@@ -29,6 +31,7 @@
     SUBMIT_BTN_SELECTOR: '.buy__submit-btn',
     MODAL_ERROR_SELECTOR: '.modal--error',
     MODAL_SUCCESS_SELECTOR: '.modal--success',
+    MODAL_CLOSE_BUTTON_SELECTOR: '.modal__close',
     MODAL_HIDDEN_CLASS: 'modal--hidden'
   };
 
@@ -259,21 +262,38 @@
     window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
   }
 
-  function onSuccessUpload() {
-    resetOrderForm();
-    var modalNode = document.querySelector(Order.MODAL_SUCCESS_SELECTOR);
-    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-  }
-
-  function onErrorDownloadUpload() {
-    var modalNode = document.querySelector(Order.MODAL_ERROR_SELECTOR);
-    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-  }
-
   function makeOrderFormData() {
     return document.querySelector(Order.MAIN_SELECTOR);
   }
 
+  function onSuccessUpload() {
+    resetOrderForm();
+    showModal(Order.MODAL_SUCCESS_SELECTOR);
+  }
+
+  function onErrorDownloadUpload() {
+    showModal(Order.MODAL_ERROR_SELECTOR);
+  }
+
+  function showModal(modalSelector) {
+    var modalNode = document.querySelector(modalSelector);
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+    var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
+    closeButtonNode.addEventListener('click', closeModal);
+    document.addEventListener('keydown', closeModal);
+
+    function closeModal(evt) {
+      if (evt.type === 'keydown' && evt.keyCode !== ESC_KEY_CODE) {
+        return;
+      }
+      if (!evt.type === 'click') {
+        return;
+      }
+      modalNode.classList.add(Order.MODAL_HIDDEN_CLASS);
+      closeButtonNode.removeEventListener('click', closeModal);
+      document.removeEventListener('keydown', closeModal);
+    }
+  }
 
   /*
    * Trolley contains goods checking
