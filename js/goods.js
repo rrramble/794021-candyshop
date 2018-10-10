@@ -212,7 +212,7 @@
     );
 
     window.utils.setDomEventHandler(
-        document, Order.MAIN_SELECTOR,
+        document, Payment.MAIN_SELECTOR,
         paymentCheckHandler,
         'change'
     );
