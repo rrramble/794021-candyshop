@@ -572,8 +572,9 @@
     }
 
     function findParentCommodityId(evt) {
-      for (var i = 0; i < evt.path.length; i++) {
-        var htmlSelector = window.utils.htmlIdToHtmlSelector(evt.path[i].id);
+      var evtPath = evt.path || (evt.composedPath && evt.composedPath());
+      for (var i = 0; i < evtPath.length; i++) {
+        var htmlSelector = window.utils.htmlIdToHtmlSelector(evtPath[i].id);
 
         if (isCommodityHtmlSelector(htmlSelector)) {
           return commodityHtmlSelectorToCommodityId(htmlSelector);
