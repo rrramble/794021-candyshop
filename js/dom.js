@@ -90,6 +90,9 @@
       this.trolley.putItem(commodityId, actualAmount);
       this.updateCommodityView(commodityId);
       this.updateTrolleyView(commodityId);
+      if (this.trolley.getCount() > 0 && this.onTrolleyNotEmpty) {
+        this.onTrolleyNotEmpty();
+      }
     };
 
     this.takeFromTrolley = function (commodityId, amount) {
@@ -101,6 +104,10 @@
       this.catalog.putItem(commodityId, actualAmount);
       this.updateCommodityView(commodityId);
       this.updateTrolleyView(commodityId);
+
+      if (this.trolley.getCount() <= 0 && this.onTrolleyEmpty) {
+        this.onTrolleyEmpty();
+      }
     };
 
     this.getTrolleyAmountFromThePage = function (commodityId) {
@@ -476,8 +483,21 @@
         var htmlId = Object.keys(FilterForm.SORTING_TYPES[0])[0];
         window.utils.setInputHtmlIdCheck(htmlId, true);
       }
-
     }; // this.filterFormHandler
+
+    this.setFunctionOnTrolleyEmpty = function (func) {
+      this.onTrolleyEmpty = func;
+      if (this.trolley.getCount() <= 0) {
+        func();
+      }
+    };
+
+    this.setFunctionOnTrolleyNotEmpty = function (func) {
+      this.onTrolleyNotEmpty = func;
+      if (this.trolley.getCount() > 0) {
+        func();
+      }
+    };
 
 
     /*
@@ -524,7 +544,6 @@
     this.renderCatalogDom();
     this.renderTrolleyDom();
     fulfillFilterAmount(this);
-
     return this;
 
     /*

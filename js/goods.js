@@ -167,10 +167,13 @@
       return data;
     });
     trolley = new window.Trolley(catalog);
+
     dom = new window.Dom(
         catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
         trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
     );
+    dom.setFunctionOnTrolleyEmpty(blockAllFormFields);
+    dom.setFunctionOnTrolleyNotEmpty(unblockAllFormFields);
 
     filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
@@ -379,19 +382,23 @@
   }
 
   function adjustFormForPaymentByCard(byCard) {
-    if (byCard) {
-      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
-      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
-      setFieldsForCardPayment(true);
-    } else {
+    if (!byCard) {
       window.utils.hideHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
       window.utils.showHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
       setFieldsForCardPayment(false);
       resetCardValidity();
+    } else {
+      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
+      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(true);
     }
   }
 
   function setFieldsForCardPayment(isToBeSet) {
+    if (isToBeSet && trolley.getCount() <= 0) {
+      return;
+    }
+
     window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
@@ -498,13 +505,10 @@
   }
 
   function adjustFormForDeliveryByCourier(byCourier) {
+
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.STREET_SELECTOR);
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
-
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.STREET_SELECTOR);
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
 
     if (byCourier) {
       window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
@@ -514,6 +518,13 @@
       window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
       resetDeliveryValidity();
     }
+
+    if (byCourier && trolley.getCount() <= 0) {
+      return;
+    }
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
   }
 
   function deliveryChangeAndCheck(evt) {
@@ -577,6 +588,30 @@
     var fileName = Delivery.Map[htmlId].filename;
     var mapFullUrl = Delivery.MAP_PATH + fileName;
     window.utils.setDomImage(document, Delivery.Store.MAP_SELECTOR, mapFullUrl, altText);
+  }
+
+  function blockAllFormFields() {
+    disableAllFormFields(true);
+  }
+
+  function unblockAllFormFields() {
+    disableAllFormFields(false);
+  }
+
+  function disableAllFormFields(shouldBeDisabled) {
+    window.utils.blockInput(shouldBeDisabled, Contacts.NAME_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Contacts.PHONE_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
+
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_HOLDER_INPUT_SELECTOR);
+
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.STREET_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.FLOOR_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
   }
 
 })();
