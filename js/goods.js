@@ -8,7 +8,7 @@
 
   var DEBOUNCE_TIME = 500;
   var ESC_KEY_CODE = 27;
-  
+
   var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
   var GOODS_HTML_SELECTOR = '.catalog__cards';
 
