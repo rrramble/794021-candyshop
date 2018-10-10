@@ -19,15 +19,9 @@
     getDomObjectsByClassName: getDomObjectsByClassName,
     removeCssClass: removeCssClass,
     addCssClass: addCssClass,
-    randomInRange: randomInRange,
-    randomInRangeUpTo: randomInRangeUpTo,
-    getRandomItemFromList: getRandomItemFromList,
-    getRandomListFromList: getRandomListFromList,
     htmlClassFromSelector: htmlClassFromSelector,
     showHtmlSelector: showHtmlSelector,
-    displayInitialHtmlSelector: displayInitialHtmlSelector,
     hideHtmlSelector: hideHtmlSelector,
-    displayNoneHtmlSelector: displayNoneHtmlSelector,
     htmlClassToSelector: htmlClassToSelector,
     querySelectorIncludingSelf: querySelectorIncludingSelf,
     htmlSelectorToClass: htmlSelectorToClass,
@@ -52,7 +46,6 @@
     setDomName: setDomName,
     replaceDomItem: replaceDomItem,
     setDomEventHandler: setDomEventHandler,
-    removeDomEventHandler: removeDomEventHandler,
     removeFirstDomSelector: removeFirstDomSelector,
 
     isLuhnChecked: isLuhnChecked,
@@ -75,8 +68,6 @@
     intPercent: intPercent,
     percentToIntValue: percentToIntValue,
 
-    disableButton: disableButton,
-    enableButton: enableButton,
     disableHtmlSelector: disableHtmlSelector,
     isHtmlIdInputDisabled: isHtmlIdInputDisabled,
     isHtmlSelectorDisabled: isHtmlSelectorDisabled,
@@ -88,7 +79,6 @@
     blockInput: blockInput,
     listMin: listMin,
     listMax: listMax,
-    getMovementX: getMovementX,
     isKeyInObjectOfList: isKeyInObjectOfList,
 
     debounce: debounce,
@@ -118,44 +108,6 @@
     }
   }
 
-  function randomInRange(from, to) {
-    var result = Math.floor(Math.random(to - from) * to + from);
-    if (result < from) {
-      result = from;
-    } else if (result >= to) {
-      result = to - 1;
-    }
-    return result;
-  }
-
-  function randomInRangeUpTo(from, upTo) {
-    var to = upTo + 1;
-    return window.utils.randomInRange(from, to);
-  }
-
-  function getRandomItemFromList(list) {
-    if (list.length === 0) {
-      return list;
-    }
-    var index = window.utils.randomInRange(0, list.length);
-    return list[index];
-  }
-
-  function getRandomListFromList(list) {
-    if (list.length === 0) {
-      return list;
-    }
-
-    var newList = list.filter(function () {
-      return window.utils.randomInRangeUpTo(0, 1) === 0;
-    });
-
-    if (newList.length === 0) {
-      newList = list[0];
-    }
-    return newList;
-  }
-
   function htmlClassFromSelector(htmlSelector) {
     var firstChar = htmlSelector[0];
     if (firstChar === '.') {
@@ -170,20 +122,10 @@
     el.classList.remove(className);
   }
 
-  function displayInitialHtmlSelector(node, htmlSelector) {
-    var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    el.style.display = 'initial';
-  }
-
   function hideHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
     el.classList.add(className);
-  }
-
-  function displayNoneHtmlSelector(node, htmlSelector) {
-    var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    el.style.display = 'none';
   }
 
   function htmlClassToSelector(htmlClass) {
@@ -298,11 +240,6 @@
   function setDomEventHandler(domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.addEventListener(type, cb);
-  }
-
-  function removeDomEventHandler(domNode, htmlSelector, cb, type) {
-    var node = domNode.querySelector(htmlSelector);
-    node.removeEventListener(type, cb);
   }
 
   function removeFirstDomSelector(selector, domNode) {
@@ -427,16 +364,6 @@
     return value.toFixed(0);
   }
 
-  function disableButton(selector, node) {
-    var baseNode = node ? node : document;
-    baseNode.querySelector(selector).disabled = true;
-  }
-
-  function enableButton(selector, node) {
-    var baseNode = node ? node : document;
-    baseNode.querySelector(selector).disabled = false;
-  }
-
   function disableHtmlSelector(shoudBeDisabled, selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).disabled = shoudBeDisabled;
@@ -499,11 +426,6 @@
   function listMax(list) {
     var result = Math.max.apply(null, list);
     return result;
-  }
-
-  function getMovementX(begin, end) {
-    var value = end.x - begin.x;
-    return value;
   }
 
   function isKeyInObjectOfList(key, list) {
