@@ -151,18 +151,18 @@
       switch (true) {
         case (evt.target.classList.contains(ADD_TO_TROLLEY_HTML_CLASS)):
         case (evt.target.classList.contains(INCREASE_TROLLEY_HTML_CLASS)):
-          event.preventDefault();
+          evt.preventDefault();
           this.putToTrolley(commodityId);
           break;
         case (evt.target.classList.contains(DECREASE_TROLLEY_HTML_CLASS)):
           this.takeFromTrolley(commodityId);
           break;
         case (evt.target.classList.contains(DELETE_FROM_TROLLEY_HTML_CLASS)):
-          event.preventDefault();
+          evt.preventDefault();
           this.takeFromTrolley(commodityId, this.trolley.getAmount(commodityId));
           break;
         case (evt.target.classList.contains(ADD_TO_FAVORITE_HTML_CLASS)):
-          event.preventDefault();
+          evt.preventDefault();
           this.toggleFavorite(commodityId);
           break;
       }
