@@ -22,7 +22,10 @@
     };
 
     this.getItem = function (id) {
-      return this.getGoods()[id];
+      var result = this.getGoods().filter(function (commodity) {
+        return commodity.id.toString() === id.toString();
+      });
+      return result[0];
     };
 
     this.getAmount = function (id) {
