@@ -249,6 +249,9 @@
 
   function onSubmitOrder(evt) {
     evt.preventDefault();
+    if (isTrolleyEmpty(trolley)) {
+      return;
+    }
     contactsCheckHandler();
     paymentCheckHandler();
     deliveryChangeAndCheck();
@@ -269,6 +272,15 @@
 
   function makeOrderFormData() {
     return document.querySelector(Order.MAIN_SELECTOR);
+  }
+
+
+  /*
+   * Trolley contains goods checking
+   */
+
+  function isTrolleyEmpty(trolleyObject) {
+    return trolleyObject.getCount() <= 0;
   }
 
   /*
