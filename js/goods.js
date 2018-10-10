@@ -505,7 +505,6 @@
   }
 
   function adjustFormForDeliveryByCourier(byCourier) {
-
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.STREET_SELECTOR);
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
@@ -529,7 +528,7 @@
 
   function deliveryChangeAndCheck(evt) {
     switch (true) {
-      case (isTakeoutSelected() && evt):
+      case (!!evt && !!Delivery.Map[evt.srcElement.id]):
         setSubwayMap(evt);
         break;
       case (!isStreetValid()):
