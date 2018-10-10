@@ -11,7 +11,7 @@
 
   var CATALOG_WRAPPER_SELECTOR = '.catalog__cards-wrap';
   var ADD_TO_TROLLEY_HTML_CLASS = 'card__btn';
-  var ADD_TO_FAVORITE_HTML_CLASS = 'card__btn-favorite';
+  var TOGGLE_FAVORITE_HTML_CLASS = 'card__btn-favorite';
   var INCREASE_TROLLEY_HTML_CLASS = 'card-order__btn--increase';
   var DECREASE_TROLLEY_HTML_CLASS = 'card-order__btn--decrease';
   var TROLLEY_AMOUNT_HTML_CLASS = 'card-order__count';
@@ -161,9 +161,10 @@
           evt.preventDefault();
           this.takeFromTrolley(commodityId, this.trolley.getAmount(commodityId));
           break;
-        case (evt.target.classList.contains(ADD_TO_FAVORITE_HTML_CLASS)):
+        case (evt.target.classList.contains(TOGGLE_FAVORITE_HTML_CLASS)):
           evt.preventDefault();
           this.toggleFavorite(commodityId);
+          this.applyFilter();
           break;
       }
     };
