@@ -65,11 +65,9 @@
   ) {
 
     this.updateTrolleyCommodityAmount = function (commodityId, parentDom) {
-      var amountNode = parentDom;
-      if (!parentDom) {
-        amountNode = trolleyDomNodeFromCommodityId(commodityId);
-      }
-      amountNode.querySelector('.card-order__count').value = this.trolley.getAmount(commodityId);
+      var amountNode = parentDom ? parentDom : trolleyDomNodeFromCommodityId(commodityId);
+      var selector = window.utils.htmlClassToSelector(TROLLEY_AMOUNT_HTML_CLASS);
+      amountNode.querySelector(selector).value = this.trolley.getAmount(commodityId);
     };
 
     this.isCommodityDrawnInTrolley = function (commodityId) {
@@ -392,7 +390,6 @@
           disableInputs(FilterForm.CATEGORIES, false);
           disableInputs(FilterForm.INGREDIENTS, false);
           disableButtons(FilterForm.RANGE_PINS, false);
-          // reset range-pins !!!!!!
           setSortingByPopular();
           break;
         case isFavoritePressed(evt) && isFavoriteChecked():
@@ -589,10 +586,6 @@
     }
   };
 
-
-  /*
-   *
-   */
 
   function fulfillFilterAmount(obj) {
     updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryCount.bind(obj.catalog));
