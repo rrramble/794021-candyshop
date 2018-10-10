@@ -520,14 +520,8 @@
   }
 
   function isEmailValid(email) {
-    /*
-    // thanks to: https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
-    var regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regEx.test(String(email).toLowerCase());
-    */
-
-    // Thanks to www.StackOverflow.com
-    var regEx = /^[\w\.\-_]{1,}@[\w\.\-]{6,}/;
+    // Thanks to https://emailregex.com/
+    var regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return regEx.test(email);
   }
 
