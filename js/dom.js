@@ -12,10 +12,14 @@
   var CATALOG_WRAPPER_SELECTOR = '.catalog__cards-wrap';
   var ADD_TO_TROLLEY_HTML_CLASS = 'card__btn';
   var TOGGLE_FAVORITE_HTML_CLASS = 'card__btn-favorite';
+
   var INCREASE_TROLLEY_HTML_CLASS = 'card-order__btn--increase';
   var DECREASE_TROLLEY_HTML_CLASS = 'card-order__btn--decrease';
   var TROLLEY_AMOUNT_HTML_CLASS = 'card-order__count';
   var DELETE_FROM_TROLLEY_HTML_CLASS = 'card-order__close';
+
+  var TROLLEY_EMPTY_CLASS = 'goods__card-empty';
+  var TROLLEY_EMPTY_SELECTOR = window.utils.htmlClassToSelector(TROLLEY_EMPTY_CLASS);
 
   var EMPTY_FILTER_TEMPLATE_SELECTOR = '#empty-filters';
   var EMPTY_FILTER_SELECTOR = '.catalog__empty-filter';
@@ -262,11 +266,11 @@
 
     this.checkAndRenderTrolleyPlaceholder = function () {
       if (this.trolley.isEmpty()) {
-        window.utils.showHtmlSelector(document, '.goods__card-empty');
-        window.utils.addCssClass('goods__cards', 'goods__cards--empty');
+        window.utils.showHtmlSelector(document, TROLLEY_EMPTY_SELECTOR);
+        window.utils.addCssClass('goods__cards', TROLLEY_EMPTY_CLASS);
       } else {
-        window.utils.hideHtmlSelector(document, '.goods__card-empty');
-        window.utils.removeCssClass('goods__cards', 'goods__cards--empty');
+        window.utils.hideHtmlSelector(document, TROLLEY_EMPTY_SELECTOR);
+        window.utils.removeCssClass('goods__cards', TROLLEY_EMPTY_CLASS);
       }
     };
 
@@ -487,7 +491,7 @@
 
     this.setFunctionOnTrolleyEmpty = function (func) {
       this.onTrolleyEmpty = func;
-      if (this.trolley.getCount() <= 0) {
+      if (this.trolley.isEmpty()) {
         func();
       }
     };
@@ -568,12 +572,14 @@
       if (isCommodityHtmlSelector(htmlSelector)) {
         return htmlSelector.slice(COMMODITY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
       }
+      return undefined;
     }
 
     function trolleyHtmlSelectorToCommodityId(htmlSelector) {
       if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
         return htmlSelector.slice(TROLLEY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
       }
+      return undefined;
     }
 
     function isCommodityHtmlSelector(htmlSelector) {
