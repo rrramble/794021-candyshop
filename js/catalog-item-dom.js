@@ -7,12 +7,17 @@
 (function () {
 
   var COMMODITY_HTML_ID_HEAD = 'commodity';
+  var Selector = {
+    MAIN_SELECTOR: '.catalog__card',
+    NAME: '.card__title',
+    IMAGE: '.card__img',
+    PRICE: '.card__price',
+    CURRENCY: '.card__currency',
+    WEIGHT: '.card__weight'
+  };
 
   window.CatalogItemDom = function (commodity, templateNode) {
-
-
     // Constructor body
-
     var baseNode = templateNode.content.cloneNode(true);
     setId(baseNode, commodity.id);
     setName(baseNode, commodity.name);
@@ -24,27 +29,25 @@
     setNutritionFacts(baseNode, commodity.nutritionFacts);
     setFavorite(baseNode, commodity.favorite);
     return baseNode;
-
     // End of constructor body
 
-
     function setId(node, commodityId) {
-      var subNode = window.utils.querySelectorIncludingSelf(node, '.catalog__card');
+      var subNode = window.utils.querySelectorIncludingSelf(node, Selector.MAIN_SELECTOR);
       subNode.id = COMMODITY_HTML_ID_HEAD + commodityId;
     }
 
     function setName(node, name) {
-      window.utils.setDomTextContent(node, '.card__title', name);
+      window.utils.setDomTextContent(node, Selector.NAME, name);
     }
 
     function setImage(node, url, alt) {
-      window.utils.setDomImage(node, '.card__img', url, alt);
+      window.utils.setDomImage(node, Selector.IMAGE, url, alt);
     }
 
     function setPrice(node, price) {
-      var priceNode = node.querySelector('.card__price');
-      var currencyNode = node.querySelector('.card__currency');
-      var weightNode = node.querySelector('.card__weight');
+      var priceNode = node.querySelector(Selector.PRICE);
+      var currencyNode = node.querySelector(Selector.CURRENCY);
+      var weightNode = node.querySelector(Selector.WEIGHT);
       priceNode.textContent = price + ' ';
       priceNode.appendChild(currencyNode);
       priceNode.appendChild(weightNode);
@@ -52,7 +55,7 @@
 
     function setWeight(node, weight) {
       var weightFormatted = '/ ' + weight + ' Г';
-      window.utils.setDomTextContent(node, '.card__weight', weightFormatted);
+      window.utils.setDomTextContent(node, Selector.WEIGHT, weightFormatted);
     }
 
     function setStockAmount(node, amount) {
@@ -62,7 +65,7 @@
       } else if (amount <= 0) {
         htmlClass = 'card--soon';
       }
-      var subNode = window.utils.querySelectorIncludingSelf(node, '.catalog__card');
+      var subNode = window.utils.querySelectorIncludingSelf(node, Selector.MAIN_SELECTOR);
       subNode.classList.remove('card--in-stock');
       subNode.classList.remove('card--little');
       subNode.classList.remove('card--soon');

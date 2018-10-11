@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Miscelaneous non-task-oriented functions
+ * Miscelaneous not task-oriented functions
  */
 
 (function () {
@@ -19,10 +19,6 @@
     getDomObjectsByClassName: getDomObjectsByClassName,
     removeCssClass: removeCssClass,
     addCssClass: addCssClass,
-    randomInRange: randomInRange,
-    randomInRangeUpTo: randomInRangeUpTo,
-    getRandomItemFromList: getRandomItemFromList,
-    getRandomListFromList: getRandomListFromList,
     htmlClassFromSelector: htmlClassFromSelector,
     showHtmlSelector: showHtmlSelector,
     hideHtmlSelector: hideHtmlSelector,
@@ -30,7 +26,10 @@
     querySelectorIncludingSelf: querySelectorIncludingSelf,
     htmlSelectorToClass: htmlSelectorToClass,
     isNumber: isNumber,
+
     isChecked: isChecked,
+    isHtmlIdChecked: isHtmlIdChecked,
+    setInputHtmlIdCheck: setInputHtmlIdCheck,
     htmlIdToHtmlSelector: htmlIdToHtmlSelector,
     isInRange: isInRange,
     isInRangeUpTo: isInRangeUpTo,
@@ -38,13 +37,16 @@
 
     setDomId: setDomId,
     setDomTextContent: setDomTextContent,
+    getDomTextContent: getDomTextContent,
+
     setDomImage: setDomImage,
     setDomValue: setDomValue,
     getDomValue: getDomValue,
+
     setDomName: setDomName,
     replaceDomItem: replaceDomItem,
     setDomEventHandler: setDomEventHandler,
-    removeDomEventHandler: removeDomEventHandler,
+    removeFirstDomSelector: removeFirstDomSelector,
 
     isLuhnChecked: isLuhnChecked,
     isCardDateChecked: isCardDateChecked,
@@ -65,15 +67,23 @@
 
     intPercent: intPercent,
     percentToIntValue: percentToIntValue,
-    disableButton: disableButton,
-    enableButton: enableButton,
+
+    disableHtmlSelector: disableHtmlSelector,
+    isHtmlIdInputDisabled: isHtmlIdInputDisabled,
+    isHtmlSelectorDisabled: isHtmlSelectorDisabled,
+    disableHtmlId: disableHtmlId,
+
     setInputToBeRequired: setInputToBeRequired,
     setDomValid: setDomValid,
     setHtmlTagAttribute: setHtmlTagAttribute,
     blockInput: blockInput,
     listMin: listMin,
     listMax: listMax,
-    getMovementX: getMovementX,
+    isKeyInObjectOfList: isKeyInObjectOfList,
+
+    debounce: debounce,
+    isClassIncludesKey: isClassIncludesKey,
+    isEmailValid: isEmailValid,
 
     HttpCode: HttpCode
   };
@@ -96,44 +106,6 @@
     for (var i = 0; i < domObjects.length; i++) {
       domObjects[i].classList.add(classToBeAdded);
     }
-  }
-
-  function randomInRange(from, to) {
-    var result = Math.floor(Math.random(to - from) * to + from);
-    if (result < from) {
-      result = from;
-    } else if (result >= to) {
-      result = to - 1;
-    }
-    return result;
-  }
-
-  function randomInRangeUpTo(from, upTo) {
-    var to = upTo + 1;
-    return window.utils.randomInRange(from, to);
-  }
-
-  function getRandomItemFromList(list) {
-    if (list.length === 0) {
-      return list;
-    }
-    var index = window.utils.randomInRange(0, list.length);
-    return list[index];
-  }
-
-  function getRandomListFromList(list) {
-    if (list.length === 0) {
-      return list;
-    }
-
-    var newList = list.filter(function () {
-      return window.utils.randomInRangeUpTo(0, 1) === 0;
-    });
-
-    if (newList.length === 0) {
-      newList = list[0];
-    }
-    return newList;
   }
 
   function htmlClassFromSelector(htmlSelector) {
@@ -188,6 +160,18 @@
     return result;
   }
 
+  function isHtmlIdChecked(htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var result = baseNode.querySelector(selector).checked;
+    return result;
+  }
+
+  function setInputHtmlIdCheck(htmlId, shouldBeSet) {
+    var htmlSelector = window.utils.htmlIdToHtmlSelector(htmlId);
+    document.querySelector(htmlSelector).checked = shouldBeSet;
+  }
+
   function htmlIdToHtmlSelector(id) {
     return '#' + id;
   }
@@ -215,6 +199,11 @@
   function setDomTextContent(node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.textContent = data;
+  }
+
+  function getDomTextContent(node, htmlSelector) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    return subNode.textContent;
   }
 
   function setDomImage(node, htmlSelector, imageUrl, imageAlt) {
@@ -253,9 +242,12 @@
     node.addEventListener(type, cb);
   }
 
-  function removeDomEventHandler(domNode, htmlSelector, cb, type) {
-    var node = domNode.querySelector(htmlSelector);
-    node.removeEventListener(type, cb);
+  function removeFirstDomSelector(selector, domNode) {
+    var baseNode = domNode ? domNode : document;
+    var node = baseNode.querySelector(selector);
+    if (node) {
+      node.remove();
+    }
   }
 
   function isLuhnChecked(cardNumber) {
@@ -372,14 +364,27 @@
     return value.toFixed(0);
   }
 
-  function disableButton(selector, node) {
+  function disableHtmlSelector(shoudBeDisabled, selector, node) {
     var baseNode = node ? node : document;
-    baseNode.querySelector(selector).disabled = true;
+    baseNode.querySelector(selector).disabled = shoudBeDisabled;
   }
 
-  function enableButton(selector, node) {
+  function disableHtmlId(shouldBeBlocked, htmlId, node) {
     var baseNode = node ? node : document;
-    baseNode.querySelector(selector).disabled = false;
+    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var childNode = baseNode.querySelector(selector);
+    childNode.disabled = shouldBeBlocked;
+  }
+
+  function isHtmlIdInputDisabled(htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    return baseNode.querySelector(selector).disabled;
+  }
+
+  function isHtmlSelectorDisabled(htmlSelector, node) {
+    var baseNode = node ? node : document;
+    return baseNode.querySelector(htmlSelector).disabled;
   }
 
   function setInputToBeRequired(isToBeRequired, selector, node) {
@@ -423,9 +428,31 @@
     return result;
   }
 
-  function getMovementX(begin, end) {
-    var value = end.x - begin.x;
-    return value;
+  function isKeyInObjectOfList(key, list) {
+    return list.some(function (item) {
+      return key in item;
+    });
+  }
+
+  function isClassIncludesKey(aClass, searchedKey) {
+    if (aClass.hasOwnProperty) {
+      return aClass.hasOwnProperty(searchedKey);
+    }
+    return aClass.prototype.hasOwnProperty(searchedKey);
+  }
+
+  function isEmailValid(email) {
+    // Thanks to https://emailregex.com/
+    var regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regEx.test(email);
+  }
+
+  var _lastTimeout;
+  function debounce(func, arg, intervalMilliseconds) {
+    if (_lastTimeout) {
+      window.clearTimeout(_lastTimeout);
+    }
+    _lastTimeout = window.setTimeout(func, arg, intervalMilliseconds);
   }
 
 })();

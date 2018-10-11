@@ -1,11 +1,13 @@
 'use strict';
 
 /*
- * Текст задания:
- * https://up.htmlacademy.ru/javascript/15/tasks/16
+ * Main module:
  */
 
 (function () {
+
+  var DEBOUNCE_TIME = 500;
+  var ESC_KEY_CODE = 27;
 
   var GOODS_HTML_TEMPLATE_SELECTOR = '#card';
   var GOODS_HTML_SELECTOR = '.catalog__cards';
@@ -13,20 +15,28 @@
   var TROLLEY_HTML_TEMPLATE_SELECTOR = '#card-order';
   var TROLLEY_HTML_SELECTOR = '.goods__cards';
 
-  var FilterRange = {
-    MIN_RANGE_SELECTOR: '.range__btn--left',
-    MAX_RANGE_SELECTOR: '.range__btn--right'
+
+  var FilterForm = {
+    MAIN_SELECTOR: '.catalog__sidebar form',
+    SHOW_ALL_HTML_SELECTOR: '.catalog__submit',
   };
+
+  var FilterRange = {
+    MAIN_SELECTOR: '.range__filter'
+  };
+
 
   var Order = {
     MAIN_SELECTOR: '.buy form',
     SUBMIT_BTN_SELECTOR: '.buy__submit-btn',
     MODAL_ERROR_SELECTOR: '.modal--error',
     MODAL_SUCCESS_SELECTOR: '.modal--success',
+    MODAL_CLOSE_BUTTON_SELECTOR: '.modal__close',
     MODAL_HIDDEN_CLASS: 'modal--hidden'
   };
 
   var Contacts = {
+    MAIN_SELECTOR: '.contact-data',
     NAME_SELECTOR: '#contact-data__name',
     NAME_MIN_LENGTH: 1,
 
@@ -71,13 +81,58 @@
 
   var Delivery = {
     MAIN_SELECTOR: '.deliver',
-    METHOD_SELECTOR: '.deliver__toggle',
-    SELF_TAKE_OUT_SELECTOR: '.toggle-btn__input[value="store"]',
+    TYPE_SELECTOR: '.deliver__toggle',
+    SELF_TAKE_OUT_ID: 'deliver__store',
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
 
     Store: {
       MAIN_SELECTOR: '.deliver__store',
+      LIST_OF_SUBWAYS_SELECTOR: '.deliver__stores',
+      MAP_SELECTOR: '.deliver__store-map-img'
     },
+    Map: {
+      'store-academicheskaya': {
+        'name': 'Академическая',
+        'filename': 'academicheskaya.jpg'
+      },
+      'store-vasileostrovskaya': {
+        'name': 'Василеостровская',
+        'filename': 'vasileostrovskaya.jpg'
+      },
+      'store-rechka': {
+        'name': 'Черная речка',
+        'filename': 'rechka.jpg'
+      },
+      'store-petrogradskaya': {
+        'name': 'Петроградская',
+        'filename': 'petrogradskaya.jpg'
+      },
+      'store-proletarskaya': {
+        'name': 'Пролетарская',
+        'filename': 'proletarskaya.jpg'
+      },
+      'store-vostaniya': {
+        'name': 'Площадь Восстания',
+        'filename': 'vostaniya.jpg'
+      },
+      'store-prosvesheniya': {
+        'name': 'Проспект Просвещения',
+        'filename': 'prosvesheniya.jpg'
+      },
+      'store-frunzenskaya': {
+        'name': 'Фрунзенская',
+        'filename': 'frunzenskaya.jpg'
+      },
+      'store-chernishevskaya': {
+        'name': 'Чернышевская',
+        'filename': 'chernishevskaya.jpg'
+      },
+      'store-tehinstitute': {
+        'name': 'Технологический институт',
+        'filename': 'tehinstitute.jpg'
+      }
+    },
+    MAP_PATH: 'img/map/',
 
     Courier: {
       MAIN_SELECTOR: '.deliver__courier',
@@ -85,7 +140,8 @@
       HOUSE_SELECTOR: '#deliver__house',
       FLOOR_SELECTOR: '#deliver__floor',
       ROOM_SELECTOR: '#deliver__room'
-    }
+    },
+
   };
 
 
@@ -93,15 +149,7 @@
    * Main code
    */
 
-  // Genereate mock goods
-  /*
-  window.mockGoods.get(onSuccess, function(text) {
-    console.log(text);
-  });
-  */
-
   window.Backend.get(onSuccessDownload, onErrorDownloadUpload);
-
   return;
 
   /*
@@ -112,45 +160,50 @@
   var catalog;
   var trolley;
   var dom;
-  var filter;
+  var filterRange;
 
   function onSuccessDownload(data) {
     catalog = new window.Catalog(function () {
       return data;
     });
     trolley = new window.Trolley(catalog);
+
     dom = new window.Dom(
         catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
         trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
     );
-    dom.renderCatalogDom();
-    dom.renderTrolleyDom();
+    dom.setFunctionOnTrolleyEmpty(blockAllFormFields);
+    dom.setFunctionOnTrolleyNotEmpty(unblockAllFormFields);
 
-    filter = new window.Filter(catalog.getMinPrice(), catalog.getMaxPrice());
+    filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
   }
 
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
     setContactsToBeRequired(true);
+    deliveryTypeHandler();
 
     window.utils.setDomEventHandler(
-        document, FilterRange.MIN_RANGE_SELECTOR,
-        filter.mouseDownHandler,
-        'mousedown'
-    );
-
-    window.utils.setDomEventHandler(
-        document, FilterRange.MAX_RANGE_SELECTOR,
-        filter.mouseDownHandler,
-        'mousedown'
-    );
-
-    window.utils.setDomEventHandler(
-        document, Order.MAIN_SELECTOR,
-        contactsCheckHandler,
+        document, FilterForm.MAIN_SELECTOR,
+        filterInputHandler,
         'change'
     );
+
+    window.utils.setDomEventHandler(
+        document, FilterForm.SHOW_ALL_HTML_SELECTOR,
+        filterSubmitHandler,
+        'click'
+    );
+
+    window.utils.setDomEventHandler(
+        document, FilterRange.MAIN_SELECTOR,
+        filterFormRangeHandler,
+        'mousedown'
+    );
+
+    document.querySelector(Contacts.MAIN_SELECTOR).
+      addEventListener('change', contactsCheckHandler);
 
     window.utils.setDomEventHandler(
         document, Payment.METHOD_SELECTOR,
@@ -159,29 +212,25 @@
     );
 
     window.utils.setDomEventHandler(
-        document, Order.MAIN_SELECTOR,
+        document, Payment.MAIN_SELECTOR,
         paymentCheckHandler,
         'change'
     );
 
     window.utils.setDomEventHandler(
-        document, Delivery.MAIN_SELECTOR,
+        document, Delivery.TYPE_SELECTOR,
         deliveryTypeHandler,
-        'click'
-    );
-
-    window.utils.setDomEventHandler(
-        document, Delivery.MAIN_SELECTOR,
-        deliveryCheckHandler,
         'change'
     );
 
     window.utils.setDomEventHandler(
-        document, Order.MAIN_SELECTOR,
-        onSubmitOrder,
-        'submit'
+        document, Delivery.Store.MAIN_SELECTOR,
+        deliveryChangeAndCheck,
+        'change'
     );
 
+    document.querySelector(Order.MAIN_SELECTOR).
+      addEventListener('submit', onSubmitOrder);
   }
 
 
@@ -189,28 +238,72 @@
    * Overall order form checking
    */
 
+  function filterInputHandler(evt) {
+    window.utils.debounce(function () {
+      dom.filterFormHandler(evt);
+    }, DEBOUNCE_TIME);
+  }
+
+  function filterSubmitHandler(evt) {
+    evt.preventDefault();
+    dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
+  }
+
+  function filterFormRangeHandler(evt) {
+    filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
+  }
+
   function onSubmitOrder(evt) {
+    evt.preventDefault();
+    if (isTrolleyEmpty(trolley)) {
+      return;
+    }
     contactsCheckHandler();
     paymentCheckHandler();
-    deliveryCheckHandler();
+    deliveryChangeAndCheck();
 
-    evt.preventDefault();
     window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
-  }
-
-  function onSuccessUpload() {
-    resetOrderForm();
-    var modalNode = document.querySelector(Order.MODAL_SUCCESS_SELECTOR);
-    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-  }
-
-  function onErrorDownloadUpload() {
-    var modalNode = document.querySelector(Order.MODAL_ERROR_SELECTOR);
-    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
   }
 
   function makeOrderFormData() {
     return document.querySelector(Order.MAIN_SELECTOR);
+  }
+
+  function onSuccessUpload() {
+    resetOrderForm();
+    showModal(Order.MODAL_SUCCESS_SELECTOR);
+  }
+
+  function onErrorDownloadUpload() {
+    showModal(Order.MODAL_ERROR_SELECTOR);
+  }
+
+  function showModal(modalSelector) {
+    var modalNode = document.querySelector(modalSelector);
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+    var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
+    closeButtonNode.addEventListener('click', closeModal);
+    document.addEventListener('keydown', closeModal);
+
+    function closeModal(evt) {
+      if (evt.type === 'keydown' && evt.keyCode !== ESC_KEY_CODE) {
+        return;
+      }
+      if (!evt.type === 'click') {
+        return;
+      }
+      modalNode.classList.add(Order.MODAL_HIDDEN_CLASS);
+      closeButtonNode.removeEventListener('click', closeModal);
+      document.removeEventListener('keydown', closeModal);
+    }
+  }
+
+  /*
+   * Trolley contains goods checking
+   */
+
+  function isTrolleyEmpty(trolleyObject) {
+    return trolleyObject.getCount() <= 0;
   }
 
   /*
@@ -243,10 +336,8 @@
     }
 
     function isEmailValid() {
-      // Thanks to www.StackOverflow.com
-      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
-      var se = /^[\w\.\-_]{1,}@[\w\.\-]{6,}/;
-      return se.test(value);
+      var email = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      return window.utils.isEmailValid(email);
     }
   }
 
@@ -282,28 +373,32 @@
   function paymentTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
-        adjustFormForPayment('card');
+        adjustFormForPaymentByCard(true);
         break;
       case (window.utils.isChecked(Payment.CASH_LABEL_SELECTOR)):
-        adjustFormForPayment('cash');
+        adjustFormForPaymentByCard(false);
         break;
     }
   }
 
-  function adjustFormForPayment(type) {
-    if (type === 'card') {
-      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
-      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
-      setFieldsForCardPayment(true);
-    } else {
+  function adjustFormForPaymentByCard(byCard) {
+    if (!byCard) {
       window.utils.hideHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
       window.utils.showHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
       setFieldsForCardPayment(false);
       resetCardValidity();
+    } else {
+      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
+      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(true);
     }
   }
 
   function setFieldsForCardPayment(isToBeSet) {
+    if (isToBeSet && trolley.getCount() <= 0) {
+      return;
+    }
+
     window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
@@ -401,39 +496,40 @@
   function deliveryTypeHandler() {
     switch (true) {
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        adjustFormForDelivery('courier');
+        adjustFormForDeliveryByCourier(true);
         break;
-      case (window.utils.isChecked(Delivery.SELF_TAKE_OUT_SELECTOR)):
-        adjustFormForDelivery('takeout');
+      case (isTakeoutSelected()):
+        adjustFormForDeliveryByCourier(false);
         break;
     }
   }
 
-  function adjustFormForDelivery(type) {
-    if (type === 'courier') {
+  function adjustFormForDeliveryByCourier(byCourier) {
+    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
+
+    if (byCourier) {
       window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
-
-      window.utils.setInputToBeRequired(true, Delivery.Courier.STREET_SELECTOR);
-      window.utils.setInputToBeRequired(true, Delivery.Courier.HOUSE_SELECTOR);
-      window.utils.setInputToBeRequired(true, Delivery.Courier.ROOM_SELECTOR);
-
     } else {
       window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
       window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
-
-      window.utils.setInputToBeRequired(false, Delivery.Courier.STREET_SELECTOR);
-      window.utils.setInputToBeRequired(false, Delivery.Courier.HOUSE_SELECTOR);
-      window.utils.setInputToBeRequired(false, Delivery.Courier.ROOM_SELECTOR);
-
-      resetContactsValidity();
+      resetDeliveryValidity();
     }
+
+    if (byCourier && trolley.getCount() <= 0) {
+      return;
+    }
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.STREET_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
   }
 
-  function deliveryCheckHandler() {
+  function deliveryChangeAndCheck(evt) {
     switch (true) {
-      case (!window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        resetDeliveryValidity();
+      case (!!evt && !!Delivery.Map[evt.srcElement.id]):
+        setSubwayMap(evt);
         break;
       case (!isStreetValid()):
         window.utils.setDomValid(false, Delivery.Courier.STREET_SELECTOR);
@@ -474,11 +570,47 @@
     }
   }
 
+  function isTakeoutSelected() {
+    return window.utils.isHtmlIdChecked(Delivery.SELF_TAKE_OUT_ID);
+  }
+
   function resetDeliveryValidity() {
     window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
+  }
+
+  function setSubwayMap(evt) {
+    var htmlId = evt.srcElement.id;
+    var altText = Delivery.Map[htmlId].name;
+    var fileName = Delivery.Map[htmlId].filename;
+    var mapFullUrl = Delivery.MAP_PATH + fileName;
+    window.utils.setDomImage(document, Delivery.Store.MAP_SELECTOR, mapFullUrl, altText);
+  }
+
+  function blockAllFormFields() {
+    disableAllFormFields(true);
+  }
+
+  function unblockAllFormFields() {
+    disableAllFormFields(false);
+  }
+
+  function disableAllFormFields(shouldBeDisabled) {
+    window.utils.blockInput(shouldBeDisabled, Contacts.NAME_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Contacts.PHONE_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
+
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Payment.CARD_HOLDER_INPUT_SELECTOR);
+
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.STREET_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.FLOOR_SELECTOR);
+    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
   }
 
 })();

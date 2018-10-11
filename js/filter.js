@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Make DOM from the catalog of goods and the trolley
+ * Class for Range filter
  */
 
 (function () {
@@ -27,34 +27,54 @@
     isMin: true
   };
 
-  window.Filter = function (minPrice, maxPrice) {
+  window.Filter = {
+    Range: Range
+  };
+
+  function Range(minPrice, maxPrice) {
     Price.min = minPrice;
     Price.max = maxPrice;
-    updateSliderValue(Pin.isMin);
-    updateSliderValue(!Pin.isMin);
+    updatePinAndSliderPosition(Pin.isMin);
+    updatePinAndSliderPosition(!Pin.isMin);
 
-    this.mouseDownHandler = function (evt) {
+    this.reset = function () {
+      updatePinAndSliderPosition(true);
+      updatePinAndSliderPosition(false);
+    };
+
+    this.mouseDownHandler = function (evt, funcCb) {
       evt.preventDefault();
+      if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {
+        return;
+      }
+      Pin.isMin = isMinRangePinPressed(evt);
       Pin.mouseStartX = evt.clientX;
-      Pin.isMin = isMinButtonClass(evt);
 
       document.addEventListener('mouseup', mouseUpHandler);
       document.addEventListener('mousemove', mouseMoveHandler);
+
+      function mouseUpHandler(ownEvt) {
+        ownEvt.preventDefault();
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        if (funcCb) {
+          funcCb(ownEvt);
+        }
+      }
     };
 
-    function mouseUpHandler(evt) {
-      evt.preventDefault();
-      document.removeEventListener('mouseup', mouseUpHandler);
-      document.removeEventListener('mousemove', mouseMoveHandler);
-    }
 
     function mouseMoveHandler(evt) {
       evt.preventDefault();
-      updateSliderPosition(Pin.isMin, evt);
+      updatePinAndSliderPosition(Pin.isMin, evt);
     }
 
-    function updateSliderPosition(isMinPin, evt) {
-      var dX = evt.clientX - Pin.mouseStartX;
+    function updatePinAndSliderPosition(isMinPin, evt) {
+      if (evt) {
+        var dX = evt.clientX - Pin.mouseStartX;
+      } else {
+        dX = isMinPin ? -Infinity : +Infinity;
+      }
       if (dX === 0) {
         return;
       }
@@ -70,18 +90,17 @@
         newX = window.utils.setWithinRange(newX, 0, maxPinLeftShift);
         window.utils.setHtmlClassLeftProperty(newX, Filter.RANGE_MIN_BTN_CLASS);
         window.utils.setHtmlClassLeftProperty(newX, Filter.FILL_LINE_CLASS);
-        Pin.mouseStartX += dX;
       } else {
         newX = maxPinRightShift - dX;
         newX = window.utils.setWithinRange(newX, 0, width - minPinLeftShift);
         window.utils.setHtmlClassRightProperty(newX, Filter.RANGE_MAX_BTN_CLASS);
         window.utils.setHtmlClassRightProperty(newX, Filter.FILL_LINE_CLASS);
-        Pin.mouseStartX += dX;
       }
-      updateSliderValue(isMinPin);
+      Pin.mouseStartX += dX;
+      updateTextValue(isMinPin);
     }
 
-    function updateSliderValue(isMinPin) {
+    function updateTextValue(isMinPin) {
       var value = calculateSliderValue(isMinPin);
       if (isMinPin) {
         window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, value);
@@ -102,14 +121,18 @@
       return window.utils.percentToIntValue(percent, Price.min, Price.max);
     }
 
-    function isMinButtonClass(evt) {
+    function isMinRangePinPressed(evt) {
       return evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS);
+    }
+
+    function isMaxRangePinPressed(evt) {
+      return evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS);
     }
 
     function getSliderWidth() {
       return window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
     }
 
-  };
+  }
 
 })();
