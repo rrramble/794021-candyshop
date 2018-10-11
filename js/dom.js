@@ -398,30 +398,22 @@
           uncheckSectionInputs(FilterForm.INGREDIENTS);
           uncheckSectionInputs(FilterForm.IN_STOCK);
           uncheckSectionInputs(FilterForm.FAVORITE);
-          disableInputs(FilterForm.CATEGORIES, false);
-          disableInputs(FilterForm.INGREDIENTS, false);
-          disableButtons(FilterForm.RANGE_PINS, false);
+          disableFilterSections(false);
           setSortingByPopular();
           break;
         case isFavoritePressed(evt) && isFavoriteChecked():
           evt.preventDefault();
           uncheckSectionInputs(FilterForm.IN_STOCK);
-          disableInputs(FilterForm.CATEGORIES, true);
-          disableInputs(FilterForm.INGREDIENTS, true);
-          disableButtons(FilterForm.RANGE_PINS, true);
+          disableFilterSections(true);
           break;
         case (isInStockPressed(evt) && isInStockChecked()):
           evt.preventDefault();
           uncheckSectionInputs(FilterForm.FAVORITE);
-          disableInputs(FilterForm.CATEGORIES, true);
-          disableInputs(FilterForm.INGREDIENTS, true);
-          disableButtons(FilterForm.RANGE_PINS, true);
+          disableFilterSections(true);
           break;
         case isFavoritePressed(evt) || isInStockPressed(evt):
           evt.preventDefault();
-          disableInputs(FilterForm.CATEGORIES, false);
-          disableInputs(FilterForm.INGREDIENTS, false);
-          disableButtons(FilterForm.RANGE_PINS, false);
+          disableFilterSections(false);
           break;
       }
 
@@ -430,6 +422,12 @@
       }
       this.applyFilter();
       return;
+
+      function disableFilterSections(shouldBeDisabled) {
+        disableInputs(FilterForm.CATEGORIES, shouldBeDisabled);
+        disableInputs(FilterForm.INGREDIENTS, shouldBeDisabled);
+        disableButtons(FilterForm.RANGE_PINS, shouldBeDisabled);
+      }
 
       function isShowAllPressed(ownEvt) {
         return ownEvt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
@@ -452,7 +450,6 @@
       function isInStockChecked() {
         return isSectionChecked(FilterForm.IN_STOCK);
       }
-
 
       function isSectionChecked(section) {
         var id = Object.keys(section[0])[0];
