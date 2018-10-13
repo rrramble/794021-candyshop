@@ -25,7 +25,7 @@
     hideHtmlSelector: hideHtmlSelector,
     convertHtmlClassToHtmlSelector: convertHtmlClassToHtmlSelector,
     querySelectorIncludingSelf: querySelectorIncludingSelf,
-    htmlSelectorToClass: htmlSelectorToClass,
+    convertHtmlSelectorToHtmlClass: convertHtmlSelectorToHtmlClass,
     isNumber: isNumber,
 
     isChecked: isChecked,
@@ -136,7 +136,7 @@
   function querySelectorIncludingSelf(dom, selector) {
     var classes = dom.classList;
     if (classes) {
-      var className = window.utils.htmlSelectorToClass(selector);
+      var className = window.utils.convertHtmlSelectorToHtmlClass(selector);
       if (classes.contains(className)) {
         return dom;
       }
@@ -144,7 +144,7 @@
     return dom.querySelector(selector);
   }
 
-  function htmlSelectorToClass(htmlSelector) {
+  function convertHtmlSelectorToHtmlClass(htmlSelector) {
     return htmlSelector.slice(1);
   }
 
