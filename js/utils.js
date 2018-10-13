@@ -229,12 +229,12 @@
   }
 
   function replaceDomItem(mainDomObject, oldChildSelector, newChildNode) {
-    var startDomObject = mainDomObject;
-    if (!mainDomObject) {
-      startDomObject = document;
+    var baseNode = mainDomObject ? mainDomObject : document;
+    var oldChildNode = baseNode.querySelector(oldChildSelector);
+    if (!oldChildNode) {
+      return;
     }
-    var parentNode = startDomObject.querySelector(oldChildSelector).parentNode;
-    var oldChildNode = parentNode.querySelector(oldChildSelector);
+    var parentNode = oldChildNode.parentNode;
     parentNode.replaceChild(newChildNode, oldChildNode);
   }
 
