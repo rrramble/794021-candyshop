@@ -67,7 +67,7 @@
     setHtmlClassRightProperty: setHtmlClassRightProperty,
 
     intPercent: intPercent,
-    percentToIntValue: percentToIntValue,
+    convertPercentToIntWithinRange: convertPercentToIntWithinRange,
 
     disableHtmlSelector: disableHtmlSelector,
     isHtmlIdInputDisabled: isHtmlIdInputDisabled,
@@ -359,7 +359,7 @@
     return percent.toFixed(0);
   }
 
-  function percentToIntValue(percent, min, max) {
+  function convertPercentToIntWithinRange(percent, min, max) {
     var value = (max - min) * percent / 100 + min;
     value = window.utils.setWithinRange(value, min, max);
     return value.toFixed(0);

@@ -118,7 +118,7 @@
         leftDistance = parentWidth - rightDistance;
       }
       var percent = window.utils.intPercent(parentWidth, leftDistance);
-      return window.utils.percentToIntValue(percent, Price.min, Price.max);
+      return window.utils.convertPercentToIntWithinRange(percent, Price.min, Price.max);
     }
 
     function isMinRangePinPressed(evt) {
