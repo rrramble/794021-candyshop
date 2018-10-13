@@ -21,10 +21,6 @@
       return this.getItem(id).amount;
     };
 
-    this.getPrice = function (id) {
-      return this.getItem(id).price;
-    };
-
     this.getCount = function () {
       var result = this.getGoods().reduce(function (accu, item) {
         return item.amount > 0 ? ++accu : accu;
