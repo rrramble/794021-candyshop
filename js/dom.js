@@ -18,8 +18,8 @@
   var TROLLEY_AMOUNT_HTML_CLASS = 'card-order__count';
   var DELETE_FROM_TROLLEY_HTML_CLASS = 'card-order__close';
 
-  var TROLLEY_EMPTY_CLASS = 'goods__card-empty';
-  var TROLLEY_EMPTY_SELECTOR = window.utils.htmlClassToSelector(TROLLEY_EMPTY_CLASS);
+  var TROLLEY_EMPTY_CLASS = 'goods__cards--empty';
+  var TROLLEY_EMPTY_SELECTOR = '.goods__card-empty';
 
   var EMPTY_FILTER_TEMPLATE_SELECTOR = '#empty-filters';
   var EMPTY_FILTER_SELECTOR = '.catalog__empty-filter';
