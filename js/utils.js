@@ -97,16 +97,16 @@
 
   function removeCssClass(objectClass, classToBeRemoved) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
-    for (var i = 0; i < domObjects.length; i++) {
-      domObjects[i].classList.remove(classToBeRemoved);
-    }
+    domObjects.forEach(function(domObject) {
+      domObject.classList.remove(classToBeRemoved);
+    });
   }
 
   function addCssClass(objectClass, classToBeAdded) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
-    for (var i = 0; i < domObjects.length; i++) {
-      domObjects[i].classList.add(classToBeAdded);
-    }
+    domObjects.forEach(function(domObject) {
+      domObject.classList.add(classToBeAdded);
+    });
   }
 
   function convertHtmlSelectorToHtmlClass(htmlSelector) {
