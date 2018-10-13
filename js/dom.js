@@ -552,60 +552,60 @@
      */
 
 
-    function trolleyDomNodeFromCommodityId(commodityId) {
-      var htmlSelector = commodityIdToCommodityHtmlSelector(commodityId);
-      return document.querySelector(htmlSelector);
-    }
-
-    function commodityIdToCommodityHtmlSelector(commodityId) {
-      return COMMODITY_HTML_SELECTOR_HEAD + commodityId;
-    }
-
-    function commodityIdToTrolleyHtmlSelector(commodityId) {
-      return TROLLEY_HTML_SELECTOR_HEAD + commodityId;
-    }
-
-    function commodityHtmlSelectorToCommodityId(htmlSelector) {
-      if (isCommodityHtmlSelector(htmlSelector)) {
-        return htmlSelector.slice(COMMODITY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
-      }
-      return undefined;
-    }
-
-    function trolleyHtmlSelectorToCommodityId(htmlSelector) {
-      if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
-        return htmlSelector.slice(TROLLEY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
-      }
-      return undefined;
-    }
-
-    function isCommodityHtmlSelector(htmlSelector) {
-      var firstLetters = htmlSelector.slice(0, COMMODITY_HTML_SELECTOR_HEAD.length);
-      return firstLetters === COMMODITY_HTML_SELECTOR_HEAD;
-    }
-
-    function isTrolleyCommodityHtmlSelector(htmlSelector) {
-      var firstLetters = htmlSelector.slice(0, TROLLEY_HTML_SELECTOR_HEAD.length);
-      return firstLetters === TROLLEY_HTML_SELECTOR_HEAD;
-    }
-
-    function findParentCommodityId(evt) {
-      var evtPath = evt.path || (evt.composedPath && evt.composedPath());
-      for (var i = 0; i < evtPath.length; i++) {
-        var htmlSelector = window.utils.convertHtmlIdToHtmlSelector(evtPath[i].id);
-
-        if (isCommodityHtmlSelector(htmlSelector)) {
-          return commodityHtmlSelectorToCommodityId(htmlSelector);
-        }
-
-        if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
-          return trolleyHtmlSelectorToCommodityId(htmlSelector);
-        }
-      }
-      return false;
-    }
   };
 
+  function trolleyDomNodeFromCommodityId(commodityId) {
+    var htmlSelector = commodityIdToCommodityHtmlSelector(commodityId);
+    return document.querySelector(htmlSelector);
+  }
+
+  function commodityIdToCommodityHtmlSelector(commodityId) {
+    return COMMODITY_HTML_SELECTOR_HEAD + commodityId;
+  }
+
+  function commodityIdToTrolleyHtmlSelector(commodityId) {
+    return TROLLEY_HTML_SELECTOR_HEAD + commodityId;
+  }
+
+  function commodityHtmlSelectorToCommodityId(htmlSelector) {
+    if (isCommodityHtmlSelector(htmlSelector)) {
+      return htmlSelector.slice(COMMODITY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
+    }
+    return undefined;
+  }
+
+  function trolleyHtmlSelectorToCommodityId(htmlSelector) {
+    if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
+      return htmlSelector.slice(TROLLEY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
+    }
+    return undefined;
+  }
+
+  function isCommodityHtmlSelector(htmlSelector) {
+    var firstLetters = htmlSelector.slice(0, COMMODITY_HTML_SELECTOR_HEAD.length);
+    return firstLetters === COMMODITY_HTML_SELECTOR_HEAD;
+  }
+
+  function isTrolleyCommodityHtmlSelector(htmlSelector) {
+    var firstLetters = htmlSelector.slice(0, TROLLEY_HTML_SELECTOR_HEAD.length);
+    return firstLetters === TROLLEY_HTML_SELECTOR_HEAD;
+  }
+
+  function findParentCommodityId(evt) {
+    var evtPath = evt.path || (evt.composedPath && evt.composedPath());
+    for (var i = 0; i < evtPath.length; i++) {
+      var htmlSelector = window.utils.convertHtmlIdToHtmlSelector(evtPath[i].id);
+
+      if (isCommodityHtmlSelector(htmlSelector)) {
+        return commodityHtmlSelectorToCommodityId(htmlSelector);
+      }
+
+      if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
+        return trolleyHtmlSelectorToCommodityId(htmlSelector);
+      }
+    }
+    return false;
+  }
 
   function fulfillFilterAmount(obj) {
     updateFilterAmount(FilterForm.CATEGORIES, FilterForm.VALUE_SELECTOR, obj.catalog.getCategoryCount.bind(obj.catalog));
