@@ -203,7 +203,7 @@
     );
 
     document.querySelector(Contacts.MAIN_SELECTOR).
-      addEventListener('change', contactsCheckHandler);
+      addEventListener('change', contactsChangeHandler);
 
     window.utils.setDomEventHandler(
         document, Payment.METHOD_SELECTOR,
@@ -258,7 +258,7 @@
     if (isTrolleyEmpty(trolley)) {
       return;
     }
-    contactsCheckHandler();
+    checkContacts();
     paymentInformationCheckHandler();
     deliveryChangeAndCheck();
 
@@ -310,7 +310,12 @@
    * Contacts handler and checking
    */
 
-  function contactsCheckHandler() {
+  function contactsChangeHandler(evt) {
+    evt.preventDefault();
+    checkContacts();
+  }
+
+  function checkContacts() {
     switch (true) {
       case (!isNameValid()):
         window.utils.setDomValid(false, Contacts.NAME_SELECTOR);
