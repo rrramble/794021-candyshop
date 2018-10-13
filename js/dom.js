@@ -152,7 +152,7 @@
     function isCommodityDrawnInTrolley(commodityId) {
       var htmlId = commodityIdToTrolleyHtmlSelector(commodityId);
       var found = document.querySelector(htmlId);
-      return found !== null;
+      return !!found;
     }
 
     function putToTrolley(commodityId, amount) {
