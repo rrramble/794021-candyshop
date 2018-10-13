@@ -182,7 +182,7 @@
   function setInterfaceHandlers() {
     setFieldsForCardPayment(true);
     setContactsToBeRequired(true);
-    deliveryTypeHandler();
+    deliveryTypeChangeHandler();
 
     window.utils.setDomEventHandler(
         document, FilterForm.MAIN_SELECTOR,
@@ -219,7 +219,7 @@
 
     window.utils.setDomEventHandler(
         document, Delivery.TYPE_SELECTOR,
-        deliveryTypeHandler,
+        deliveryTypeChangeHandler,
         'change'
     );
 
@@ -493,7 +493,7 @@
    * Delivery handler and checking
    */
 
-  function deliveryTypeHandler() {
+  function deliveryTypeChangeHandler() {
     switch (true) {
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
         adjustFormForDeliveryByCourier(true);
