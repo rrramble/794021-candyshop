@@ -7,7 +7,10 @@
 (function () {
 
   var COMMODITY_HTML_SELECTOR_HEAD = '#commodity';
+  var COMMODITY_HTML_ID_HEAD = 'commodity';
+
   var TROLLEY_HTML_SELECTOR_HEAD = '#trolley-commodity';
+  var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
 
   var CATALOG_WRAPPER_SELECTOR = '.catalog__cards-wrap';
   var ADD_TO_TROLLEY_HTML_CLASS = 'card__btn';
@@ -366,11 +369,10 @@
 
     function renderTrolleyDom() {
       var node = document.createDocumentFragment();
-      for (var i = 0; i < this.catalog.getCount(); i++) {
-        if (this.trolley.getAmount(i) > 0) {
-          node.appendChild(this.trolleyNodes[i]);
-        }
-      }
+      this.trolley.getGoods().reduce(function(accu, commodity) {
+        return commodity.amount <= 0 ? node :
+          node.appendChild(this.trolleyNodes[commodity.id]);
+      }, node);
       document.querySelector(this.trolleyParentHtmlSelector).appendChild(node);
       this.checkAndRenderTrolleyPlaceholder();
     }
@@ -577,44 +579,47 @@
     return TROLLEY_HTML_SELECTOR_HEAD + commodityId;
   }
 
-  function commodityHtmlSelectorToCommodityId(htmlSelector) {
-    if (isCommodityHtmlSelector(htmlSelector)) {
-      return htmlSelector.slice(COMMODITY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
-    }
-    return undefined;
+  function convertCommodityHtmlIdToCommodityId(htmlId) {
+    return htmlId.slice(COMMODITY_HTML_ID_HEAD.length, htmlId.length);
   }
 
-  function trolleyHtmlSelectorToCommodityId(htmlSelector) {
-    if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
-      return htmlSelector.slice(TROLLEY_HTML_SELECTOR_HEAD.length, htmlSelector.length);
-    }
-    return undefined;
+  function convertTrolleyHtmlIdToCommodityId(htmlId) {
+    return htmlId.slice(TROLLEY_HTML_ID_HEAD.length, htmlId.length);
   }
 
-  function isCommodityHtmlSelector(htmlSelector) {
-    var firstLetters = htmlSelector.slice(0, COMMODITY_HTML_SELECTOR_HEAD.length);
+  function isCommodityHtmlId(htmlId) {
+    if (!htmlId) {
+      return false;
+    }
+    var firstLetters = htmlId.slice(0, COMMODITY_HTML_SELECTOR_HEAD.length - 1);
+    var firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
     return firstLetters === COMMODITY_HTML_SELECTOR_HEAD;
   }
 
-  function isTrolleyCommodityHtmlSelector(htmlSelector) {
-    var firstLetters = htmlSelector.slice(0, TROLLEY_HTML_SELECTOR_HEAD.length);
+  function isTrolleyHtmlId(htmlId) {
+    if (!htmlId) {
+      return false;
+    }
+    var firstLetters = htmlId.slice(0, TROLLEY_HTML_SELECTOR_HEAD.length - 1);
+    var firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
     return firstLetters === TROLLEY_HTML_SELECTOR_HEAD;
   }
 
   function findParentCommodityId(evt) {
     var evtPath = evt.path || (evt.composedPath && evt.composedPath());
-    for (var i = 0; i < evtPath.length; i++) {
-      var htmlSelector = window.utils.convertHtmlIdToHtmlSelector(evtPath[i].id);
-
-      if (isCommodityHtmlSelector(htmlSelector)) {
-        return commodityHtmlSelectorToCommodityId(htmlSelector);
+    var htmlId = evtPath.reduce(function(accu, path) {
+      if (isCommodityHtmlId(path.id)) {
+        return convertCommodityHtmlIdToCommodityId(path.id)
+      } else if (isTrolleyHtmlId(path.id)) {
+        return convertTrolleyHtmlIdToCommodityId(path.id)
+      } else {
+        return accu;
       }
+    }, -1);
 
-      if (isTrolleyCommodityHtmlSelector(htmlSelector)) {
-        return trolleyHtmlSelectorToCommodityId(htmlSelector);
-      }
+    if (htmlId !== -1) {
+      return htmlId;
     }
-    return false;
   }
 
   function fulfillFilterAmount(obj) {
