@@ -7,6 +7,7 @@
 (function () {
 
   var SELECTOR_HIDDEN = '.visually-hidden';
+  var CARD_NUMBER_LENGTHS = [16, 17, 18, 19];
 
   var HttpCode = {
     successCodes: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226],
@@ -252,7 +253,7 @@
 
   function isLuhnChecked(cardNumber) {
     var noSpaces = window.utils.trimAll(cardNumber.toString());
-    if (noSpaces.length !== 16) {
+    if (!CARD_NUMBER_LENGTHS.includes(noSpaces.length)) {
       return false;
     }
     var numbers = noSpaces.split('');
