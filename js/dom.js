@@ -68,24 +68,94 @@
       trolley, trolleyHtmlTemplateSelector, trolleyParentHtmlSelector
   ) {
 
-    this.updateTrolleyCommodityAmount = function (commodityId, parentDom) {
+    this.updateTrolleyCommodityAmount = updateTrolleyCommodityAmount;
+    this.isCommodityDrawnInTrolley = isCommodityDrawnInTrolley;
+    this.putToTrolley = putToTrolley;
+    this.takeFromTrolley = takeFromTrolley;
+    this.getTrolleyAmountFromThePage = getTrolleyAmountFromThePage;
+    this.setAmountInTrolley = setAmountInTrolley;
+    this.toggleFavorite = toggleFavorite;
+    this.updateFavoriteAmount = updateFavoriteAmount;
+    this.commodityClickHandler = commodityClickHandler;
+    this.trolleyChangeHandler = trolleyChangeHandler;
+    this.updateCommodityView = updateCommodityView;
+    this.replaceDomInTrolley = replaceDomInTrolley;
+    this.updateTrolleyView = updateTrolleyView;
+    this.checkAndRenderCatalogPlaceholder = checkAndRenderCatalogPlaceholder;
+    this.checkAndRenderTrolleyPlaceholder = checkAndRenderTrolleyPlaceholder;
+    this.updateTrolleyInfo = updateTrolleyInfo;
+    this.renderCatalogDom = renderCatalogDom;
+    this.renderTrolleyDom = renderTrolleyDom;
+    this.createCatalogNodes = createCatalogNodes;
+    this.createTrolleyDom = createTrolleyDom;
+    this.applyFilter = applyFilter;
+    this.filterFormHandler = filterFormHandler;
+    this.setFunctionOnTrolleyEmpty = setFunctionOnTrolleyEmpty;
+    this.setFunctionOnTrolleyNotEmpty = setFunctionOnTrolleyNotEmpty;
+
+    /*
+     * Variables initialisation
+     */
+
+    this.catalog = catalog;
+    this.trolley = trolley;
+
+    this.catalogHtmlTemplate = document.querySelector(catalogHtmlTemplateSelector);
+    this.trolleyHtmlTemplate = document.querySelector(trolleyHtmlTemplateSelector);
+
+    this.catalogParentHtmlSelector = catalogParentHtmlSelector;
+    this.trolleyParentHtmlSelector = trolleyParentHtmlSelector;
+
+    this.trolleyNodes = this.createTrolleyDom();
+
+    window.utils.setDomEventHandler(
+        document,
+        this.catalogParentHtmlSelector,
+        this.commodityClickHandler.bind(this),
+        'click'
+    );
+    window.utils.setDomEventHandler(
+        document,
+        this.trolleyParentHtmlSelector,
+        this.commodityClickHandler.bind(this),
+        'click'
+    );
+
+    window.utils.setDomEventHandler(
+        document,
+        this.trolleyParentHtmlSelector,
+        this.trolleyChangeHandler.bind(this),
+        'change'
+    );
+
+    // Draw a section 'Find no goods fitting selected filters'
+    var fragmentNode = document.createDocumentFragment();
+    var templateNode = document.querySelector(EMPTY_FILTER_TEMPLATE_SELECTOR).content.cloneNode(true);
+    fragmentNode.appendChild(templateNode);
+    document.querySelector(CATALOG_WRAPPER_SELECTOR).appendChild(fragmentNode);
+
+    this.renderCatalogDom();
+    this.renderTrolleyDom();
+    fulfillFilterAmount(this);
+    return this;
+
+    /*
+     * End of constructor
+     */
+
+    function updateTrolleyCommodityAmount(commodityId, parentDom) {
       var amountNode = parentDom ? parentDom : trolleyDomNodeFromCommodityId(commodityId);
       var selector = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
       amountNode.querySelector(selector).value = this.trolley.getAmount(commodityId);
-    };
+    }
 
-    this.isCommodityDrawnInTrolley = function (commodityId) {
+    function isCommodityDrawnInTrolley(commodityId) {
       var htmlId = commodityIdToTrolleyHtmlSelector(commodityId);
       var found = document.querySelector(htmlId);
       return found !== null;
-    };
+    }
 
-
-    /*
-     * Click handlers
-     */
-
-    this.putToTrolley = function (commodityId, amount) {
+    function putToTrolley(commodityId, amount) {
       var actualAmount = amount ? amount : 1;
       var taken = this.catalog.takeItem(commodityId, actualAmount);
       if (taken <= 0) {
@@ -97,9 +167,9 @@
       if (this.trolley.getCount() > 0 && this.onTrolleyNotEmpty) {
         this.onTrolleyNotEmpty();
       }
-    };
+    }
 
-    this.takeFromTrolley = function (commodityId, amount) {
+    function takeFromTrolley(commodityId, amount) {
       var actualAmount = amount ? amount : 1;
       var taken = this.trolley.takeItem(commodityId, actualAmount);
       if (taken <= 0) {
@@ -112,18 +182,18 @@
       if (this.trolley.getCount() <= 0 && this.onTrolleyEmpty) {
         this.onTrolleyEmpty();
       }
-    };
+    }
 
-    this.getTrolleyAmountFromThePage = function (commodityId) {
+    function getTrolleyAmountFromThePage(commodityId) {
       var htmlSelector = commodityIdToTrolleyHtmlSelector(commodityId);
       var commodityNode = document.querySelector(htmlSelector);
       var valueClass = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
       var valueNode = commodityNode.querySelector(valueClass);
       var value = valueNode.value;
       return value;
-    };
+    }
 
-    this.setAmountInTrolley = function (commodityId) {
+    function setAmountInTrolley(commodityId) {
       var previousAmount = this.trolley.getAmount(commodityId);
       var triedAmount = this.getTrolleyAmountFromThePage(commodityId);
       var difference = triedAmount - previousAmount;
@@ -137,21 +207,25 @@
         this.takeFromTrolley(commodityId, -difference);
       }
       this.updateTrolleyView(commodityId);
-    };
+    }
 
-    this.toggleFavorite = function (commodityId) {
+    function toggleFavorite(commodityId) {
       this.catalog.toggleFavorite(commodityId);
       var favoriteStatus = this.catalog.getFavoriteStatus(commodityId);
       this.updateCommodityView(commodityId);
       this.updateFavoriteAmount();
       return favoriteStatus;
+    }
+
+    function updateFavoriteAmount() {
+      updateFilterAmount(
+        FilterForm.FAVORITE,
+        FilterForm.VALUE_SELECTOR,
+        this.catalog.getFavoriteCount.bind(this.catalog)
+      );
     };
 
-    this.updateFavoriteAmount = function () {
-      updateFilterAmount(FilterForm.FAVORITE, FilterForm.VALUE_SELECTOR, this.catalog.getFavoriteCount.bind(this.catalog));
-    };
-
-    this.commodityClickHandler = function (evt) {
+    function commodityClickHandler(evt) {
       var commodityId = findParentCommodityId(evt);
       if (!window.utils.isNumber(commodityId)) {
         return;
@@ -176,9 +250,9 @@
           this.applyFilter();
           break;
       }
-    };
+    }
 
-    this.trolleyChangeCb = function (evt) {
+    function trolleyChangeHandler(evt) {
       var commodityId = findParentCommodityId(evt);
       if (!window.utils.isNumber(commodityId)) {
         return;
@@ -186,14 +260,9 @@
       if (evt.target.classList.contains(TROLLEY_AMOUNT_HTML_CLASS)) {
         this.setAmountInTrolley(commodityId);
       }
-    };
+    }
 
-
-    /*
-     * Document DOM render and update
-     */
-
-    this.updateCommodityView = function (commodityId) {
+    function updateCommodityView(commodityId) {
       var newCommodityDom = new window.CatalogItemDom(
           this.catalog.getItem(commodityId),
           this.catalogHtmlTemplate
@@ -206,23 +275,18 @@
           newCommodityDom
       );
       this.checkAndRenderCatalogPlaceholder();
-    };
+    }
 
-    this.replaceDomInTrolley = function (commodityId) {
+     function replaceDomInTrolley(commodityId) {
       var newCommodityDom = this.trolleyNodes[commodityId];
       window.utils.replaceDomItem(
           document,
           commodityIdToTrolleyHtmlSelector(commodityId),
           newCommodityDom
       );
-    };
+    }
 
-    this.deleteDisplayingInTrolley = function (commodityId) {
-      var commodityNode = document.querySelector(commodityIdToTrolleyHtmlSelector(commodityId));
-      commodityNode.remove();
-    };
-
-    this.updateTrolleyView = function (commodityId) {
+    function updateTrolleyView(commodityId) {
       var newCommodityDom = new window.TrolleyItemDom(
           this.trolley.getItem(commodityId),
           this.trolleyHtmlTemplate
@@ -236,7 +300,7 @@
 
       if (this.isCommodityDrawnInTrolley(commodityId) &&
           this.trolley.getAmount(commodityId) <= 0) {
-        this.deleteDisplayingInTrolley(commodityId);
+        deleteDisplayingInTrolley(commodityId);
       }
 
       if (!this.isCommodityDrawnInTrolley(commodityId) &&
@@ -246,9 +310,9 @@
 
       this.checkAndRenderTrolleyPlaceholder();
       this.updateTrolleyInfo();
-    };
+    }
 
-    this.checkAndRenderCatalogPlaceholder = function () {
+    function checkAndRenderCatalogPlaceholder() {
       if (this.catalog.getCount() > 0) {
         window.utils.removeCssClass('catalog__cards', 'catalog__cards--load');
         window.utils.hideHtmlSelector(document, '.catalog__load');
@@ -261,10 +325,9 @@
       } else {
         window.utils.hideHtmlSelector(document, EMPTY_FILTER_SELECTOR);
       }
+    }
 
-    };
-
-    this.checkAndRenderTrolleyPlaceholder = function () {
+    function checkAndRenderTrolleyPlaceholder() {
       if (this.trolley.isEmpty()) {
         window.utils.showHtmlSelector(document, TROLLEY_EMPTY_SELECTOR);
         window.utils.addCssClass('goods__cards', TROLLEY_EMPTY_CLASS);
@@ -272,9 +335,9 @@
         window.utils.hideHtmlSelector(document, TROLLEY_EMPTY_SELECTOR);
         window.utils.removeCssClass('goods__cards', TROLLEY_EMPTY_CLASS);
       }
-    };
+    }
 
-    this.updateTrolleyInfo = function () {
+    function updateTrolleyInfo() {
       if (this.trolley.isEmpty()) {
         window.utils.setDomTextContent(document, '.main-header__basket', 'В корзине ничего нет');
       } else {
@@ -282,9 +345,9 @@
         text += ' , на сумму: ' + this.trolley.getTotalOrderedSum() + ' ₽';
         window.utils.setDomTextContent(document, '.main-header__basket', text);
       }
-    };
+    }
 
-    this.renderCatalogDom = function () {
+    function renderCatalogDom() {
       this.catalogNodes = this.createCatalogNodes();
 
       // make new DOM of goods
@@ -301,9 +364,9 @@
       // Render new DOM of goods
       document.querySelector(this.catalogParentHtmlSelector).appendChild(tempNode);
       this.checkAndRenderCatalogPlaceholder();
-    };
+    }
 
-    this.renderTrolleyDom = function () {
+    function renderTrolleyDom() {
       var node = document.createDocumentFragment();
       for (var i = 0; i < this.catalog.getCount(); i++) {
         if (this.trolley.getAmount(i) > 0) {
@@ -312,9 +375,9 @@
       }
       document.querySelector(this.trolleyParentHtmlSelector).appendChild(node);
       this.checkAndRenderTrolleyPlaceholder();
-    };
+    }
 
-    this.createCatalogNodes = function () {
+    function createCatalogNodes() {
       var template = this.catalogHtmlTemplate;
       var result = this.catalog.getGoods().reduce(function (accu, item) {
         if (!item.filtered) {
@@ -323,17 +386,17 @@
         return accu;
       }, []);
       return result;
-    };
+    }
 
-    this.createTrolleyDom = function () {
+    function createTrolleyDom() {
       var template = this.trolleyHtmlTemplate;
       var result = this.trolley.getGoods().map(function (item) {
         return new window.TrolleyItemDom(item, template);
       });
       return result;
-    };
+    }
 
-    this.applyFilter = function () {
+    function applyFilter() {
       this.catalog.applyFilter(
           getCheckedInputs(FilterForm.CATEGORIES),
           getCheckedInputs(FilterForm.INGREDIENTS),
@@ -344,53 +407,9 @@
           getSortingType()
       );
       this.renderCatalogDom();
+    }
 
-      function getCheckedInputs(listOfInputs) {
-        return listOfInputs.reduce(function (accu, item) {
-          var id = Object.keys(item)[0];
-          var value = item[id];
-          if (
-            !window.utils.isHtmlIdInputDisabled(id) &&
-            window.utils.isHtmlIdChecked(id)
-          ) {
-            accu.push(value);
-          }
-          return accu;
-        }, []);
-      }
-
-      function getMinPinInputRangeValue(isMin) {
-        if (isMin) {
-          var textSelector = Filter.MIN_RANGE_BTN_TEXT_SELECTOR;
-          var pinSelector = Object.keys(FilterForm.RANGE_PINS[0])[0];
-        } else {
-          textSelector = Filter.MAX_RANGE_BTN_TEXT_SELECTOR;
-          pinSelector = Object.keys(FilterForm.RANGE_PINS[1])[0];
-        }
-        if (window.utils.isHtmlSelectorDisabled(pinSelector)) {
-          return isMin ? -Infinity : +Infinity;
-        }
-        return window.utils.getDomTextContent(document, textSelector);
-      }
-
-      function getSortingType() {
-        var result = FilterForm.SORTING_TYPES.reduce(function (currentType, item) {
-          var htmlId = Object.keys(item)[0];
-          var type = item[htmlId];
-          currentType = window.utils.isHtmlIdChecked(htmlId) ? type : currentType;
-          return currentType;
-        }, '');
-        return result;
-      }
-
-    };
-
-
-    /*
-     * Filter form handler
-     */
-
-    this.filterFormHandler = function (evt, resetPriceRangeCb) {
+    function filterFormHandler(evt, resetPriceRangeCb) {
       switch (true) {
         case isShowAllPressed(evt):
           evt.preventDefault();
@@ -423,136 +442,129 @@
       this.applyFilter();
       return;
 
-      function disableFilterSections(shouldBeDisabled) {
-        disableInputs(FilterForm.CATEGORIES, shouldBeDisabled);
-        disableInputs(FilterForm.INGREDIENTS, shouldBeDisabled);
-        disableButtons(FilterForm.RANGE_PINS, shouldBeDisabled);
-      }
+    } // filterFormHandler
 
-      function isShowAllPressed(ownEvt) {
-        return ownEvt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
-      }
-
-      function isFavoritePressed(ownEvt) {
-        var key = Object.keys(FilterForm.FAVORITE[0])[0];
-        return ownEvt.srcElement.id === key;
-      }
-
-      function isFavoriteChecked() {
-        return isSectionChecked(FilterForm.FAVORITE);
-      }
-
-      function isInStockPressed(ownEvt) {
-        var key = Object.keys(FilterForm.IN_STOCK[0])[0];
-        return ownEvt.srcElement.id === key;
-      }
-
-      function isInStockChecked() {
-        return isSectionChecked(FilterForm.IN_STOCK);
-      }
-
-      function isSectionChecked(section) {
-        var id = Object.keys(section[0])[0];
-        return window.utils.isHtmlIdChecked(id);
-      }
-
-      function uncheckSectionInputs(formList, exceptionId) {
-        formList.forEach(function (item) {
-          var id = Object.keys(item)[0];
-          if (exceptionId && (exceptionId === id || exceptionId.includes(id))) {
-            return;
-          }
-          window.utils.setInputHtmlIdCheck(id);
-        });
-      }
-
-      function disableInputs(inputs, shouldBeDisabled) {
-        inputs.forEach(function (input) {
-          var id = Object.keys(input)[0];
-          window.utils.disableHtmlId(shouldBeDisabled, id);
-        });
-      }
-
-      function disableButtons(buttons, shouldBeDisabled) {
-        buttons.forEach(function (button) {
-          var selector = Object.keys(button)[0];
-          window.utils.disableHtmlSelector(shouldBeDisabled, selector);
-        });
-      }
-
-      function setSortingByPopular() {
-        var htmlId = Object.keys(FilterForm.SORTING_TYPES[0])[0];
-        window.utils.setInputHtmlIdCheck(htmlId, true);
-      }
-    }; // this.filterFormHandler
-
-    this.setFunctionOnTrolleyEmpty = function (func) {
+    function setFunctionOnTrolleyEmpty(func) {
       this.onTrolleyEmpty = func;
       if (this.trolley.isEmpty()) {
         func();
       }
-    };
+    }
 
-    this.setFunctionOnTrolleyNotEmpty = function (func) {
+    function setFunctionOnTrolleyNotEmpty(func) {
       this.onTrolleyNotEmpty = func;
       if (this.trolley.getCount() > 0) {
         func();
       }
-    };
+    }
+
+  }; // End of the class
 
 
-    /*
-     * Constructor body
-     */
+  function deleteDisplayingInTrolley(commodityId) {
+    var commodityNode = document.querySelector(commodityIdToTrolleyHtmlSelector(commodityId));
+    commodityNode.remove();
+  }
 
-    this.catalog = catalog;
-    this.trolley = trolley;
+  function getCheckedInputs(listOfInputs) {
+    return listOfInputs.reduce(function (accu, item) {
+      var id = Object.keys(item)[0];
+      var value = item[id];
+      if (
+        !window.utils.isHtmlIdInputDisabled(id) &&
+        window.utils.isHtmlIdChecked(id)
+      ) {
+        accu.push(value);
+      }
+      return accu;
+    }, []);
+  }
 
-    this.catalogHtmlTemplate = document.querySelector(catalogHtmlTemplateSelector);
-    this.trolleyHtmlTemplate = document.querySelector(trolleyHtmlTemplateSelector);
+  function getMinPinInputRangeValue(isMin) {
+    if (isMin) {
+      var textSelector = Filter.MIN_RANGE_BTN_TEXT_SELECTOR;
+      var pinSelector = Object.keys(FilterForm.RANGE_PINS[0])[0];
+    } else {
+      textSelector = Filter.MAX_RANGE_BTN_TEXT_SELECTOR;
+      pinSelector = Object.keys(FilterForm.RANGE_PINS[1])[0];
+    }
+    if (window.utils.isHtmlSelectorDisabled(pinSelector)) {
+      return isMin ? -Infinity : +Infinity;
+    }
+    return window.utils.getDomTextContent(document, textSelector);
+  }
 
-    this.catalogParentHtmlSelector = catalogParentHtmlSelector;
-    this.trolleyParentHtmlSelector = trolleyParentHtmlSelector;
+  function getSortingType() {
+    var result = FilterForm.SORTING_TYPES.reduce(function (currentType, item) {
+      var htmlId = Object.keys(item)[0];
+      var type = item[htmlId];
+      currentType = window.utils.isHtmlIdChecked(htmlId) ? type : currentType;
+      return currentType;
+    }, '');
+    return result;
+  }
 
-    this.trolleyNodes = this.createTrolleyDom();
+  function disableFilterSections(shouldBeDisabled) {
+    disableInputs(FilterForm.CATEGORIES, shouldBeDisabled);
+    disableInputs(FilterForm.INGREDIENTS, shouldBeDisabled);
+    disableButtons(FilterForm.RANGE_PINS, shouldBeDisabled);
+  }
 
-    window.utils.setDomEventHandler(
-        document,
-        this.catalogParentHtmlSelector,
-        this.commodityClickHandler.bind(this),
-        'click'
-    );
-    window.utils.setDomEventHandler(
-        document,
-        this.trolleyParentHtmlSelector,
-        this.commodityClickHandler.bind(this),
-        'click'
-    );
+  function isShowAllPressed(ownEvt) {
+    return ownEvt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
+  }
 
-    window.utils.setDomEventHandler(
-        document,
-        this.trolleyParentHtmlSelector,
-        this.trolleyChangeCb.bind(this),
-        'change'
-    );
+  function isFavoritePressed(ownEvt) {
+    var key = Object.keys(FilterForm.FAVORITE[0])[0];
+    return ownEvt.srcElement.id === key;
+  }
 
-    // Draw a section 'Find no goods fitting selected filters'
-    var fragmentNode = document.createDocumentFragment();
-    var templateNode = document.querySelector(EMPTY_FILTER_TEMPLATE_SELECTOR).content.cloneNode(true);
-    fragmentNode.appendChild(templateNode);
-    document.querySelector(CATALOG_WRAPPER_SELECTOR).appendChild(fragmentNode);
+  function isFavoriteChecked() {
+    return isSectionChecked(FilterForm.FAVORITE);
+  }
 
-    this.renderCatalogDom();
-    this.renderTrolleyDom();
-    fulfillFilterAmount(this);
-    return this;
+  function isInStockPressed(ownEvt) {
+    var key = Object.keys(FilterForm.IN_STOCK[0])[0];
+    return ownEvt.srcElement.id === key;
+  }
 
-    /*
-     * End of constructor
-     */
+  function isInStockChecked() {
+    return isSectionChecked(FilterForm.IN_STOCK);
+  }
 
+  function isSectionChecked(section) {
+    var id = Object.keys(section[0])[0];
+    return window.utils.isHtmlIdChecked(id);
+  }
 
-  };
+  function uncheckSectionInputs(formList, exceptionId) {
+    formList.forEach(function (item) {
+      var id = Object.keys(item)[0];
+      if (exceptionId && (exceptionId === id || exceptionId.includes(id))) {
+        return;
+      }
+      window.utils.setInputHtmlIdCheck(id);
+    });
+  }
+
+  function disableInputs(inputs, shouldBeDisabled) {
+    inputs.forEach(function (input) {
+      var id = Object.keys(input)[0];
+      window.utils.disableHtmlId(shouldBeDisabled, id);
+    });
+  }
+
+  function disableButtons(buttons, shouldBeDisabled) {
+    buttons.forEach(function (button) {
+      var selector = Object.keys(button)[0];
+      window.utils.disableHtmlSelector(shouldBeDisabled, selector);
+    });
+  }
+
+  function setSortingByPopular() {
+    var htmlId = Object.keys(FilterForm.SORTING_TYPES[0])[0];
+    window.utils.setInputHtmlIdCheck(htmlId, true);
+  }
 
   function trolleyDomNodeFromCommodityId(commodityId) {
     var htmlSelector = commodityIdToCommodityHtmlSelector(commodityId);
