@@ -31,7 +31,7 @@
     isChecked: isChecked,
     isHtmlIdChecked: isHtmlIdChecked,
     setInputHtmlIdCheck: setInputHtmlIdCheck,
-    htmlIdToHtmlSelector: htmlIdToHtmlSelector,
+    convertHtmlIdToHtmlSelector: convertHtmlIdToHtmlSelector,
     isInRange: isInRange,
     isInRangeUpTo: isInRangeUpTo,
     setWithinRange: setWithinRange,
@@ -163,17 +163,17 @@
 
   function isHtmlIdChecked(htmlId, node) {
     var baseNode = node ? node : document;
-    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
     var result = baseNode.querySelector(selector).checked;
     return result;
   }
 
   function setInputHtmlIdCheck(htmlId, shouldBeSet) {
-    var htmlSelector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var htmlSelector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
     document.querySelector(htmlSelector).checked = shouldBeSet;
   }
 
-  function htmlIdToHtmlSelector(id) {
+  function convertHtmlIdToHtmlSelector(id) {
     return '#' + id;
   }
 
@@ -372,14 +372,14 @@
 
   function disableHtmlId(shouldBeBlocked, htmlId, node) {
     var baseNode = node ? node : document;
-    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
     var childNode = baseNode.querySelector(selector);
     childNode.disabled = shouldBeBlocked;
   }
 
   function isHtmlIdInputDisabled(htmlId, node) {
     var baseNode = node ? node : document;
-    var selector = window.utils.htmlIdToHtmlSelector(htmlId);
+    var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
     return baseNode.querySelector(selector).disabled;
   }
 

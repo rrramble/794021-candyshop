@@ -592,7 +592,7 @@
     function findParentCommodityId(evt) {
       var evtPath = evt.path || (evt.composedPath && evt.composedPath());
       for (var i = 0; i < evtPath.length; i++) {
-        var htmlSelector = window.utils.htmlIdToHtmlSelector(evtPath[i].id);
+        var htmlSelector = window.utils.convertHtmlIdToHtmlSelector(evtPath[i].id);
 
         if (isCommodityHtmlSelector(htmlSelector)) {
           return commodityHtmlSelectorToCommodityId(htmlSelector);
@@ -618,7 +618,7 @@
     list.forEach(function (item) {
       var htmlId = Object.keys(item)[0];
       var category = item[htmlId];
-      var selector = window.utils.htmlIdToHtmlSelector(htmlId) + ' ~ ' + valueSelector;
+      var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId) + ' ~ ' + valueSelector;
       var valueFormatted = '(' + getAmount(category) + ')';
       window.utils.setDomTextContent(document, selector, valueFormatted);
     });
