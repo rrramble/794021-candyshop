@@ -213,7 +213,7 @@
 
     window.utils.setDomEventHandler(
         document, Payment.MAIN_SELECTOR,
-        paymentInformationCheckHandler,
+        paymentInformationChangeHandler,
         'change'
     );
 
@@ -259,7 +259,7 @@
       return;
     }
     checkContacts();
-    paymentInformationCheckHandler();
+    checkPaymentInformation();
     deliveryChangeAndCheck();
 
     window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
@@ -424,7 +424,11 @@
     window.utils.blockInput(!isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
   }
 
-  function paymentInformationCheckHandler() {
+  function paymentInformationChangeHandler() {
+    checkPaymentInformation();
+  }
+
+  function checkPaymentInformation() {
     switch (true) {
       case (!window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
         resetCardValidity();
