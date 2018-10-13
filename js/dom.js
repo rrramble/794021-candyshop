@@ -151,7 +151,7 @@
       updateFilterAmount(FilterForm.FAVORITE, FilterForm.VALUE_SELECTOR, this.catalog.getFavoriteCount.bind(this.catalog));
     };
 
-    this.commodityCb = function (evt) {
+    this.commodityClickHandler = function (evt) {
       var commodityId = findParentCommodityId(evt);
       if (!window.utils.isNumber(commodityId)) {
         return;
@@ -519,13 +519,13 @@
     window.utils.setDomEventHandler(
         document,
         this.catalogParentHtmlSelector,
-        this.commodityCb.bind(this),
+        this.commodityClickHandler.bind(this),
         'click'
     );
     window.utils.setDomEventHandler(
         document,
         this.trolleyParentHtmlSelector,
-        this.commodityCb.bind(this),
+        this.commodityClickHandler.bind(this),
         'click'
     );
 
