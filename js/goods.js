@@ -192,7 +192,7 @@
 
     window.utils.setDomEventHandler(
         document, FilterForm.SHOW_ALL_HTML_SELECTOR,
-        filterSubmitHandler,
+        filterShowAllHandler,
         'click'
     );
 
@@ -244,7 +244,7 @@
     }, DEBOUNCE_TIME);
   }
 
-  function filterSubmitHandler(evt) {
+  function filterShowAllHandler(evt) {
     evt.preventDefault();
     dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
   }
