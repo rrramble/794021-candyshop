@@ -207,7 +207,7 @@
 
     window.utils.setDomEventHandler(
         document, Payment.METHOD_SELECTOR,
-        paymentTypeHandler,
+        paymentTypeChangeHandler,
         'click'
     );
 
@@ -370,7 +370,7 @@
    * Payment handler and checking
    */
 
-  function paymentTypeHandler() {
+  function paymentTypeChangeHandler() {
     switch (true) {
       case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
         adjustFormForPaymentByCard(true);
