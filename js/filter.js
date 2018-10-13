@@ -117,7 +117,7 @@
         var rightDistance = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
         leftDistance = parentWidth - rightDistance;
       }
-      var percent = window.utils.intPercent(parentWidth, leftDistance);
+      var percent = window.utils.calcIntPercent(parentWidth, leftDistance);
       return window.utils.convertPercentToIntWithinRange(percent, Price.min, Price.max);
     }
 
