@@ -87,12 +87,12 @@
     };
 
     this.getMinPrice = function () {
-      var value = window.utils.listMin(this.getPrices());
+      var value = window.utils.getListMin(this.getPrices());
       return value;
     };
 
     this.getMaxPrice = function () {
-      var value = window.utils.listMax(this.getPrices());
+      var value = window.utils.getListMax(this.getPrices());
       return value;
     };
 

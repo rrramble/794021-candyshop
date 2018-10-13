@@ -78,8 +78,8 @@
     setDomValid: setDomValid,
     setHtmlTagAttribute: setHtmlTagAttribute,
     blockInput: blockInput,
-    listMin: listMin,
-    listMax: listMax,
+    getListMin: getListMin,
+    getListMax: getListMax,
     isKeyInObjectOfList: isKeyInObjectOfList,
 
     debounce: debounce,
@@ -419,12 +419,12 @@
     childNode.disabled = shouldBeBlocked;
   }
 
-  function listMin(list) {
+  function getListMin(list) {
     var result = Math.min.apply(null, list);
     return result;
   }
 
-  function listMax(list) {
+  function getListMax(list) {
     var result = Math.max.apply(null, list);
     return result;
   }
