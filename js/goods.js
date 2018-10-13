@@ -198,7 +198,7 @@
 
     window.utils.setDomEventHandler(
         document, FilterRange.MAIN_SELECTOR,
-        filterFormRangeHandler,
+        filterPriceRangeHandler,
         'mousedown'
     );
 
@@ -249,7 +249,7 @@
     dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
   }
 
-  function filterFormRangeHandler(evt) {
+  function filterPriceRangeHandler(evt) {
     filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
   }
 
