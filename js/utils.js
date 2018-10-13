@@ -23,7 +23,7 @@
     htmlClassFromSelector: htmlClassFromSelector,
     showHtmlSelector: showHtmlSelector,
     hideHtmlSelector: hideHtmlSelector,
-    htmlClassToSelector: htmlClassToSelector,
+    convertHtmlClassToHtmlSelector: convertHtmlClassToHtmlSelector,
     querySelectorIncludingSelf: querySelectorIncludingSelf,
     htmlSelectorToClass: htmlSelectorToClass,
     isNumber: isNumber,
@@ -90,7 +90,7 @@
   };
 
   function getDomObjectsByClassName(objectClass) {
-    var domId = window.utils.htmlClassToSelector(objectClass);
+    var domId = window.utils.convertHtmlClassToHtmlSelector(objectClass);
     var domObjects = document.querySelectorAll(domId);
     return domObjects;
   }
@@ -129,7 +129,7 @@
     el.classList.add(className);
   }
 
-  function htmlClassToSelector(htmlClass) {
+  function convertHtmlClassToHtmlSelector(htmlClass) {
     return '.' + htmlClass;
   }
 
@@ -330,26 +330,26 @@
   }
 
   function getHtmlClassLeftProperty(htmlClass, node) {
-    var selector = window.utils.htmlClassToSelector(htmlClass);
+    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
     return window.utils.omitPx(leftPx);
   }
 
   function setHtmlClassLeftProperty(value, htmlClass, node) {
     var baseNode = node ? node : document;
-    var selector = window.utils.htmlClassToSelector(htmlClass);
+    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     baseNode.querySelector(selector).style.left = value + 'px';
   }
 
   function getHtmlClassRightProperty(htmlClass, node) {
-    var selector = window.utils.htmlClassToSelector(htmlClass);
+    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
     return window.utils.omitPx(rightPx);
   }
 
   function setHtmlClassRightProperty(value, htmlClass, node) {
     var baseNode = node ? node : document;
-    var selector = window.utils.htmlClassToSelector(htmlClass);
+    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     baseNode.querySelector(selector).style.right = value + 'px';
   }
 

@@ -70,7 +70,7 @@
 
     this.updateTrolleyCommodityAmount = function (commodityId, parentDom) {
       var amountNode = parentDom ? parentDom : trolleyDomNodeFromCommodityId(commodityId);
-      var selector = window.utils.htmlClassToSelector(TROLLEY_AMOUNT_HTML_CLASS);
+      var selector = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
       amountNode.querySelector(selector).value = this.trolley.getAmount(commodityId);
     };
 
@@ -117,7 +117,7 @@
     this.getTrolleyAmountFromThePage = function (commodityId) {
       var htmlSelector = commodityIdToTrolleyHtmlSelector(commodityId);
       var commodityNode = document.querySelector(htmlSelector);
-      var valueClass = window.utils.htmlClassToSelector(TROLLEY_AMOUNT_HTML_CLASS);
+      var valueClass = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
       var valueNode = commodityNode.querySelector(valueClass);
       var value = valueNode.value;
       return value;
