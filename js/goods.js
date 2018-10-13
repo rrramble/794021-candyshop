@@ -225,7 +225,7 @@
 
     window.utils.setDomEventHandler(
         document, Delivery.Store.MAIN_SELECTOR,
-        deliveryChangeAndCheck,
+        deliveryInformationChangeHandler,
         'change'
     );
 
@@ -260,7 +260,7 @@
     }
     checkContacts();
     checkPaymentInformation();
-    deliveryChangeAndCheck();
+    checkDeliveryInformation();
 
     window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
   }
@@ -535,7 +535,12 @@
     window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
   }
 
-  function deliveryChangeAndCheck(evt) {
+  function deliveryInformationChangeHandler(evt) {
+    evt.preventDefault();
+    checkDeliveryInformation(evt);
+  }
+
+  function checkDeliveryInformation(evt) {
     switch (true) {
       case (!!evt && !!Delivery.Map[evt.srcElement.id]):
         setSubwayMap(evt);
