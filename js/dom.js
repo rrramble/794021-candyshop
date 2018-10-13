@@ -187,10 +187,8 @@
     function getTrolleyAmountFromThePage(commodityId) {
       var htmlSelector = commodityIdToTrolleyHtmlSelector(commodityId);
       var commodityNode = document.querySelector(htmlSelector);
-      var valueClass = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
-      var valueNode = commodityNode.querySelector(valueClass);
-      var value = valueNode.value;
-      return value;
+      var valueSelector = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
+      return window.utils.getDomValue(commodityNode, valueSelector);
     }
 
     function setAmountInTrolley(commodityId) {
