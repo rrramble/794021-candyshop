@@ -20,7 +20,7 @@
     getDomObjectsByClassName: getDomObjectsByClassName,
     removeCssClass: removeCssClass,
     addCssClass: addCssClass,
-    htmlClassFromSelector: htmlClassFromSelector,
+    convertHtmlSelectorToHtmlClass: convertHtmlSelectorToHtmlClass,
     showHtmlSelector: showHtmlSelector,
     hideHtmlSelector: hideHtmlSelector,
     convertHtmlClassToHtmlSelector: convertHtmlClassToHtmlSelector,
@@ -109,7 +109,7 @@
     }
   }
 
-  function htmlClassFromSelector(htmlSelector) {
+  function convertHtmlSelectorToHtmlClass(htmlSelector) {
     var firstChar = htmlSelector[0];
     if (firstChar === '.') {
       return htmlSelector.slice(1);
@@ -119,13 +119,13 @@
 
   function showHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
+    var className = window.utils.convertHtmlSelectorToHtmlClass(SELECTOR_HIDDEN);
     el.classList.remove(className);
   }
 
   function hideHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
+    var className = window.utils.convertHtmlSelectorToHtmlClass(SELECTOR_HIDDEN);
     el.classList.add(className);
   }
 
