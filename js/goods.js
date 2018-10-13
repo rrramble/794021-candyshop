@@ -186,7 +186,7 @@
 
     window.utils.setDomEventHandler(
         document, FilterForm.MAIN_SELECTOR,
-        filterInputHandler,
+        filterInputChangeHandler,
         'change'
     );
 
@@ -238,7 +238,7 @@
    * Overall order form checking
    */
 
-  function filterInputHandler(evt) {
+  function filterInputChangeHandler(evt) {
     window.utils.debounce(function () {
       dom.filterFormHandler(evt);
     }, DEBOUNCE_TIME);
