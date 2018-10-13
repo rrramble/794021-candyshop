@@ -22,11 +22,6 @@
     setPrice(baseNode, commodity.price);
     setAmount(baseNode, commodity.amount);
     setNameAndId(baseNode, '------placeholder-----');
-    /*
-    if (commodity.amount <= 0) {
-      window.utils.hideHtmlSelector(node, '.card-order');
-    }
-    */
     return baseNode;
 
     // End of constructor body
