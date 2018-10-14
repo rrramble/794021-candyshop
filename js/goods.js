@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Main module:
+ * Main module of the application
  */
 
 (function () {
@@ -64,7 +64,7 @@
     CARD_NUMBER_MIN_LENGTH: 16,
     CARD_NUMBER_MAX_LENGTH: 16,
 
-    CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
+    CARD_DATE_INPUT_DOM_NODE: document.querySelector('#payment__card-date'),
     CARD_DATE_MIN_LENGTH: 5,
     CARD_DATE_MAX_LENGTH: 5,
 
@@ -357,7 +357,7 @@
     window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
 
     Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR, '');
+    Payment.CARD_DATE_INPUT_DOM_NODE.value = '';
     window.utils.setDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR, '');
     window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
 
@@ -414,10 +414,14 @@
     );
 
     // Setup card date
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_DATE_MIN_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_DATE_MAX_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
+    Payment.CARD_DATE_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_DATE_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_DATE_MIN_LENGTH,
+      Payment.CARD_DATE_INPUT_DOM_NODE
+    );
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_DATE_MAX_LENGTH,
+      Payment.CARD_DATE_INPUT_DOM_NODE
+    );
 
     window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
@@ -444,18 +448,18 @@
         break;
       case (!isCardDateValid()):
         window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
-        window.utils.setDomValid(false, Payment.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(false, Payment.CARD_DATE_INPUT_DOM_NODE);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardCvcValid()):
         window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
-        window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
         window.utils.setDomValid(false, Payment.CARD_CVC_INPUT_SELECTOR);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardholderNameValid()):
         window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
-        window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
         window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
         window.utils.setDomValid(false, Payment.CARD_HOLDER_INPUT_SELECTOR);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
@@ -471,7 +475,7 @@
     }
 
     function isCardDateValid() {
-      var cardDate = window.utils.getDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR);
+      var cardDate = Payment.CARD_DATE_INPUT_DOM_NODE.value;
       return window.utils.isCardDateChecked(cardDate);
     }
 
@@ -488,7 +492,7 @@
 
   function resetCardValidity() {
     window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
-    window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
+    window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
     window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
     window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
   }
@@ -623,7 +627,8 @@
     window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
 
     Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_DATE_INPUT_SELECTOR);
+    Payment.CARD_DATE_INPUT_DOM_NODE.disabled = shouldBeDisabled;
+
     window.utils.blockInput(shouldBeDisabled, Payment.CARD_CVC_INPUT_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Payment.CARD_HOLDER_INPUT_SELECTOR);
 
