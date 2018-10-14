@@ -147,13 +147,13 @@
      */
 
     function updateTrolleyCommodityAmount(commodityId, parentDom) {
-      var amountNode = parentDom ? parentDom : trolleyDomNodeFromCommodityId(commodityId);
+      var amountNode = parentDom ? parentDom : getTrolleyDomNodeOfCommodityId(commodityId);
       var selector = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
       amountNode.querySelector(selector).value = this.trolley.getAmount(commodityId);
     }
 
     function isCommodityDrawnInTrolley(commodityId) {
-      var htmlId = commodityIdToTrolleyHtmlSelector(commodityId);
+      var htmlId = convertCommodityIdToTrolleySelector(commodityId);
       var found = document.querySelector(htmlId);
       return !!found;
     }
@@ -188,7 +188,7 @@
     }
 
     function getTrolleyAmountFromThePage(commodityId) {
-      var htmlSelector = commodityIdToTrolleyHtmlSelector(commodityId);
+      var htmlSelector = convertCommodityIdToTrolleySelector(commodityId);
       var commodityNode = document.querySelector(htmlSelector);
       var valueSelector = window.utils.convertHtmlClassToHtmlSelector(TROLLEY_AMOUNT_HTML_CLASS);
       return window.utils.getDomValue(commodityNode, valueSelector);
@@ -272,7 +272,7 @@
 
       window.utils.replaceDomItem(
           document,
-          commodityIdToCommodityHtmlSelector(commodityId),
+          convertCommodityIdToHtmlSelector(commodityId),
           newCommodityDom
       );
       this.checkAndRenderCatalogPlaceholder();
@@ -282,7 +282,7 @@
       var newCommodityDom = this.trolleyNodes[commodityId];
       window.utils.replaceDomItem(
           document,
-          commodityIdToTrolleyHtmlSelector(commodityId),
+          convertCommodityIdToTrolleySelector(commodityId),
           newCommodityDom
       );
     }
@@ -359,7 +359,7 @@
 
       // remove old drawn goods
       this.catalog.getGoods().forEach(function (item, i) {
-        window.utils.removeFirstDomSelector(commodityIdToCommodityHtmlSelector(i));
+        window.utils.removeFirstDomSelector(convertCommodityIdToHtmlSelector(i));
       });
 
       // Render new DOM of goods
@@ -462,7 +462,7 @@
 
 
   function deleteDisplayingInTrolley(commodityId) {
-    var commodityNode = document.querySelector(commodityIdToTrolleyHtmlSelector(commodityId));
+    var commodityNode = document.querySelector(convertCommodityIdToTrolleySelector(commodityId));
     commodityNode.remove();
   }
 
@@ -566,16 +566,16 @@
     window.utils.setInputHtmlIdCheck(htmlId, true);
   }
 
-  function trolleyDomNodeFromCommodityId(commodityId) {
-    var htmlSelector = commodityIdToCommodityHtmlSelector(commodityId);
+  function getTrolleyDomNodeOfCommodityId(commodityId) {
+    var htmlSelector = convertCommodityIdToHtmlSelector(commodityId);
     return document.querySelector(htmlSelector);
   }
 
-  function commodityIdToCommodityHtmlSelector(commodityId) {
+  function convertCommodityIdToHtmlSelector(commodityId) {
     return COMMODITY_HTML_SELECTOR_HEAD + commodityId;
   }
 
-  function commodityIdToTrolleyHtmlSelector(commodityId) {
+  function convertCommodityIdToTrolleySelector(commodityId) {
     return TROLLEY_HTML_SELECTOR_HEAD + commodityId;
   }
 
