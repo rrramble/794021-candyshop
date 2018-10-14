@@ -609,6 +609,7 @@
 
   function unblockAllFormFields() {
     disableAllFormFields(false);
+    paymentTypeChangeHandler();
   }
 
   function disableAllFormFields(shouldBeDisabled) {
