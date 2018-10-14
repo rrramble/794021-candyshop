@@ -72,13 +72,10 @@
     trimSpaces: trimSpaces,
     omitPx: omitPx,
 
-    getHtmlSelectorProperty: getHtmlSelectorProperty,
-
     getDomNodeLeftProperty: getDomNodeLeftProperty,
     getDomNodeRightProperty: getDomNodeRightProperty,
     setDomNodeLeftProperty: setDomNodeLeftProperty,
     setDomNodeRightProperty: setDomNodeRightProperty,
-    setHtmlClassRightProperty: setHtmlClassRightProperty,
 
     calculateIntPercent: calculateIntPercent,
     convertPercentToIntWithinRange: convertPercentToIntWithinRange,
@@ -335,13 +332,6 @@
     return parseFloat(px.toString());
   }
 
-  function getHtmlSelectorProperty(property, htmlSelector, node) {
-    var baseNode = node ? node : document;
-    var childNode = baseNode.querySelector(htmlSelector);
-    var result = window.getComputedStyle(childNode).getPropertyValue(property);
-    return result;
-  }
-
   function getDomNodeLeftProperty(domNode) {
     var propertyPx = window.getComputedStyle(domNode).getPropertyValue('left');
     return window.utils.omitPx(propertyPx);
@@ -358,12 +348,6 @@
 
   function setDomNodeRightProperty(node, value) {
     node.style.right = value + 'px';
-  }
-
-  function setHtmlClassRightProperty(value, htmlClass, node) {
-    var baseNode = node ? node : document;
-    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
-    baseNode.querySelector(selector).style.right = value + 'px';
   }
 
   function calculateIntPercent(base, part) {
