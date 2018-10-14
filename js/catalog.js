@@ -78,13 +78,11 @@
 
   function getIngredientsCount(ingredient) {
     return this.getGoods().reduce(function (accu, item) {
-      if (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) {
-        accu++;
-      }
-      if (ingredient === 'gluten-free' && !item.nutritionFacts.gluten) {
-        accu++;
-      }
-      if (ingredient === 'vegetarian' && item.nutritionFacts.vegetarian) {
+      if (
+        (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) ||
+        (ingredient === 'gluten-free' && !item.nutritionFacts.gluten) ||
+        (ingredient === 'vegetarian' && item.nutritionFacts.vegetarian)
+      ) {
         accu++;
       }
       return accu;
