@@ -278,7 +278,7 @@
       this.checkAndRenderCatalogPlaceholder();
     }
 
-     function replaceDomInTrolley(commodityId) {
+    function replaceDomInTrolley(commodityId) {
       var newCommodityDom = this.trolleyNodes[commodityId];
       window.utils.replaceDomItem(
           document,
