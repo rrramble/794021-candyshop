@@ -355,14 +355,12 @@
     return window.utils.omitPx(propertyPx);
   }
 
-  // ? should it be removed?
   function getHtmlClassLeftProperty(htmlClass, node) {
     var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
     return window.utils.omitPx(leftPx);
   }
 
-  // ? should it be removed?
   function setHtmlClassLeftProperty(value, htmlClass, node) {
     var baseNode = node ? node : document;
     var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
@@ -377,7 +375,6 @@
     node.style.right = value + 'px';
   }
 
-  // ? should it be removed?
   function getHtmlClassRightProperty(htmlClass, node) {
     var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
