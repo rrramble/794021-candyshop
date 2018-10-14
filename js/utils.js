@@ -73,9 +73,13 @@
     omitPx: omitPx,
 
     getHtmlSelectorProperty: getHtmlSelectorProperty,
-    getHtmlSelectorWidth: getHtmlSelectorWidth,
+
+    getDomNodeLeftProperty: getDomNodeLeftProperty,
+    getDomNodeRightProperty: getDomNodeRightProperty,
     getHtmlClassLeftProperty: getHtmlClassLeftProperty,
-    setHtmlClassLeftProperty: setHtmlClassLeftProperty,
+    setHtmlClassLeftProperty: setHtmlClassLeftProperty, //
+    setDomNodeLeftProperty: setDomNodeLeftProperty,
+    setDomNodeRightProperty: setDomNodeRightProperty,
     getHtmlClassRightProperty: getHtmlClassRightProperty,
     setHtmlClassRightProperty: setHtmlClassRightProperty,
 
@@ -215,6 +219,10 @@
     subNode.textContent = data;
   }
 
+  function setDomNodeTextContent(node, value) {
+    node.textContent = value;
+  }
+
   function getDomTextContent(node, htmlSelector) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     return subNode.textContent;
@@ -337,23 +345,39 @@
     return result;
   }
 
-  function getHtmlSelectorWidth(htmlSelector, node) {
-    var resultPx = window.utils.getHtmlSelectorProperty('width', htmlSelector, node);
-    return window.utils.omitPx(resultPx);
+  function getDomNodeLeftProperty(domNode) {
+    var propertyPx = window.getComputedStyle(domNode).getPropertyValue('left');
+    return window.utils.omitPx(propertyPx);
   }
 
+  function getDomNodeRightProperty(domNode) {
+    var propertyPx = window.getComputedStyle(domNode).getPropertyValue('right');
+    return window.utils.omitPx(propertyPx);
+  }
+
+  // ? should it be removed?
   function getHtmlClassLeftProperty(htmlClass, node) {
     var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
     return window.utils.omitPx(leftPx);
   }
 
+  // ? should it be removed?
   function setHtmlClassLeftProperty(value, htmlClass, node) {
     var baseNode = node ? node : document;
     var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     baseNode.querySelector(selector).style.left = value + 'px';
   }
 
+  function setDomNodeLeftProperty(node, value) {
+    node.style.left = value + 'px';
+  }
+
+  function setDomNodeRightProperty(node, value) {
+    node.style.right = value + 'px';
+  }
+
+  // ? should it be removed?
   function getHtmlClassRightProperty(htmlClass, node) {
     var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
     var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
