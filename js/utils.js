@@ -76,11 +76,8 @@
 
     getDomNodeLeftProperty: getDomNodeLeftProperty,
     getDomNodeRightProperty: getDomNodeRightProperty,
-    getHtmlClassLeftProperty: getHtmlClassLeftProperty,
-    setHtmlClassLeftProperty: setHtmlClassLeftProperty, //
     setDomNodeLeftProperty: setDomNodeLeftProperty,
     setDomNodeRightProperty: setDomNodeRightProperty,
-    getHtmlClassRightProperty: getHtmlClassRightProperty,
     setHtmlClassRightProperty: setHtmlClassRightProperty,
 
     calculateIntPercent: calculateIntPercent,
@@ -355,30 +352,12 @@
     return window.utils.omitPx(propertyPx);
   }
 
-  function getHtmlClassLeftProperty(htmlClass, node) {
-    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
-    var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
-    return window.utils.omitPx(leftPx);
-  }
-
-  function setHtmlClassLeftProperty(value, htmlClass, node) {
-    var baseNode = node ? node : document;
-    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
-    baseNode.querySelector(selector).style.left = value + 'px';
-  }
-
   function setDomNodeLeftProperty(node, value) {
     node.style.left = value + 'px';
   }
 
   function setDomNodeRightProperty(node, value) {
     node.style.right = value + 'px';
-  }
-
-  function getHtmlClassRightProperty(htmlClass, node) {
-    var selector = window.utils.convertHtmlClassToHtmlSelector(htmlClass);
-    var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
-    return window.utils.omitPx(rightPx);
   }
 
   function setHtmlClassRightProperty(value, htmlClass, node) {
