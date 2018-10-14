@@ -19,6 +19,10 @@
     HOLDER_MAX_LENGTH: 200
   }
 
+  var Text = {
+    INCORRECT_DATA: 'Некорректные данные'
+  }
+
   // Thanks to https://emailregex.com/
   var EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -87,7 +91,10 @@
 
     setInputToBeRequired: setInputToBeRequired,
     setDomValid: setDomValid,
+    setDomNodeValidity: setDomNodeValidity,
     setHtmlTagAttribute: setHtmlTagAttribute,
+    setDomNodeAttribute: setDomNodeAttribute,
+
     blockInput: blockInput,
     getListMin: getListMin,
     getListMax: getListMax,
@@ -397,6 +404,11 @@
     }
   }
 
+  function setDomNodeValidity(shouldBeValid, baseNode) {
+    var text = shouldBeValid ? '' : Text.INCORRECT_DATA;
+    baseNode.setCustomValidity(text);
+  }
+
   function setHtmlTagAttribute(shouldBeSet, parameter, value, selector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
@@ -405,6 +417,12 @@
     } else {
       childNode.removeAttribute(parameter);
     }
+  }
+
+  function setDomNodeAttribute(shouldBeSet, parameter, value, baseNode) {
+    shouldBeSet ?
+      baseNode.setAttribute(parameter, value) :
+      baseNode.removeAttribute(parameter);
   }
 
   function blockInput(shouldBeBlocked, selector, node) {
