@@ -351,22 +351,47 @@
     window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
   }
 
-  function resetOrderForm() {
+  function resetContactsValues() {
     window.utils.setDomValue(document, Contacts.NAME_SELECTOR, '');
     window.utils.setDomValue(document, Contacts.PHONE_SELECTOR, '');
     window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
+  }
 
+  function resetCardValidity() {
+    window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
+    window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
+    window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
+  }
+
+  function resetCardValues() {
     Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
     Payment.CARD_DATE_INPUT_DOM_NODE.value = '';
     window.utils.setDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR, '');
     window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
+  }
 
+  function resetDeliveryValues() {
     window.utils.setDomValue(document, Delivery.Courier.STREET_SELECTOR, '');
     window.utils.setDomValue(document, Delivery.Courier.HOUSE_SELECTOR, '');
     window.utils.setDomValue(document, Delivery.Courier.FLOOR_SELECTOR, '');
     window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
+  }
 
+  function resetDeliveryValidity() {
+    window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
+    window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
+  }
+
+  function resetOrderForm() {
     resetContactsValidity();
+    resetContactsValues();
+    resetCardValidity();
+    resetCardValues();
+    resetDeliveryValues();
+    resetDeliveryValidity();
   }
 
 
@@ -490,13 +515,6 @@
     }
   }
 
-  function resetCardValidity() {
-    window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
-    window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
-    window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
-  }
-
   function setContactsToBeRequired(isToBeSet) {
     window.utils.setInputToBeRequired(isToBeSet, Contacts.NAME_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_SELECTOR);
@@ -595,13 +613,6 @@
 
   function isTakeoutSelected() {
     return window.utils.isHtmlIdChecked(Delivery.SELF_TAKE_OUT_ID);
-  }
-
-  function resetDeliveryValidity() {
-    window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
-    window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
-    window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
 
   function setSubwayMap(evt) {
