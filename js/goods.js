@@ -60,7 +60,8 @@
     CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
     CARD_FORM_SELECTOR: '.payment__card-wrap',
 
-    CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
+    CARD_NUMBER_INPUT_DOM_NODE: document.querySelector('#payment__card-number'),
+
     CARD_NUMBER_INPUT_CLASS: 'text-input__input',
     CARD_NUMBER_MIN_LENGTH: 16,
     CARD_NUMBER_MAX_LENGTH: 16,
@@ -357,7 +358,7 @@
     window.utils.setDomValue(document, Contacts.PHONE_SELECTOR, '');
     window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
 
-    window.utils.setDomValue(document, Payment.CARD_NUMBER_INPUT_SELECTOR, '');
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
     window.utils.setDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR, '');
     window.utils.setDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR, '');
     window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
@@ -404,11 +405,17 @@
       return;
     }
 
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    // Setup card number
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH,
+      Payment.CARD_NUMBER_INPUT_DOM_NODE
+    );
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH,
+      Payment.CARD_NUMBER_INPUT_DOM_NODE
+    );
 
+    // Setup card date
     window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_DATE_MIN_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_DATE_MAX_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
@@ -434,22 +441,22 @@
         resetCardValidity();
         break;
       case (!isCardNumberValid()):
-        window.utils.setDomValid(false, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(false, Payment.CARD_NUMBER_INPUT_DOM_NODE);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardDateValid()):
-        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
         window.utils.setDomValid(false, Payment.CARD_DATE_INPUT_SELECTOR);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardCvcValid()):
-        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
         window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
         window.utils.setDomValid(false, Payment.CARD_CVC_INPUT_SELECTOR);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardholderNameValid()):
-        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
         window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
         window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
         window.utils.setDomValid(false, Payment.CARD_HOLDER_INPUT_SELECTOR);
@@ -461,7 +468,7 @@
     }
 
     function isCardNumberValid() {
-      var cardNumber = window.utils.getDomValue(document, Payment.CARD_NUMBER_INPUT_SELECTOR);
+      var cardNumber = Payment.CARD_NUMBER_INPUT_DOM_NODE.value;
       return window.utils.isLuhnChecked(cardNumber);
     }
 
@@ -482,7 +489,7 @@
   }
 
   function resetCardValidity() {
-    window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
     window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
     window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
     window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
@@ -617,7 +624,7 @@
     window.utils.blockInput(shouldBeDisabled, Contacts.PHONE_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
 
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_NUMBER_INPUT_SELECTOR);
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
     window.utils.blockInput(shouldBeDisabled, Payment.CARD_DATE_INPUT_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Payment.CARD_CVC_INPUT_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Payment.CARD_HOLDER_INPUT_SELECTOR);
