@@ -61,8 +61,6 @@
     CARD_FORM_SELECTOR: '.payment__card-wrap',
 
     CARD_NUMBER_INPUT_DOM_NODE: document.querySelector('#payment__card-number'),
-
-    CARD_NUMBER_INPUT_CLASS: 'text-input__input',
     CARD_NUMBER_MIN_LENGTH: 16,
     CARD_NUMBER_MAX_LENGTH: 16,
 
