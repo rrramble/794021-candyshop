@@ -83,7 +83,7 @@
     getHtmlClassRightProperty: getHtmlClassRightProperty,
     setHtmlClassRightProperty: setHtmlClassRightProperty,
 
-    calcIntPercent: calcIntPercent,
+    calculateIntPercent: calculateIntPercent,
     convertPercentToIntWithinRange: convertPercentToIntWithinRange,
 
     disableHtmlSelector: disableHtmlSelector,
@@ -387,7 +387,7 @@
     baseNode.querySelector(selector).style.right = value + 'px';
   }
 
-  function calcIntPercent(base, part) {
+  function calculateIntPercent(base, part) {
     var percent = base === 0 ? 0 : part / base * 100;
     percent = window.utils.setWithinRange(percent, 0, 100);
     return percent.toFixed(0);

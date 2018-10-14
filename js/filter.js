@@ -130,7 +130,7 @@
       var rightDistance = window.utils.getDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE);
       leftDistance = SLIDER_WIDTH - rightDistance;
     }
-    var percent = window.utils.calcIntPercent(SLIDER_WIDTH, leftDistance);
+    var percent = window.utils.calculateIntPercent(SLIDER_WIDTH, leftDistance);
     return window.utils.convertPercentToIntWithinRange(percent, Price.min, Price.max);
   }
 
