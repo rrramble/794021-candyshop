@@ -8,13 +8,22 @@
 
   var Filter = {
     MAIN_SECTION_SELECTOR: '.catalog__filter.range',
+
     RANGE_MIN_BTN_CLASS: 'range__btn--left',
+    RANGE_MIN_PIN_BTN_DOM_NODE: document.querySelector('.range__btn--left'),
+
     RANGE_MAX_BTN_CLASS: 'range__btn--right',
-    MIN_RANGE_BTN_TEXT_SELECTOR: '.range__price--min',
-    MAX_RANGE_BTN_TEXT_SELECTOR: '.range__price--max',
-    RANGE_BTN_PARENT_SELECTOR: '.range__filter',
-    FILL_LINE_CLASS: 'range__fill-line',
-    PIN_WIDTH: 10
+    RANGE_MAX_PIN_BTN_DOM_NODE: document.querySelector('.range__btn--right'),
+
+    MIN_RANGE_TEXT_DOM_NODE: document.querySelector('.range__price--min'),
+    MAX_RANGE_TEXT_DOM_NODE: document.querySelector('.range__price--max'),
+
+    RANGE_BTN_PARENT_DOM_NODE: document.querySelector('.range__filter'),
+    SLIDER_DOM_NODE: document.querySelector('.range__fill-line'),
+
+    PIN_WIDTH: 10,
+
+    rangeMinPinDomNode: document.querySelector('.range__btn--left')
   };
 
   var Price = {
@@ -30,6 +39,8 @@
   window.Filter = {
     Range: Range
   };
+
+  var SLIDER_WIDTH = getSliderWidth() - Filter.PIN_WIDTH - Filter.PIN_WIDTH / 2;
 
   function Range(minPrice, maxPrice) {
     Price.min = minPrice;
@@ -82,22 +93,22 @@
       return;
     }
 
-    var minPinLeftShift = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
-    var width = getSliderWidth() - Filter.PIN_WIDTH - Filter.PIN_WIDTH / 2;
-    var maxPinRightShift = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
-    var maxPinLeftShift = width - maxPinRightShift;
+    var minPinLeftShift = window.utils.getDomNodeLeftProperty(Filter.rangeMinPinDomNode);
+    var maxPinRightShift = window.utils.getDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE);
+    var maxPinLeftShift = SLIDER_WIDTH - maxPinRightShift;
 
     var newX;
     if (isMinPin) {
       newX = minPinLeftShift + dX;
       newX = window.utils.setWithinRange(newX, 0, maxPinLeftShift);
-      window.utils.setHtmlClassLeftProperty(newX, Filter.RANGE_MIN_BTN_CLASS);
-      window.utils.setHtmlClassLeftProperty(newX, Filter.FILL_LINE_CLASS);
+      window.utils.setDomNodeLeftProperty(Filter.RANGE_MIN_PIN_BTN_DOM_NODE, newX);
+      window.utils.setDomNodeLeftProperty(Filter.SLIDER_DOM_NODE, newX);
+
     } else {
       newX = maxPinRightShift - dX;
-      newX = window.utils.setWithinRange(newX, 0, width - minPinLeftShift);
-      window.utils.setHtmlClassRightProperty(newX, Filter.RANGE_MAX_BTN_CLASS);
-      window.utils.setHtmlClassRightProperty(newX, Filter.FILL_LINE_CLASS);
+      newX = window.utils.setWithinRange(newX, 0, SLIDER_WIDTH - minPinLeftShift);
+      window.utils.setDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE, newX);
+      window.utils.setDomNodeRightProperty(Filter.SLIDER_DOM_NODE, newX);
     }
     Pin.mouseStartX += dX;
     updateTextValue(isMinPin);
@@ -106,21 +117,20 @@
   function updateTextValue(isMinPin) {
     var value = calculateSliderValue(isMinPin);
     if (isMinPin) {
-      window.utils.setDomTextContent(document, Filter.MIN_RANGE_BTN_TEXT_SELECTOR, value);
+      Filter.MIN_RANGE_TEXT_DOM_NODE.textContent = value;
     } else {
-      window.utils.setDomTextContent(document, Filter.MAX_RANGE_BTN_TEXT_SELECTOR, value);
+      Filter.MAX_RANGE_TEXT_DOM_NODE.textContent = value;
     }
   }
 
   function calculateSliderValue(isMinPin) {
-    var parentWidth = getSliderWidth() - Filter.PIN_WIDTH - Filter.PIN_WIDTH / 2;
     if (isMinPin) {
-      var leftDistance = window.utils.getHtmlClassLeftProperty(Filter.RANGE_MIN_BTN_CLASS);
+      var leftDistance = window.utils.getDomNodeLeftProperty(Filter.RANGE_MIN_PIN_BTN_DOM_NODE);
     } else {
-      var rightDistance = window.utils.getHtmlClassRightProperty(Filter.RANGE_MAX_BTN_CLASS);
-      leftDistance = parentWidth - rightDistance;
+      var rightDistance = window.utils.getDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE);
+      leftDistance = SLIDER_WIDTH - rightDistance;
     }
-    var percent = window.utils.calcIntPercent(parentWidth, leftDistance);
+    var percent = window.utils.calcIntPercent(SLIDER_WIDTH, leftDistance);
     return window.utils.convertPercentToIntWithinRange(percent, Price.min, Price.max);
   }
 
@@ -133,7 +143,9 @@
   }
 
   function getSliderWidth() {
-    return window.utils.getHtmlSelectorWidth(Filter.RANGE_BTN_PARENT_SELECTOR);
+    var resultPx = window.getComputedStyle(Filter.RANGE_BTN_PARENT_DOM_NODE).
+      getPropertyValue('width');
+    return window.utils.omitPx(resultPx);
   }
 
 })();
