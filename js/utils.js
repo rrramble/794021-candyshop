@@ -7,7 +7,20 @@
 (function () {
 
   var SELECTOR_HIDDEN = '.visually-hidden';
-  var CARD_NUMBER_LENGTHS = [16, 17, 18, 19];
+  var Card = {
+    NUMBER_LENGTHS: [16, 17, 18, 19],
+    MIN_YEAR: 18,
+    MAX_YEAR: 99,
+    MIN_MONTH: 1,
+    MAX_MONTH: 12,
+    MIN_CVC: 100,
+    MAX_CVC: 999,
+    HOLDER_MIN_LENGTH: 1,
+    HOLDER_MAX_LENGTH: 200
+  }
+
+  // Thanks to https://emailregex.com/
+  var EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   var HttpCode = {
     successCodes: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226],
@@ -253,7 +266,7 @@
 
   function isLuhnChecked(cardNumber) {
     var noSpaces = window.utils.trimAll(cardNumber.toString());
-    if (!CARD_NUMBER_LENGTHS.includes(noSpaces.length)) {
+    if (!Card.NUMBER_LENGTHS.includes(noSpaces.length)) {
       return false;
     }
     var numbers = noSpaces.split('');
@@ -276,22 +289,22 @@
     var month = noFillings.slice(0, 2);
     var divider = noFillings.slice(2, 3);
     var year = noFillings.slice(3);
-    return window.utils.isInRangeUpTo(month, 1, 12) &&
-      window.utils.isInRangeUpTo(year, 18, 50) &&
+    return window.utils.isInRangeUpTo(month, Card.MIN_MONTH, Card.MAX_MONTH) &&
+      window.utils.isInRangeUpTo(year, Card.MIN_YEAR, Card.MAX_YEAR) &&
       !window.utils.isNumber(divider);
   }
 
   function isCvcChecked(cvc) {
     var noFillings = window.utils.trimAll(cvc) / 1;
     var number = noFillings.toFixed(0);
-    var result = window.utils.isInRangeUpTo(number, 0, 999) &&
-      number.length === 3;
-    return result;
+    return window.utils.isInRangeUpTo(number, Card.MIN_CVC, Card.MAX_CVC);
   }
 
   function isCacrdholderNameChecked(fullName) {
     var noFillings = window.utils.trimAll(fullName);
-    return noFillings.length > 0;
+    return window.utils.isInRangeUpTo(noFillings.length,
+      Card.HOLDER_MIN_LENGTH, Card.HOLDER_MAX_LENGTH
+    );
   }
 
   function isEven(a) {
@@ -443,9 +456,7 @@
   }
 
   function isEmailValid(email) {
-    // Thanks to https://emailregex.com/
-    var regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regEx.test(email);
+    return EMAIL_REGEX.test(email);
   }
 
   var _lastTimeout;
