@@ -278,18 +278,18 @@
       return false;
     }
     var numbers = noSpaces.split('');
-    var semiDoubled = numbers.map(semiDouble);
+    var semiDoubled = numbers.map(calculateLuhnSemiDouble);
     var total = semiDoubled.reduce(window.utils.sum, 0);
     return (total % 10 === 0);
+  }
 
-    function semiDouble(char, index) {
-      var digit = parseInt(char, 10);
-      if (window.utils.isEven(index)) {
-        var digitDoubled = digit * 2;
-        digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
-      }
-      return digit;
+  function calculateLuhnSemiDouble(char, index) {
+    var digit = parseInt(char, 10);
+    if (window.utils.isEven(index)) {
+      var digitDoubled = digit * 2;
+      digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
     }
+    return digit;
   }
 
   function isCardDateChecked(cardDate) {
