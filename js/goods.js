@@ -149,7 +149,7 @@
    * Main code
    */
 
-  window.Backend.get(onSuccessDownload, onErrorDownloadUpload);
+  window.Backend.get(downloadSuccessHandler, downloadUploadErrorHandler);
   return;
 
   /*
@@ -162,7 +162,7 @@
   var dom;
   var filterRange;
 
-  function onSuccessDownload(data) {
+  function downloadSuccessHandler(data) {
     catalog = new window.Catalog(function () {
       return data;
     });
@@ -230,7 +230,7 @@
     );
 
     document.querySelector(Order.MAIN_SELECTOR).
-      addEventListener('submit', onSubmitOrder);
+      addEventListener('submit', formSubmitHandler);
   }
 
 
@@ -253,7 +253,7 @@
     filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
   }
 
-  function onSubmitOrder(evt) {
+  function formSubmitHandler(evt) {
     evt.preventDefault();
     if (isTrolleyEmpty(trolley)) {
       return;
@@ -262,19 +262,19 @@
     checkPaymentInformation();
     checkDeliveryInformation();
 
-    window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
+    window.Backend.put(makeOrderFormData(), uploadSuccessHandler, downloadUploadErrorHandler);
   }
 
   function makeOrderFormData() {
     return document.querySelector(Order.MAIN_SELECTOR);
   }
 
-  function onSuccessUpload() {
+  function uploadSuccessHandler() {
     resetOrderForm();
     showModal(Order.MODAL_SUCCESS_SELECTOR);
   }
 
-  function onErrorDownloadUpload() {
+  function downloadUploadErrorHandler() {
     showModal(Order.MODAL_ERROR_SELECTOR);
   }
 
