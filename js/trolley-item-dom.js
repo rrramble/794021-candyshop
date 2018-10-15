@@ -11,8 +11,29 @@
 
   window.TrolleyItemDom = function (commodity, templateNode) {
 
+    var setId = function (node, commodityId) {
+      var text = TROLLEY_HTML_ID_HEAD + commodityId;
+      window.utils.setDomId(node, '.card-order', text);
+    };
 
-    // Constructor body
+    var setTitle = function (node, name) {
+      window.utils.setDomTextContent(node, '.card-order__title', name);
+    };
+
+    var setImage = function (node, url, alt) {
+      window.utils.setDomImage(node, '.card-order__img', url, alt);
+    };
+
+    var setPrice = function (node, price) {
+      window.utils.setDomTextContent(node, '.card-order__price', price);
+    };
+
+    var setAmount = function (node, amount) {
+      window.utils.setDomValue(node, '.card-order__count', amount);
+    };
+
+
+    // Beginning of the constructor
 
     this.commodity = commodity;
     var baseNode = templateNode.content.cloneNode(true);
@@ -23,29 +44,8 @@
     setAmount(baseNode, commodity.amount);
     return baseNode;
 
-    // End of constructor body
+    // End of the constructor
 
-
-    function setId(node, commodityId) {
-      var text = TROLLEY_HTML_ID_HEAD + commodityId;
-      window.utils.setDomId(node, '.card-order', text);
-    }
-
-    function setTitle(node, name) {
-      window.utils.setDomTextContent(node, '.card-order__title', name);
-    }
-
-    function setImage(node, url, alt) {
-      window.utils.setDomImage(node, '.card-order__img', url, alt);
-    }
-
-    function setPrice(node, price) {
-      window.utils.setDomTextContent(node, '.card-order__price', price);
-    }
-
-    function setAmount(node, amount) {
-      window.utils.setDomValue(node, '.card-order__count', amount);
-    }
-  };
+  }; // window.TrolleyItemDom
 
 })();
