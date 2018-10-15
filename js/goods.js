@@ -136,7 +136,8 @@
 
     Courier: {
       MAIN_SELECTOR: '.deliver__courier',
-      STREET_SELECTOR: '#deliver__street',
+
+      STREET_DOM_NODE: document.querySelector('#deliver__street'),
       HOUSE_SELECTOR: '#deliver__house',
       FLOOR_SELECTOR: '#deliver__floor',
       ROOM_SELECTOR: '#deliver__room'
@@ -373,14 +374,14 @@
   }
 
   function resetDeliveryValues() {
-    window.utils.setDomValue(document, Delivery.Courier.STREET_SELECTOR, '');
+    Delivery.Courier.STREET_DOM_NODE.value = '';
     window.utils.setDomValue(document, Delivery.Courier.HOUSE_SELECTOR, '');
     window.utils.setDomValue(document, Delivery.Courier.FLOOR_SELECTOR, '');
     window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
   }
 
   function resetDeliveryValidity() {
-    window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
     window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
@@ -550,7 +551,7 @@
   }
 
   function adjustFormForDeliveryByCourier(byCourier) {
-    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.STREET_SELECTOR);
+    Delivery.Courier.STREET_DOM_NODE.required = byCourier;
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
 
@@ -566,7 +567,7 @@
     if (byCourier && trolley.getCount() <= 0) {
       return;
     }
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.STREET_SELECTOR);
+    Delivery.Courier.STREET_DOM_NODE.disabled = !byCourier;
     window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
   }
@@ -582,14 +583,14 @@
         setSubwayMap(evt);
         break;
       case (!isStreetValid()):
-        window.utils.setDomValid(false, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomNodeValidity(false, Delivery.Courier.STREET_DOM_NODE);
         break;
       case (!isHouseValid()):
-        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
         window.utils.setDomValid(false, Delivery.Courier.HOUSE_SELECTOR);
         break;
       case (isFloorTyped() && !isFloorValid()):
-        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
+        window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
         window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
         window.utils.setDomValid(false, Delivery.Courier.FLOOR_SELECTOR);
         break;
@@ -598,7 +599,7 @@
     }
 
     function isStreetValid() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.STREET_SELECTOR);
+      var value = Delivery.Courier.STREET_DOM_NODE.value;
       var noFillings = window.utils.trimSpaces(value);
       return noFillings.length > 0;
     }
@@ -651,7 +652,7 @@
     Payment.CARD_CVC_INPUT_DOM_NODE.disabled = shouldBeDisabled;
     Payment.CARD_HOLDER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
 
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.STREET_SELECTOR);
+    Delivery.Courier.STREET_DOM_NODE.disabled = shouldBeDisabled;
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.HOUSE_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
