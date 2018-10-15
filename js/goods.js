@@ -412,10 +412,10 @@
     Payment.CARD_NUMBER_INPUT_DOM_NODE.required = isToBeSet;
     Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = !isToBeSet;
     window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH,
-       Payment.CARD_NUMBER_INPUT_DOM_NODE
+        Payment.CARD_NUMBER_INPUT_DOM_NODE
     );
     window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH,
-       Payment.CARD_NUMBER_INPUT_DOM_NODE
+        Payment.CARD_NUMBER_INPUT_DOM_NODE
     );
 
     // Setup card date
@@ -432,7 +432,7 @@
     Payment.CARD_CVC_INPUT_DOM_NODE.required = isToBeSet;
     Payment.CARD_CVC_INPUT_DOM_NODE.disabled = !isToBeSet;
     window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH,
-       Payment.CARD_CVC_INPUT_DOM_NODE
+        Payment.CARD_CVC_INPUT_DOM_NODE
     );
     window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_CVC_MAX_LENGTH,
         Payment.CARD_CVC_INPUT_DOM_NODE
