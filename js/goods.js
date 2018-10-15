@@ -27,10 +27,9 @@
 
 
   var Order = {
-    MAIN_SELECTOR: '.buy form',
-    SUBMIT_BTN_SELECTOR: '.buy__submit-btn',
-    MODAL_ERROR_SELECTOR: '.modal--error',
-    MODAL_SUCCESS_SELECTOR: '.modal--success',
+    MAIN_DOM_NODE: document.querySelector('.buy form'),
+    MODAL_ERROR_DOM_NODE: document.querySelector('.modal--error'),
+    MODAL_SUCCESS_DOM_NODE: document.querySelector('.modal--success'),
     MODAL_CLOSE_BUTTON_SELECTOR: '.modal__close',
     MODAL_HIDDEN_CLASS: 'modal--hidden'
   };
@@ -230,8 +229,7 @@
         'change'
     );
 
-    document.querySelector(Order.MAIN_SELECTOR).
-      addEventListener('submit', formSubmitHandler);
+    Order.MAIN_DOM_NODE.addEventListener('submit', formSubmitHandler);
   }
 
 
@@ -263,24 +261,23 @@
     checkPaymentInformation();
     checkDeliveryInformation();
 
-    window.Backend.put(makeOrderFormData(), uploadSuccessHandler, downloadUploadErrorHandler);
+    window.Backend.put(getFormData(), uploadSuccessHandler, downloadUploadErrorHandler);
   }
 
-  function makeOrderFormData() {
-    return document.querySelector(Order.MAIN_SELECTOR);
+  function getFormData() {
+    return Order.MAIN_DOM_NODE;
   }
 
   function uploadSuccessHandler() {
     resetOrderForm();
-    showModal(Order.MODAL_SUCCESS_SELECTOR);
+    showModal(Order.MODAL_SUCCESS_DOM_NODE);
   }
 
   function downloadUploadErrorHandler() {
-    showModal(Order.MODAL_ERROR_SELECTOR);
+    showModal(Order.MODAL_ERROR_DOM_NODE);
   }
 
-  function showModal(modalSelector) {
-    var modalNode = document.querySelector(modalSelector);
+  function showModal(modalNode) {
     modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
     var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
     closeButtonNode.addEventListener('click', closeModal);
