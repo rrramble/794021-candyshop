@@ -58,6 +58,7 @@
     getDomTextContent: getDomTextContent,
 
     setDomImage: setDomImage,
+    setDomNodeImage: setDomNodeImage,
     setDomValue: setDomValue,
     getDomValue: getDomValue,
 
@@ -230,6 +231,11 @@
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.src = imageUrl ? imageUrl : '';
     subNode.alt = imageAlt ? imageAlt : '';
+  }
+
+  function setDomNodeImage(baseNode, imageUrl, imageAlt) {
+    baseNode.src = imageUrl ? imageUrl : '';
+    baseNode.alt = imageAlt ? imageAlt : '';
   }
 
   function setDomValue(node, selector, data) {
