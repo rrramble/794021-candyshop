@@ -87,7 +87,7 @@
     Store: {
       MAIN_SELECTOR: '.deliver__store',
       LIST_OF_SUBWAYS_SELECTOR: '.deliver__stores',
-      MAP_SELECTOR: '.deliver__store-map-img'
+      MAP_DOM_NODE: document.querySelector('.deliver__store-map-img')
     },
     Map: {
       'store-academicheskaya': {
@@ -627,7 +627,7 @@
     var altText = Delivery.Map[htmlId].name;
     var fileName = Delivery.Map[htmlId].filename;
     var mapFullUrl = Delivery.MAP_PATH + fileName;
-    window.utils.setDomImage(document, Delivery.Store.MAP_SELECTOR, mapFullUrl, altText);
+    window.utils.setDomNodeImage(Delivery.Store.MAP_DOM_NODE, mapFullUrl, altText);
   }
 
   function blockAllFormFields() {
