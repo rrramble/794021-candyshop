@@ -29,7 +29,7 @@
   var TROLLEY_EMPTY_DOM_NODE = document.querySelector('.goods__card-empty');
 
   var EMPTY_FILTER_TEMPLATE_SELECTOR = '#empty-filters';
-  var EMPTY_FILTER_HTML_SELECTOR = '.catalog__empty-filter'
+  var EMPTY_FILTER_HTML_SELECTOR = '.catalog__empty-filter';
 
   var FilterForm = {
     MAIN_SELECTOR: '.catalog__sidebar form',
