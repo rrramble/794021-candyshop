@@ -140,7 +140,7 @@
       STREET_DOM_NODE: document.querySelector('#deliver__street'),
       HOUSE_DOM_NODE: document.querySelector('#deliver__house'),
       FLOOR_DOM_NODE: document.querySelector('#deliver__floor'),
-      ROOM_SELECTOR: '#deliver__room'
+      ROOM_DOM_NODE: document.querySelector('#deliver__room')
     },
 
   };
@@ -377,14 +377,14 @@
     Delivery.Courier.STREET_DOM_NODE.value = '';
     Delivery.Courier.HOUSE_DOM_NODE.value = '';
     Delivery.Courier.FLOOR_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
+    Delivery.Courier.ROOM_DOM_NODE.value = '';
   }
 
   function resetDeliveryValidity() {
     window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
     window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
     window.utils.setDomNodeValidity(true, Delivery.Courier.FLOOR_DOM_NODE);
-    window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.ROOM_DOM_NODE);
   }
 
   function resetOrderForm() {
@@ -553,7 +553,7 @@
   function adjustFormForDeliveryByCourier(byCourier) {
     Delivery.Courier.STREET_DOM_NODE.required = byCourier;
     Delivery.Courier.HOUSE_DOM_NODE.required = byCourier;
-    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
+    Delivery.Courier.ROOM_DOM_NODE.required = byCourier;
 
     if (byCourier) {
       window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
@@ -569,7 +569,7 @@
     }
     Delivery.Courier.STREET_DOM_NODE.disabled = !byCourier;
     Delivery.Courier.HOUSE_DOM_NODE.disabled = !byCourier;
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
+    Delivery.Courier.ROOM_DOM_NODE.disabled = !byCourier;
   }
 
   function deliveryInformationChangeHandler(evt) {
@@ -655,7 +655,7 @@
     Delivery.Courier.STREET_DOM_NODE.disabled = shouldBeDisabled;
     Delivery.Courier.HOUSE_DOM_NODE.disabled = shouldBeDisabled;
     Delivery.Courier.FLOOR_DOM_NODE.disabled = shouldBeDisabled;
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
+    Delivery.Courier.ROOM_DOM_NODE.disabled = shouldBeDisabled;
   }
 
 })();
