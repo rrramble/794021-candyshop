@@ -138,7 +138,7 @@
       MAIN_SELECTOR: '.deliver__courier',
 
       STREET_DOM_NODE: document.querySelector('#deliver__street'),
-      HOUSE_SELECTOR: '#deliver__house',
+      HOUSE_DOM_NODE: document.querySelector('#deliver__house'),
       FLOOR_SELECTOR: '#deliver__floor',
       ROOM_SELECTOR: '#deliver__room'
     },
@@ -375,14 +375,14 @@
 
   function resetDeliveryValues() {
     Delivery.Courier.STREET_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Delivery.Courier.HOUSE_SELECTOR, '');
+    Delivery.Courier.HOUSE_DOM_NODE.value = '';
     window.utils.setDomValue(document, Delivery.Courier.FLOOR_SELECTOR, '');
     window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
   }
 
   function resetDeliveryValidity() {
     window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
-    window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
     window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
@@ -552,7 +552,7 @@
 
   function adjustFormForDeliveryByCourier(byCourier) {
     Delivery.Courier.STREET_DOM_NODE.required = byCourier;
-    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    Delivery.Courier.HOUSE_DOM_NODE.required = byCourier;
     window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
 
     if (byCourier) {
@@ -568,7 +568,7 @@
       return;
     }
     Delivery.Courier.STREET_DOM_NODE.disabled = !byCourier;
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
+    Delivery.Courier.HOUSE_DOM_NODE.disabled = !byCourier;
     window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
   }
 
@@ -587,11 +587,11 @@
         break;
       case (!isHouseValid()):
         window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
-        window.utils.setDomValid(false, Delivery.Courier.HOUSE_SELECTOR);
+        window.utils.setDomNodeValidity(false, Delivery.Courier.HOUSE_DOM_NODE);
         break;
       case (isFloorTyped() && !isFloorValid()):
         window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
-        window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
+        window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
         window.utils.setDomValid(false, Delivery.Courier.FLOOR_SELECTOR);
         break;
       default:
@@ -605,7 +605,7 @@
     }
 
     function isHouseValid() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.HOUSE_SELECTOR);
+      var value = Delivery.Courier.HOUSE_DOM_NODE.value;
       var noFillings = window.utils.trimSpaces(value);
       return noFillings.length > 0;
     }
@@ -653,7 +653,7 @@
     Payment.CARD_HOLDER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
 
     Delivery.Courier.STREET_DOM_NODE.disabled = shouldBeDisabled;
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.HOUSE_SELECTOR);
+    Delivery.Courier.HOUSE_DOM_NODE.disabled = shouldBeDisabled;
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.FLOOR_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
   }
