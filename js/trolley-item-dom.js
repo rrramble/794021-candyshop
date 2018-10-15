@@ -21,7 +21,6 @@
     setImage(baseNode, commodity.picture, commodity.name);
     setPrice(baseNode, commodity.price);
     setAmount(baseNode, commodity.amount);
-    setNameAndId(baseNode, '------placeholder-----');
     return baseNode;
 
     // End of constructor body
@@ -47,12 +46,6 @@
     function setAmount(node, amount) {
       window.utils.setDomValue(node, '.card-order__count', amount);
     }
-
-    function setNameAndId(node, name) {
-      window.utils.setDomName(node, '.card-order__count', name);
-      window.utils.setDomId(node, '.card-order__count', 'card-order__' + name);
-    }
-
   };
 
 })();
