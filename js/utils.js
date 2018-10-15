@@ -414,7 +414,7 @@
 
   function setDomNodeAttribute(shouldBeSet, parameter, value, baseNode) {
     if (shouldBeSet) {
-      baseNode.setAttribute(parameter, value)
+      baseNode.setAttribute(parameter, value);
     } else {
       baseNode.removeAttribute(parameter);
     }
