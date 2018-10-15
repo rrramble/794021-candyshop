@@ -145,42 +145,15 @@
   };
 
 
-  /*
-   * Main code
-   */
-
-  window.Backend.get(downloadSuccessHandler, downloadUploadErrorHandler);
-  Delivery.Courier.FLOOR_DOM_NODE.type = 'number';
-  return;
-
-  /*
-   * End of main code
-   */
-
+  // Variables for the namespace
 
   var catalog;
   var trolley;
   var dom;
   var filterRange;
 
-  function downloadSuccessHandler(data) {
-    catalog = new window.Catalog(function () {
-      return data;
-    });
-    trolley = new window.Trolley(catalog);
 
-    dom = new window.Dom(
-        catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
-        trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
-    );
-    dom.setFunctionOnTrolleyEmpty(blockAllFormFields);
-    dom.setFunctionOnTrolleyNotEmpty(unblockAllFormFields);
-
-    filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
-    setInterfaceHandlers();
-  }
-
-  function setInterfaceHandlers() {
+  var setInterfaceHandlers = function () {
     setFieldsForCardPayment(true);
     setContactsToBeRequired(true);
     deliveryTypeChangeHandler();
@@ -210,29 +183,29 @@
       addEventListener('change', deliveryInformationChangeHandler);
 
     Order.MAIN_DOM_NODE.addEventListener('submit', formSubmitHandler);
-  }
+  };
 
 
   /*
    * Overall order form checking
    */
 
-  function filterInputChangeHandler(evt) {
+  var filterInputChangeHandler = function (evt) {
     window.utils.debounce(function () {
       dom.filterFormHandler(evt);
     }, DEBOUNCE_TIME);
-  }
+  };
 
-  function filterShowAllHandler(evt) {
+  var filterShowAllHandler = function (evt) {
     evt.preventDefault();
     dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
-  }
+  };
 
-  function filterPriceRangeHandler(evt) {
+  var filterPriceRangeHandler = function (evt) {
     filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
-  }
+  };
 
-  function formSubmitHandler(evt) {
+  var formSubmitHandler = function (evt) {
     evt.preventDefault();
     if (isTrolleyEmpty(trolley)) {
       return;
@@ -240,30 +213,24 @@
     checkContacts();
     checkPaymentInformation();
     checkDeliveryInformation();
-
     window.Backend.put(getFormData(), uploadSuccessHandler, downloadUploadErrorHandler);
-  }
+  };
 
-  function getFormData() {
+  var getFormData = function () {
     return Order.MAIN_DOM_NODE;
-  }
+  };
 
-  function uploadSuccessHandler() {
+  var uploadSuccessHandler = function () {
     resetOrderForm();
     showModal(Order.MODAL_SUCCESS_DOM_NODE);
-  }
+  };
 
-  function downloadUploadErrorHandler() {
+  var downloadUploadErrorHandler = function () {
     showModal(Order.MODAL_ERROR_DOM_NODE);
-  }
+  };
 
-  function showModal(modalNode) {
-    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-    var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
-    closeButtonNode.addEventListener('click', closeModal);
-    document.addEventListener('keydown', closeModal);
-
-    function closeModal(evt) {
+  var showModal = function (modalNode) {
+    var closeModal = function (evt) {
       if (evt.type === 'keydown' && evt.keyCode !== ESC_KEY_CODE) {
         return;
       }
@@ -274,26 +241,32 @@
       closeButtonNode.removeEventListener('click', closeModal);
       document.removeEventListener('keydown', closeModal);
     }
-  }
+
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+    var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
+    closeButtonNode.addEventListener('click', closeModal);
+    document.addEventListener('keydown', closeModal);
+  };
 
   /*
    * Trolley contains goods checking
    */
 
-  function isTrolleyEmpty(trolleyObject) {
+  var isTrolleyEmpty = function (trolleyObject) {
     return trolleyObject.getCount() <= 0;
-  }
+  };
+
 
   /*
    * Contacts handler and checking
    */
 
-  function contactsChangeHandler(evt) {
+  var contactsChangeHandler = function (evt) {
     evt.preventDefault();
     checkContacts();
-  }
+  };
 
-  function checkContacts() {
+  var checkContacts = function () {
     switch (true) {
       case (!isNameValid()):
         window.utils.setDomNodeValidity(false, Contacts.NAME_DOM_NODE);
@@ -305,81 +278,81 @@
       default:
         resetContactsValidity();
     }
+  };
 
-    function isNameValid() {
-      var value = Contacts.NAME_DOM_NODE.value;
-      var trimmed = window.utils.trimAll(value);
-      return trimmed.length > 0;
-    }
+  var isNameValid = function () {
+    var value = Contacts.NAME_DOM_NODE.value;
+    var trimmed = window.utils.trimAll(value);
+    return trimmed.length > 0;
+  };
 
-    function isEmailTyped() {
-      var value = Contacts.EMAIL_DOM_NODE.value;
-      var trimmed = window.utils.trimSpaces(value);
-      return trimmed.length > 0;
-    }
+  var isEmailTyped = function () {
+    var value = Contacts.EMAIL_DOM_NODE.value;
+    var trimmed = window.utils.trimSpaces(value);
+    return trimmed.length > 0;
+  };
 
-    function isEmailValid() {
-      var value = Contacts.EMAIL_DOM_NODE.value;
-      return window.utils.isEmailValid(value);
-    }
-  }
+  var isEmailValid = function () {
+    var value = Contacts.EMAIL_DOM_NODE.value;
+    return window.utils.isEmailValid(value);
+  };
 
-  function resetContactsValidity() {
+  var resetContactsValidity = function () {
     window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
     window.utils.setDomNodeValidity(true, Contacts.PHONE_DOM_NODE);
     window.utils.setDomNodeValidity(true, Contacts.EMAIL_DOM_NODE);
-  }
+  };
 
-  function resetContactsValues() {
+  var resetContactsValues = function () {
     Contacts.NAME_DOM_NODE.value = '';
     Contacts.PHONE_DOM_NODE.value = '';
     Contacts.EMAIL_DOM_NODE.value = '';
-  }
+  };
 
-  function resetCardValidity() {
+  var resetCardValidity = function () {
     window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
     window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
     window.utils.setDomNodeValidity(true, Payment.CARD_CVC_INPUT_DOM_NODE);
     window.utils.setDomNodeValidity(true, Payment.CARD_HOLDER_INPUT_DOM_NODE);
-  }
+  };
 
-  function resetCardValues() {
+  var resetCardValues = function () {
     Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
     Payment.CARD_DATE_INPUT_DOM_NODE.value = '';
     Payment.CARD_CVC_INPUT_DOM_NODE.value = '';
     Payment.CARD_HOLDER_INPUT_DOM_NODE.value = '';
-  }
+  };
 
-  function resetDeliveryValues() {
+  var resetDeliveryValues = function () {
     Delivery.Courier.STREET_DOM_NODE.value = '';
     Delivery.Courier.HOUSE_DOM_NODE.value = '';
     Delivery.Courier.FLOOR_DOM_NODE.value = '';
     Delivery.Courier.FLOOR_DOM_NODE.type = 'number';
     Delivery.Courier.ROOM_DOM_NODE.value = '';
-  }
+  };
 
-  function resetDeliveryValidity() {
+  var resetDeliveryValidity = function () {
     window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
     window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
     window.utils.setDomNodeValidity(true, Delivery.Courier.FLOOR_DOM_NODE);
     window.utils.setDomNodeValidity(true, Delivery.Courier.ROOM_DOM_NODE);
-  }
+  };
 
-  function resetOrderForm() {
+  var resetOrderForm = function () {
     resetContactsValidity();
     resetContactsValues();
     resetCardValidity();
     resetCardValues();
     resetDeliveryValues();
     resetDeliveryValidity();
-  }
+  };
 
 
   /*
    * Payment handler and checking
    */
 
-  function paymentTypeChangeHandler() {
+  var paymentTypeChangeHandler = function () {
     switch (true) {
       case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
         adjustFormForPaymentByCard(true);
@@ -388,9 +361,9 @@
         adjustFormForPaymentByCard(false);
         break;
     }
-  }
+  };
 
-  function adjustFormForPaymentByCard(byCard) {
+  var adjustFormForPaymentByCard = function (byCard) {
     if (!byCard) {
       window.utils.hideHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
       window.utils.showHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
@@ -401,9 +374,9 @@
       window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
       setFieldsForCardPayment(true);
     }
-  }
+  };
 
-  function setFieldsForCardPayment(isToBeSet) {
+  var setFieldsForCardPayment = function (isToBeSet) {
     if (isToBeSet && trolley.getCount() <= 0) {
       return;
     }
@@ -444,13 +417,13 @@
     window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_HOLDER_MIN_WIDTH,
         Payment.CARD_HOLDER_INPUT_DOM_NODE
     );
-  }
+  }; // setFieldsForCardPayment
 
-  function paymentInformationChangeHandler() {
+  var paymentInformationChangeHandler = function () {
     checkPaymentInformation();
-  }
+  };
 
-  function checkPaymentInformation() {
+  var checkPaymentInformation = function () {
     switch (true) {
       case (!window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
         resetCardValidity();
@@ -481,43 +454,43 @@
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_VALID_MESSAGE);
         resetCardValidity();
     }
+  };
 
-    function isCardNumberValid() {
-      var cardNumber = Payment.CARD_NUMBER_INPUT_DOM_NODE.value;
-      return window.utils.isLuhnChecked(cardNumber);
-    }
+  var isCardNumberValid = function () {
+    var cardNumber = Payment.CARD_NUMBER_INPUT_DOM_NODE.value;
+    return window.utils.isLuhnChecked(cardNumber);
+  };
 
-    function isCardDateValid() {
-      var cardDate = Payment.CARD_DATE_INPUT_DOM_NODE.value;
-      return window.utils.isCardDateChecked(cardDate);
-    }
+  var isCardDateValid = function () {
+    var cardDate = Payment.CARD_DATE_INPUT_DOM_NODE.value;
+    return window.utils.isCardDateChecked(cardDate);
+  };
 
-    function isCardCvcValid() {
-      var cvc = Payment.CARD_CVC_INPUT_DOM_NODE.value;
-      return window.utils.isCvcChecked(cvc);
-    }
+  var isCardCvcValid = function () {
+    var cvc = Payment.CARD_CVC_INPUT_DOM_NODE.value;
+    return window.utils.isCvcChecked(cvc);
+  };
 
-    function isCardholderNameValid() {
-      var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value;
-      return window.utils.isCacrdholderNameChecked(cardholder);
-    }
-  }
+  var isCardholderNameValid = function () {
+    var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value;
+    return window.utils.isCacrdholderNameChecked(cardholder);
+  };
 
-  function setContactsToBeRequired(isToBeSet) {
+  var setContactsToBeRequired = function (isToBeSet) {
     Contacts.NAME_DOM_NODE.required = isToBeSet;
     window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_DOM_NODE);
 
     Contacts.PHONE_DOM_NODE.required = isToBeSet;
     window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_DOM_NODE);
     window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_DOM_NODE);
-  }
+  };
 
 
   /*
    * Delivery handler and checking
    */
 
-  function deliveryTypeChangeHandler() {
+  var deliveryTypeChangeHandler = function () {
     switch (true) {
       case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
         adjustFormForDeliveryByCourier(true);
@@ -526,9 +499,9 @@
         adjustFormForDeliveryByCourier(false);
         break;
     }
-  }
+  };
 
-  function adjustFormForDeliveryByCourier(byCourier) {
+  var adjustFormForDeliveryByCourier = function (byCourier) {
     Delivery.Courier.STREET_DOM_NODE.required = byCourier;
     Delivery.Courier.HOUSE_DOM_NODE.required = byCourier;
     Delivery.Courier.ROOM_DOM_NODE.required = byCourier;
@@ -548,14 +521,14 @@
     Delivery.Courier.STREET_DOM_NODE.disabled = !byCourier;
     Delivery.Courier.HOUSE_DOM_NODE.disabled = !byCourier;
     Delivery.Courier.ROOM_DOM_NODE.disabled = !byCourier;
-  }
+  };
 
-  function deliveryInformationChangeHandler(evt) {
+  var deliveryInformationChangeHandler = function (evt) {
     evt.preventDefault();
     checkDeliveryInformation(evt);
-  }
+  };
 
-  function checkDeliveryInformation(evt) {
+  var checkDeliveryInformation = function (evt) {
     switch (true) {
       case (!!evt && !!Delivery.Map[evt.srcElement.id]):
         setSubwayMap(evt);
@@ -575,52 +548,52 @@
       default:
         resetDeliveryValidity();
     }
+  };
 
-    function isStreetValid() {
-      var value = Delivery.Courier.STREET_DOM_NODE.value;
-      var noFillings = window.utils.trimSpaces(value);
-      return noFillings.length > 0;
-    }
+  var isStreetValid = function () {
+    var value = Delivery.Courier.STREET_DOM_NODE.value;
+    var noFillings = window.utils.trimSpaces(value);
+    return noFillings.length > 0;
+  };
 
-    function isHouseValid() {
-      var value = Delivery.Courier.HOUSE_DOM_NODE.value;
-      var noFillings = window.utils.trimSpaces(value);
-      return noFillings.length > 0;
-    }
+  var isHouseValid = function () {
+    var value = Delivery.Courier.HOUSE_DOM_NODE.value;
+    var noFillings = window.utils.trimSpaces(value);
+    return noFillings.length > 0;
+  };
 
-    function isFloorTyped() {
-      var value = Delivery.Courier.FLOOR_DOM_NODE.value;
-      return value.length > 0;
-    }
+  var isFloorTyped = function () {
+    var value = Delivery.Courier.FLOOR_DOM_NODE.value;
+    return value.length > 0;
+  };
 
-    function isFloorValid() {
-      var value = Delivery.Courier.FLOOR_DOM_NODE.value;
-      return window.utils.isNumber(value);
-    }
-  }
+  var isFloorValid = function () {
+    var value = Delivery.Courier.FLOOR_DOM_NODE.value;
+    return window.utils.isNumber(value);
+  };
 
-  function isTakeoutSelected() {
+  var isTakeoutSelected = function () {
     return Delivery.SELF_TAKE_OUT_DOM_NODE.checked;
-  }
+  };
 
-  function setSubwayMap(evt) {
+  var setSubwayMap = function (evt) {
     var htmlId = evt.srcElement.id;
     var altText = Delivery.Map[htmlId].name;
     var fileName = Delivery.Map[htmlId].filename;
     var mapFullUrl = Delivery.MAP_PATH + fileName;
     window.utils.setDomNodeImage(Delivery.Store.MAP_DOM_NODE, mapFullUrl, altText);
-  }
+  };
 
-  function blockAllFormFields() {
+  var blockAllFormFields = function () {
     disableAllFormFields(true);
-  }
+  };
 
-  function unblockAllFormFields() {
+  var unblockAllFormFields = function () {
     disableAllFormFields(false);
     paymentTypeChangeHandler();
-  }
+  };
 
-  function disableAllFormFields(shouldBeDisabled) {
+  var disableAllFormFields = function (shouldBeDisabled) {
     Contacts.NAME_DOM_NODE.disabled = shouldBeDisabled;
     Contacts.PHONE_DOM_NODE.disabled = shouldBeDisabled;
     Contacts.EMAIL_DOM_NODE.disabled = shouldBeDisabled;
@@ -634,6 +607,32 @@
     Delivery.Courier.HOUSE_DOM_NODE.disabled = shouldBeDisabled;
     Delivery.Courier.FLOOR_DOM_NODE.disabled = shouldBeDisabled;
     Delivery.Courier.ROOM_DOM_NODE.disabled = shouldBeDisabled;
-  }
+  };
+
+  var downloadSuccessHandler = function (data) {
+    catalog = new window.Catalog(function () {
+      return data;
+    });
+    trolley = new window.Trolley(catalog);
+
+    dom = new window.Dom(
+        catalog, GOODS_HTML_TEMPLATE_SELECTOR, GOODS_HTML_SELECTOR,
+        trolley, TROLLEY_HTML_TEMPLATE_SELECTOR, TROLLEY_HTML_SELECTOR
+    );
+    dom.setFunctionOnTrolleyEmpty(blockAllFormFields);
+    dom.setFunctionOnTrolleyNotEmpty(unblockAllFormFields);
+
+    filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
+    setInterfaceHandlers();
+  };
+
+
+  // Beginning of the main code
+
+  window.Backend.get(downloadSuccessHandler, downloadUploadErrorHandler);
+  Delivery.Courier.FLOOR_DOM_NODE.type = 'number';
+  return;
+
+  // End of the main code
 
 })();
