@@ -184,50 +184,29 @@
     setContactsToBeRequired(true);
     deliveryTypeChangeHandler();
 
-    window.utils.setDomEventHandler(
-        document, FilterForm.MAIN_SELECTOR,
-        filterInputChangeHandler,
-        'change'
-    );
+    document.querySelector(FilterForm.MAIN_SELECTOR).
+      addEventListener('change', filterInputChangeHandler);
 
-    window.utils.setDomEventHandler(
-        document, FilterForm.SHOW_ALL_HTML_SELECTOR,
-        filterShowAllHandler,
-        'click'
-    );
+    document.querySelector(FilterForm.SHOW_ALL_HTML_SELECTOR).
+      addEventListener('click', filterShowAllHandler);
 
-    window.utils.setDomEventHandler(
-        document, FilterRange.MAIN_SELECTOR,
-        filterPriceRangeHandler,
-        'mousedown'
-    );
+    document.querySelector(FilterRange.MAIN_SELECTOR).
+      addEventListener('mousedown', filterPriceRangeHandler);
 
     document.querySelector(Contacts.MAIN_SELECTOR).
       addEventListener('change', contactsChangeHandler);
 
-    window.utils.setDomEventHandler(
-        document, Payment.METHOD_SELECTOR,
-        paymentTypeChangeHandler,
-        'click'
-    );
+    document.querySelector(Payment.METHOD_SELECTOR).
+      addEventListener('click', paymentTypeChangeHandler);
 
-    window.utils.setDomEventHandler(
-        document, Payment.MAIN_SELECTOR,
-        paymentInformationChangeHandler,
-        'change'
-    );
+    document.querySelector(Payment.MAIN_SELECTOR).
+      addEventListener('change', paymentInformationChangeHandler);
 
-    window.utils.setDomEventHandler(
-        document, Delivery.TYPE_SELECTOR,
-        deliveryTypeChangeHandler,
-        'change'
-    );
+    document.querySelector(Delivery.TYPE_SELECTOR).
+      addEventListener('change', deliveryTypeChangeHandler);
 
-    window.utils.setDomEventHandler(
-        document, Delivery.Store.MAIN_SELECTOR,
-        deliveryInformationChangeHandler,
-        'change'
-    );
+    document.querySelector(Delivery.Store.MAIN_SELECTOR).
+      addEventListener('change', deliveryInformationChangeHandler);
 
     Order.MAIN_DOM_NODE.addEventListener('submit', formSubmitHandler);
   }
