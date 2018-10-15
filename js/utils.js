@@ -302,7 +302,7 @@
   function isCacrdholderNameChecked(fullName) {
     var noFillings = window.utils.trimAll(fullName);
     return window.utils.isInRangeUpTo(noFillings.length,
-      Card.HOLDER_MIN_LENGTH, Card.HOLDER_MAX_LENGTH
+        Card.HOLDER_MIN_LENGTH, Card.HOLDER_MAX_LENGTH
     );
   }
 
@@ -413,9 +413,11 @@
   }
 
   function setDomNodeAttribute(shouldBeSet, parameter, value, baseNode) {
-    shouldBeSet ?
-      baseNode.setAttribute(parameter, value) :
+    if (shouldBeSet) {
+      baseNode.setAttribute(parameter, value)
+    } else {
       baseNode.removeAttribute(parameter);
+    }
   }
 
   function blockInput(shouldBeBlocked, selector, node) {
