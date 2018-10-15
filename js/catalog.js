@@ -15,51 +15,22 @@
     'rating': sortRating
   };
 
-  window.Catalog = function (loadGoods) {
-    // Initialization of the functions
-    this.getGoods = getGoods;
-    this.getItem = getItem;
-    this.getAmount = getAmount;
-    this.getCategoryCount = getCategoryCount;
-    this.getUnfilteredCount = getUnfilteredCount;
-    this.getIngredientsCount = getIngredientsCount;
-    this.getFavoriteCount = getFavoriteCount;
-    this.getCount = getCount;
-    this.getInStockCount = getInStockCount;
-    this.getFavoriteStatus = getFavoriteStatus;
-    this.getPrices = getPrices;
-    this.getMinPrice = getMinPrice;
-    this.getMaxPrice = getMaxPrice;
-    this.putItem = putItem;
-    this.takeItem = takeItem;
-    this.toggleFavorite = toggleFavorite;
-    this.filterItem = filterItem;
-    this.unfilterItem = unfilterItem;
-    this.isFiltered = isFiltered;
-    this.canBeFiltered = canBeFiltered;
-    this.applyFilter = applyFilter;
-    this.sort = sort;
-    this.tuneData = tuneData;
+  window.Catalog = function(loadGoods) {
 
-    this.goods = loadGoods();
-    this.tuneData();
-    return;
-    // End of constructor
-
-    function getGoods() {
+    this.getGoods = function() {
       return this.goods;
     }
 
-    function getItem(id) {
+    this.getItem = function(id) {
       var result = this.getGoods().filter(function (commodity) {
         return commodity.id.toString() === id.toString();
       });
       return result[0];
     }
 
-    function getAmount(id) {
+    this.getAmount = function(id) {
       return this.getItem(id).amount;
-    }
+    };
 
     function getCategoryCount(category) {
       return this.getGoods().reduce(function (accu, item) {
@@ -201,6 +172,41 @@
         item.filtered = false;
       });
     }
+
+
+
+    // Initialization of the functions
+    this.getGoods = getGoods;
+    this.getItem = getItem;
+    this.getAmount = getAmount;
+    this.getCategoryCount = getCategoryCount;
+    this.getUnfilteredCount = getUnfilteredCount;
+    this.getIngredientsCount = getIngredientsCount;
+    this.getFavoriteCount = getFavoriteCount;
+    this.getCount = getCount;
+    this.getInStockCount = getInStockCount;
+    this.getFavoriteStatus = getFavoriteStatus;
+    this.getPrices = getPrices;
+    this.getMinPrice = getMinPrice;
+    this.getMaxPrice = getMaxPrice;
+    this.putItem = putItem;
+    this.takeItem = takeItem;
+    this.toggleFavorite = toggleFavorite;
+    this.filterItem = filterItem;
+    this.unfilterItem = unfilterItem;
+    this.isFiltered = isFiltered;
+    this.canBeFiltered = canBeFiltered;
+    this.applyFilter = applyFilter;
+    this.sort = sort;
+    this.tuneData = tuneData;
+
+
+    // Beginning of the constructor
+    this.goods = loadGoods();
+    this.tuneData();
+    return;
+    // End of the constructor
+
 
   }; // End of the class
 
