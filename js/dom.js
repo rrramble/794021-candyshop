@@ -220,11 +220,11 @@
 
     function updateFavoriteAmount() {
       updateFilterAmount(
-        FilterForm.FAVORITE,
-        FilterForm.VALUE_SELECTOR,
-        this.catalog.getFavoriteCount.bind(this.catalog)
+          FilterForm.FAVORITE,
+          FilterForm.VALUE_SELECTOR,
+          this.catalog.getFavoriteCount.bind(this.catalog)
       );
-    };
+    }
 
     function commodityClickHandler(evt) {
       var commodityId = findParentCommodityId(evt);
@@ -369,7 +369,7 @@
 
     function renderTrolleyDom() {
       var node = document.createDocumentFragment();
-      this.trolley.getGoods().reduce(function(accu, commodity) {
+      this.trolley.getGoods().reduce(function (accu, commodity) {
         return commodity.amount <= 0 ? node :
           node.appendChild(this.trolleyNodes[commodity.id]);
       }, node);
@@ -592,7 +592,7 @@
       return false;
     }
     var firstLetters = htmlId.slice(0, COMMODITY_HTML_SELECTOR_HEAD.length - 1);
-    var firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
+    firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
     return firstLetters === COMMODITY_HTML_SELECTOR_HEAD;
   }
 
@@ -601,13 +601,13 @@
       return false;
     }
     var firstLetters = htmlId.slice(0, TROLLEY_HTML_SELECTOR_HEAD.length - 1);
-    var firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
+    firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
     return firstLetters === TROLLEY_HTML_SELECTOR_HEAD;
   }
 
   function findParentCommodityId(evt) {
     var evtPath = evt.path || (evt.composedPath && evt.composedPath());
-    var htmlId = evtPath.reduce(function(accu, path) {
+    var htmlId = evtPath.reduce(function (accu, path) {
       if (isCommodityHtmlId(path.id)) {
         return convertCommodityHtmlIdToCommodityId(path.id)
       } else if (isTrolleyHtmlId(path.id)) {
@@ -620,6 +620,7 @@
     if (htmlId !== -1) {
       return htmlId;
     }
+    return undefined;
   }
 
   function fulfillFilterAmount(obj) {
