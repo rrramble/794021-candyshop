@@ -240,7 +240,7 @@
       modalNode.classList.add(Order.MODAL_HIDDEN_CLASS);
       closeButtonNode.removeEventListener('click', closeModal);
       document.removeEventListener('keydown', closeModal);
-    }
+    };
 
     modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
     var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
