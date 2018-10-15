@@ -11,6 +11,8 @@
 
   var TROLLEY_HTML_SELECTOR_HEAD = '#trolley-commodity';
   var TROLLEY_HTML_ID_HEAD = 'trolley-commodity';
+  var TROLLEY_TOTAL_DOM_NODE = document.querySelector('.main-header__basket');
+  var NO_COMMODITY_IN_TROLLEY_MESSAGE = 'В корзине ничего нет';
 
   var CATALOG_WRAPPER_SELECTOR = '.catalog__cards-wrap';
   var CATALOG_LOADING_MESSAGE_DOM_NODE = document.querySelector('.catalog__load');
@@ -267,11 +269,11 @@
 
     this.updateTrolleyInfo = function () {
       if (this.trolley.isEmpty()) {
-        window.utils.setDomTextContent(document, '.main-header__basket', 'В корзине ничего нет');
+        TROLLEY_TOTAL_DOM_NODE.textContent = NO_COMMODITY_IN_TROLLEY_MESSAGE;
       } else {
         var text = 'Товаров в корзине: ' + this.trolley.getCount();
         text += ' , на сумму: ' + this.trolley.getTotalOrderedSum() + ' ₽';
-        window.utils.setDomTextContent(document, '.main-header__basket', text);
+        TROLLEY_TOTAL_DOM_NODE.textContent = text;
       }
     };
 
