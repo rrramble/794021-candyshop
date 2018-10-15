@@ -37,7 +37,8 @@
 
   var Contacts = {
     MAIN_SELECTOR: '.contact-data',
-    NAME_SELECTOR: '#contact-data__name',
+
+    NAME_DOM_NODE: document.querySelector('#contact-data__name'),
     NAME_MIN_LENGTH: 1,
 
     PHONE_SELECTOR: '#contact-data__tel',
@@ -317,10 +318,10 @@
   function checkContacts() {
     switch (true) {
       case (!isNameValid()):
-        window.utils.setDomValid(false, Contacts.NAME_SELECTOR);
+        window.utils.setDomNodeValidity(false, Contacts.NAME_DOM_NODE);
         break;
       case (isEmailTyped() && !isEmailValid()):
-        window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
+        window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
         window.utils.setDomValid(false, Contacts.EMAIL_SELECTOR);
         break;
       default:
@@ -328,7 +329,7 @@
     }
 
     function isNameValid() {
-      var value = window.utils.getDomValue(document, Contacts.NAME_SELECTOR);
+      var value = Contacts.NAME_DOM_NODE.value;
       var trimmed = window.utils.trimAll(value);
       return trimmed.length > 0;
     }
@@ -346,13 +347,13 @@
   }
 
   function resetContactsValidity() {
-    window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
+    window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
     window.utils.setDomValid(true, Contacts.PHONE_SELECTOR);
     window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
   }
 
   function resetContactsValues() {
-    window.utils.setDomValue(document, Contacts.NAME_SELECTOR, '');
+    Contacts.NAME_DOM_NODE.value = '';
     window.utils.setDomValue(document, Contacts.PHONE_SELECTOR, '');
     window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
   }
@@ -524,8 +525,8 @@
   }
 
   function setContactsToBeRequired(isToBeSet) {
-    window.utils.setInputToBeRequired(isToBeSet, Contacts.NAME_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_SELECTOR);
+    Contacts.NAME_DOM_NODE.required = isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_DOM_NODE);
 
     window.utils.setInputToBeRequired(isToBeSet, Contacts.PHONE_SELECTOR);
     window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_SELECTOR);
@@ -641,7 +642,7 @@
   }
 
   function disableAllFormFields(shouldBeDisabled) {
-    window.utils.blockInput(shouldBeDisabled, Contacts.NAME_SELECTOR);
+    Contacts.NAME_DOM_NODE.disabled = shouldBeDisabled;
     window.utils.blockInput(shouldBeDisabled, Contacts.PHONE_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
 
