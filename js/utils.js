@@ -6,7 +6,7 @@
 
 (function () {
 
-  var SELECTOR_HIDDEN = '.visually-hidden';
+  var VISUALLY_HIDDEN_HTML_CLASS = 'visually-hidden';
 
   var Card = {
     NUMBER_LENGTHS: [16, 17, 18, 19],
@@ -64,14 +64,20 @@
 
   var showHtmlSelector = function (node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var className = window.utils.convertHtmlSelectorToHtmlClass(SELECTOR_HIDDEN);
-    el.classList.remove(className);
+    el.classList.remove(VISUALLY_HIDDEN_HTML_CLASS);
+  };
+
+  var showDomNodeVisually = function (baseNode) {
+    baseNode.classList.remove(VISUALLY_HIDDEN_HTML_CLASS);
   };
 
   var hideHtmlSelector = function (node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var className = window.utils.convertHtmlSelectorToHtmlClass(SELECTOR_HIDDEN);
-    el.classList.add(className);
+    el.classList.add(VISUALLY_HIDDEN_HTML_CLASS);
+  };
+
+  var hideDomNodeVisually = function (baseNode) {
+    baseNode.classList.add(VISUALLY_HIDDEN_HTML_CLASS);
   };
 
   var convertHtmlClassToHtmlSelector = function (htmlClass) {
@@ -397,6 +403,9 @@
     convertHtmlSelectorToHtmlClass: convertHtmlSelectorToHtmlClass,
     showHtmlSelector: showHtmlSelector,
     hideHtmlSelector: hideHtmlSelector,
+    showDomNodeVisually: showDomNodeVisually,
+    hideDomNodeVisually: hideDomNodeVisually,
+
     convertHtmlClassToHtmlSelector: convertHtmlClassToHtmlSelector,
     querySelectorIncludingSelf: querySelectorIncludingSelf,
     isNumber: isNumber,
