@@ -17,11 +17,11 @@
     MAX_CVC: 999,
     HOLDER_MIN_LENGTH: 1,
     HOLDER_MAX_LENGTH: 200
-  }
+  };
 
   var Text = {
     INCORRECT_DATA: 'Некорректные данные'
-  }
+  };
 
   // Thanks to https://emailregex.com/
   var EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -115,14 +115,14 @@
 
   function removeCssClass(objectClass, classToBeRemoved) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
-    domObjects.forEach(function(domObject) {
+    domObjects.forEach(function (domObject) {
       domObject.classList.remove(classToBeRemoved);
     });
   }
 
   function addCssClass(objectClass, classToBeAdded) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
-    domObjects.forEach(function(domObject) {
+    domObjects.forEach(function (domObject) {
       domObject.classList.add(classToBeAdded);
     });
   }
@@ -207,10 +207,6 @@
   function setDomTextContent(node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.textContent = data;
-  }
-
-  function setDomNodeTextContent(node, value) {
-    node.textContent = value;
   }
 
   function getDomTextContent(node, htmlSelector) {
