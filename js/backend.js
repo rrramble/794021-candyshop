@@ -20,20 +20,15 @@
     }
   };
 
-  window.Backend = {
-    get: get,
-    put: put
+  var processResult = function (result, onLoad, onError) {
+    if (window.utils.HttpCode.isSuccess(result.status)) {
+      onLoad(result.response);
+    } else {
+      onError(result.status + '. ' + result.statusText);
+    }
   };
 
-  function get(onLoad, onError) {
-    processXhr(Host.Download, onLoad, onError);
-  }
-
-  function put(data, onLoad, onError) {
-    processXhr(Host.Upload, onLoad, onError, data);
-  }
-
-  function processXhr(connection, onLoad, onError, data) {
+  var processXhr = function (connection, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
 
     xhr.addEventListener('load', function () {
@@ -60,15 +55,19 @@
     } catch (err) {
       onError(err.name + ' ' + err.message);
     }
+  };
 
-  }
+  var get = function (onLoad, onError) {
+    processXhr(Host.Download, onLoad, onError);
+  };
 
-  function processResult(result, onLoad, onError) {
-    if (window.utils.HttpCode.isSuccess(result.status)) {
-      onLoad(result.response);
-    } else {
-      onError(result.status + '. ' + result.statusText);
-    }
-  }
+  var put = function (data, onLoad, onError) {
+    processXhr(Host.Upload, onLoad, onError, data);
+  };
+
+  window.Backend = {
+    get: get,
+    put: put
+  };
 
 })();
