@@ -41,7 +41,7 @@
     NAME_DOM_NODE: document.querySelector('#contact-data__name'),
     NAME_MIN_LENGTH: 1,
 
-    PHONE_SELECTOR: '#contact-data__tel',
+    PHONE_DOM_NODE: document.querySelector('#contact-data__tel'),
     PHONE_MIN_LENGTH: 10,
     PHONE_MAX_LENGTH: 22,
 
@@ -348,13 +348,13 @@
 
   function resetContactsValidity() {
     window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
-    window.utils.setDomValid(true, Contacts.PHONE_SELECTOR);
+    window.utils.setDomNodeValidity(true, Contacts.PHONE_DOM_NODE);
     window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
   }
 
   function resetContactsValues() {
     Contacts.NAME_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Contacts.PHONE_SELECTOR, '');
+    Contacts.PHONE_DOM_NODE.value = '';
     window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
   }
 
@@ -528,9 +528,9 @@
     Contacts.NAME_DOM_NODE.required = isToBeSet;
     window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_DOM_NODE);
 
-    window.utils.setInputToBeRequired(isToBeSet, Contacts.PHONE_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_SELECTOR);
+    Contacts.PHONE_DOM_NODE.required = isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_DOM_NODE);
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_DOM_NODE);
   }
 
 
@@ -643,7 +643,7 @@
 
   function disableAllFormFields(shouldBeDisabled) {
     Contacts.NAME_DOM_NODE.disabled = shouldBeDisabled;
-    window.utils.blockInput(shouldBeDisabled, Contacts.PHONE_SELECTOR);
+    Contacts.PHONE_DOM_NODE.disabled = shouldBeDisabled;
     window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
 
     Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
