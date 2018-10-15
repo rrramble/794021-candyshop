@@ -453,12 +453,12 @@
   };
 
 
-  function deleteDisplayingInTrolley(commodityId) {
+  var deleteDisplayingInTrolley = function (commodityId) {
     var commodityNode = document.querySelector(convertCommodityIdToTrolleySelector(commodityId));
     commodityNode.remove();
-  }
+  };
 
-  function getCheckedInputs(listOfInputs) {
+  var getCheckedInputs = function (listOfInputs) {
     return listOfInputs.reduce(function (accu, item) {
       var id = Object.keys(item)[0];
       var value = item[id];
@@ -470,9 +470,9 @@
       }
       return accu;
     }, []);
-  }
+  };
 
-  function getMinPinInputRangeValue(isMin) {
+  var getMinPinInputRangeValue = function (isMin) {
     if (isMin) {
       var textSelector = Filter.MIN_RANGE_BTN_TEXT_SELECTOR;
       var pinSelector = Object.keys(FilterForm.RANGE_PINS[0])[0];
@@ -484,9 +484,9 @@
       return isMin ? -Infinity : +Infinity;
     }
     return window.utils.getDomTextContent(document, textSelector);
-  }
+  };
 
-  function getSortingType() {
+  var getSortingType = function () {
     var result = FilterForm.SORTING_TYPES.reduce(function (currentType, item) {
       var htmlId = Object.keys(item)[0];
       var type = item[htmlId];
@@ -494,42 +494,42 @@
       return currentType;
     }, '');
     return result;
-  }
+  };
 
-  function disableFilterSections(shouldBeDisabled) {
+  var disableFilterSections = function (shouldBeDisabled) {
     disableInputs(FilterForm.CATEGORIES, shouldBeDisabled);
     disableInputs(FilterForm.INGREDIENTS, shouldBeDisabled);
     disableButtons(FilterForm.RANGE_PINS, shouldBeDisabled);
-  }
+  };
 
-  function isShowAllPressed(ownEvt) {
+  var isShowAllPressed = function (ownEvt) {
     return ownEvt.srcElement.classList.contains(FilterForm.SHOW_ALL_HTML_CLASS);
-  }
+  };
 
-  function isFavoritePressed(ownEvt) {
+  var isFavoritePressed = function (ownEvt) {
     var key = Object.keys(FilterForm.FAVORITE[0])[0];
     return ownEvt.srcElement.id === key;
-  }
+  };
 
-  function isFavoriteChecked() {
+  var isFavoriteChecked = function () {
     return isSectionChecked(FilterForm.FAVORITE);
-  }
+  };
 
-  function isInStockPressed(ownEvt) {
+  var isInStockPressed = function (ownEvt) {
     var key = Object.keys(FilterForm.IN_STOCK[0])[0];
     return ownEvt.srcElement.id === key;
-  }
+  };
 
-  function isInStockChecked() {
+  var isInStockChecked = function () {
     return isSectionChecked(FilterForm.IN_STOCK);
-  }
+  };
 
-  function isSectionChecked(section) {
+  var isSectionChecked = function (section) {
     var id = Object.keys(section[0])[0];
     return window.utils.isHtmlIdChecked(id);
-  }
+  };
 
-  function uncheckSectionInputs(formList, exceptionId) {
+  var uncheckSectionInputs = function (formList, exceptionId) {
     formList.forEach(function (item) {
       var id = Object.keys(item)[0];
       if (exceptionId && (exceptionId === id || exceptionId.includes(id))) {
@@ -537,67 +537,67 @@
       }
       window.utils.setInputHtmlIdCheck(id);
     });
-  }
+  };
 
-  function disableInputs(inputs, shouldBeDisabled) {
+  var disableInputs = function (inputs, shouldBeDisabled) {
     inputs.forEach(function (input) {
       var id = Object.keys(input)[0];
       window.utils.disableHtmlId(shouldBeDisabled, id);
     });
-  }
+  };
 
-  function disableButtons(buttons, shouldBeDisabled) {
+  var disableButtons = function (buttons, shouldBeDisabled) {
     buttons.forEach(function (button) {
       var selector = Object.keys(button)[0];
       window.utils.disableHtmlSelector(shouldBeDisabled, selector);
     });
-  }
+  };
 
-  function setSortingByPopular() {
+  var setSortingByPopular = function () {
     var htmlId = Object.keys(FilterForm.SORTING_TYPES[0])[0];
     window.utils.setInputHtmlIdCheck(htmlId, true);
-  }
+  };
 
-  function getTrolleyDomNodeOfCommodityId(commodityId) {
+  var getTrolleyDomNodeOfCommodityId = function (commodityId) {
     var htmlSelector = convertCommodityIdToHtmlSelector(commodityId);
     return document.querySelector(htmlSelector);
-  }
+  };
 
-  function convertCommodityIdToHtmlSelector(commodityId) {
+  var convertCommodityIdToHtmlSelector = function (commodityId) {
     return COMMODITY_HTML_SELECTOR_HEAD + commodityId;
-  }
+  };
 
-  function convertCommodityIdToTrolleySelector(commodityId) {
+  var convertCommodityIdToTrolleySelector = function (commodityId) {
     return TROLLEY_HTML_SELECTOR_HEAD + commodityId;
-  }
+  };
 
-  function convertCommodityHtmlIdToCommodityId(htmlId) {
+  var convertCommodityHtmlIdToCommodityId = function (htmlId) {
     return htmlId.slice(COMMODITY_HTML_ID_HEAD.length, htmlId.length);
-  }
+  };
 
-  function convertTrolleyHtmlIdToCommodityId(htmlId) {
+  var convertTrolleyHtmlIdToCommodityId = function (htmlId) {
     return htmlId.slice(TROLLEY_HTML_ID_HEAD.length, htmlId.length);
-  }
+  };
 
-  function isCommodityHtmlId(htmlId) {
+  var isCommodityHtmlId = function (htmlId) {
     if (!htmlId) {
       return false;
     }
     var firstLetters = htmlId.slice(0, COMMODITY_HTML_SELECTOR_HEAD.length - 1);
     firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
     return firstLetters === COMMODITY_HTML_SELECTOR_HEAD;
-  }
+  };
 
-  function isTrolleyHtmlId(htmlId) {
+  var isTrolleyHtmlId = function (htmlId) {
     if (!htmlId) {
       return false;
     }
     var firstLetters = htmlId.slice(0, TROLLEY_HTML_SELECTOR_HEAD.length - 1);
     firstLetters = window.utils.convertHtmlIdToHtmlSelector(firstLetters);
     return firstLetters === TROLLEY_HTML_SELECTOR_HEAD;
-  }
+  };
 
-  function findParentCommodityId(evt) {
+  var findParentCommodityId = function (evt) {
     var evtPath = evt.path || (evt.composedPath && evt.composedPath());
     var htmlId = evtPath.reduce(function (accu, path) {
       if (isCommodityHtmlId(path.id)) {
@@ -613,7 +613,6 @@
       return htmlId;
     }
     return undefined;
-  }
-
+  };
 
 })();
