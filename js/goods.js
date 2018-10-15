@@ -72,7 +72,6 @@
     CARD_CVC_MIN_LENGTH: 3,
     CARD_CVC_MAX_LENGTH: 3,
 
-    // CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
     CARD_HOLDER_INPUT_DOM_NODE: document.querySelector('#payment__cardholder'),
     CARD_HOLDER_MIN_WIDTH: 1,
 
@@ -362,7 +361,6 @@
     window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
     window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
     window.utils.setDomNodeValidity(true, Payment.CARD_CVC_INPUT_DOM_NODE);
-    // window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
     window.utils.setDomNodeValidity(true, Payment.CARD_HOLDER_INPUT_DOM_NODE);
   }
 
@@ -370,7 +368,6 @@
     Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
     Payment.CARD_DATE_INPUT_DOM_NODE.value = '';
     Payment.CARD_CVC_INPUT_DOM_NODE.value = '';
-    // window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
     Payment.CARD_HOLDER_INPUT_DOM_NODE.value = '';
   }
 
@@ -516,12 +513,12 @@
     }
 
     function isCardCvcValid() {
-      var cvc = Payment.CARD_CVC_INPUT_DOM_NODE.value; // перенести выше
+      var cvc = Payment.CARD_CVC_INPUT_DOM_NODE.value;
       return window.utils.isCvcChecked(cvc);
     }
 
     function isCardholderNameValid() {
-      var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value; // перенести выше
+      var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value;
       return window.utils.isCacrdholderNameChecked(cardholder);
     }
   }
