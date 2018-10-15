@@ -81,7 +81,7 @@
   var Delivery = {
     MAIN_SELECTOR: '.deliver',
     TYPE_SELECTOR: '.deliver__toggle',
-    SELF_TAKE_OUT_ID: 'deliver__store',
+    SELF_TAKE_OUT_DOM_NODE: document.querySelector('#deliver__store'),
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
 
     Store: {
@@ -619,7 +619,7 @@
   }
 
   function isTakeoutSelected() {
-    return window.utils.isHtmlIdChecked(Delivery.SELF_TAKE_OUT_ID);
+    return Delivery.SELF_TAKE_OUT_DOM_NODE.checked;
   }
 
   function setSubwayMap(evt) {
