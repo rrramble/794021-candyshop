@@ -251,7 +251,7 @@
       } else {
         window.utils.hideHtmlSelector(document, EMPTY_FILTER_SELECTOR);
       }
-    }
+    };
 
     this.checkAndRenderTrolleyPlaceholder = function () {
       if (this.trolley.isEmpty()) {
@@ -294,9 +294,10 @@
 
     this.renderTrolleyDom = function () {
       var node = document.createDocumentFragment();
+      var nodes = this.trolleyNodes;
       this.trolley.getGoods().reduce(function (accu, commodity) {
         return commodity.amount <= 0 ? node :
-          node.appendChild(this.trolleyNodes[commodity.id]);
+          node.appendChild(nodes[commodity.id]);
       }, node);
       document.querySelector(this.trolleyParentHtmlSelector).appendChild(node);
       this.checkAndRenderTrolleyPlaceholder();
