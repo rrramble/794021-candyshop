@@ -473,7 +473,7 @@
 
   var isCardholderNameValid = function () {
     var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value;
-    return window.utils.isCacrdholderNameChecked(cardholder);
+    return window.utils.isCardholderNameChecked(cardholder);
   };
 
   var setContactsToBeRequired = function (isToBeSet) {

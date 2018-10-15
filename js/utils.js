@@ -234,7 +234,7 @@
     return window.utils.isInRangeUpTo(number, Card.MIN_CVC, Card.MAX_CVC);
   };
 
-  var isCacrdholderNameChecked = function (fullName) {
+  var isCardholderNameChecked = function (fullName) {
     var noFillings = window.utils.trimAll(fullName);
     return window.utils.isInRangeUpTo(noFillings.length,
         Card.HOLDER_MIN_LENGTH, Card.HOLDER_MAX_LENGTH
@@ -426,7 +426,7 @@
     isLuhnChecked: isLuhnChecked,
     isCardDateChecked: isCardDateChecked,
     isCvcChecked: isCvcChecked,
-    isCacrdholderNameChecked: isCacrdholderNameChecked,
+    isCardholderNameChecked: isCardholderNameChecked,
     isEven: isEven,
     sum: sum,
     trimAll: trimAll,
