@@ -139,7 +139,7 @@
 
       STREET_DOM_NODE: document.querySelector('#deliver__street'),
       HOUSE_DOM_NODE: document.querySelector('#deliver__house'),
-      FLOOR_SELECTOR: '#deliver__floor',
+      FLOOR_DOM_NODE: document.querySelector('#deliver__floor'),
       ROOM_SELECTOR: '#deliver__room'
     },
 
@@ -376,14 +376,14 @@
   function resetDeliveryValues() {
     Delivery.Courier.STREET_DOM_NODE.value = '';
     Delivery.Courier.HOUSE_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Delivery.Courier.FLOOR_SELECTOR, '');
+    Delivery.Courier.FLOOR_DOM_NODE.value = '';
     window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
   }
 
   function resetDeliveryValidity() {
     window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
     window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
-    window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.FLOOR_DOM_NODE);
     window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
   }
 
@@ -592,7 +592,7 @@
       case (isFloorTyped() && !isFloorValid()):
         window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
         window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
-        window.utils.setDomValid(false, Delivery.Courier.FLOOR_SELECTOR);
+        window.utils.setDomNodeValidity(false, Delivery.Courier.FLOOR_DOM_NODE);
         break;
       default:
         resetDeliveryValidity();
@@ -611,12 +611,12 @@
     }
 
     function isFloorTyped() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
+      var value = Delivery.Courier.FLOOR_DOM_NODE.value;
       return value.length > 0;
     }
 
     function isFloorValid() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
+      var value = Delivery.Courier.FLOOR_DOM_NODE.value;
       return window.utils.isNumber(value);
     }
   }
@@ -654,7 +654,7 @@
 
     Delivery.Courier.STREET_DOM_NODE.disabled = shouldBeDisabled;
     Delivery.Courier.HOUSE_DOM_NODE.disabled = shouldBeDisabled;
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.FLOOR_SELECTOR);
+    Delivery.Courier.FLOOR_DOM_NODE.disabled = shouldBeDisabled;
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
   }
 
