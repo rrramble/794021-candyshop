@@ -79,7 +79,7 @@
 
     function mouseMoveHandler(ownEvt) {
       ownEvt.preventDefault();
-      updatePinAndSliderPosition(Pin.isMin, evt);
+      updatePinAndSliderPosition(Pin.isMin, ownEvt);
     }
   } // mouseDownHandler
 
