@@ -42,7 +42,6 @@
     hideHtmlSelector: hideHtmlSelector,
     convertHtmlClassToHtmlSelector: convertHtmlClassToHtmlSelector,
     querySelectorIncludingSelf: querySelectorIncludingSelf,
-    convertHtmlSelectorToHtmlClass: convertHtmlSelectorToHtmlClass,
     isNumber: isNumber,
 
     isChecked: isChecked,
@@ -128,14 +127,6 @@
     });
   }
 
-  function convertHtmlSelectorToHtmlClass(htmlSelector) {
-    var firstChar = htmlSelector[0];
-    if (firstChar === '.') {
-      return htmlSelector.slice(1);
-    }
-    return undefined;
-  }
-
   function showHtmlSelector(node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     var className = window.utils.convertHtmlSelectorToHtmlClass(SELECTOR_HIDDEN);
@@ -152,6 +143,10 @@
     return '.' + htmlClass;
   }
 
+  function convertHtmlSelectorToHtmlClass(htmlSelector) {
+    return htmlSelector.slice(1);
+  }
+
   function querySelectorIncludingSelf(dom, selector) {
     var classes = dom.classList;
     if (classes) {
@@ -161,10 +156,6 @@
       }
     }
     return dom.querySelector(selector);
-  }
-
-  function convertHtmlSelectorToHtmlClass(htmlSelector) {
-    return htmlSelector.slice(1);
   }
 
   function isNumber(n) {
