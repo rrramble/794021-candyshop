@@ -68,11 +68,12 @@
     CARD_DATE_MIN_LENGTH: 5,
     CARD_DATE_MAX_LENGTH: 5,
 
-    CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc',
+    CARD_CVC_INPUT_DOM_NODE: document.querySelector('#payment__card-cvc'),
     CARD_CVC_MIN_LENGTH: 3,
     CARD_CVC_MAX_LENGTH: 3,
 
-    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    // CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    CARD_HOLDER_INPUT_DOM_NODE: document.querySelector('#payment__cardholder'),
     CARD_HOLDER_MIN_WIDTH: 1,
 
     CASH_PAYMENT_MESSAGE_SELECTOR: '.payment__cash-wrap'
@@ -360,15 +361,17 @@
   function resetCardValidity() {
     window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
     window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
-    window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setDomNodeValidity(true, Payment.CARD_CVC_INPUT_DOM_NODE);
+    // window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
+    window.utils.setDomNodeValidity(true, Payment.CARD_HOLDER_INPUT_DOM_NODE);
   }
 
   function resetCardValues() {
     Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
     Payment.CARD_DATE_INPUT_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR, '');
-    window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
+    Payment.CARD_CVC_INPUT_DOM_NODE.value = '';
+    // window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.value = '';
   }
 
   function resetDeliveryValues() {
@@ -448,14 +451,22 @@
       Payment.CARD_DATE_INPUT_DOM_NODE
     );
 
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_CVC_MAX_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
+    // Setup card CVC
+    Payment.CARD_CVC_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_CVC_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH,
+      Payment.CARD_CVC_INPUT_DOM_NODE
+    );
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_CVC_MAX_LENGTH,
+      Payment.CARD_CVC_INPUT_DOM_NODE
+    );
 
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_HOLDER_MIN_WIDTH, Payment.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
+    // Setup cardholder name
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_HOLDER_MIN_WIDTH,
+      Payment.CARD_HOLDER_INPUT_DOM_NODE
+    );
   }
 
   function paymentInformationChangeHandler() {
@@ -479,14 +490,14 @@
       case (!isCardCvcValid()):
         window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
         window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
-        window.utils.setDomValid(false, Payment.CARD_CVC_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(false, Payment.CARD_CVC_INPUT_DOM_NODE);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       case (!isCardholderNameValid()):
         window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
         window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
-        window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
-        window.utils.setDomValid(false, Payment.CARD_HOLDER_INPUT_SELECTOR);
+        window.utils.setDomNodeValidity(true, Payment.CARD_CVC_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Payment.CARD_HOLDER_INPUT_DOM_NODE);
         window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
         break;
       default:
@@ -505,12 +516,12 @@
     }
 
     function isCardCvcValid() {
-      var cvc = window.utils.getDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR);
+      var cvc = Payment.CARD_CVC_INPUT_DOM_NODE.value; // перенести выше
       return window.utils.isCvcChecked(cvc);
     }
 
     function isCardholderNameValid() {
-      var cardholder = window.utils.getDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR);
+      var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value; // перенести выше
       return window.utils.isCacrdholderNameChecked(cardholder);
     }
   }
@@ -639,9 +650,8 @@
 
     Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
     Payment.CARD_DATE_INPUT_DOM_NODE.disabled = shouldBeDisabled;
-
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_HOLDER_INPUT_SELECTOR);
+    Payment.CARD_CVC_INPUT_DOM_NODE.disabled = shouldBeDisabled;
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
 
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.STREET_SELECTOR);
     window.utils.blockInput(shouldBeDisabled, Delivery.Courier.HOUSE_SELECTOR);
