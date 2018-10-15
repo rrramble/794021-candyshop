@@ -8,44 +8,70 @@
 (function () {
 
   var IMG_PATH = 'img/cards/';
-  var Sorting = {
-    'popular': sortDefault,
-    'cheap': sortCheap,
-    'expensive': sortExpensive,
-    'rating': sortRating
-  };
 
-  window.Catalog = function(loadGoods) {
+  window.Catalog = function (loadGoods) {
 
-    this.getGoods = function() {
+    var sortDefault = function (first, second) {
+      return first.id - second.id;
+    };
+
+    var sortCheap = function (first, second) {
+      return first.price - second.price;
+    };
+
+    var sortExpensive = function (first, second) {
+      return second.price - first.price;
+    };
+
+    var sortRating = function (first, second) {
+      if (second.rating.value > first.rating.value) {
+        return 1;
+      }
+      if (first.rating.value > second.rating.value) {
+        return -1;
+      }
+      return second.rating.number - first.rating.number;
+    };
+
+    var Sorting = {
+      'popular': sortDefault,
+      'cheap': sortCheap,
+      'expensive': sortExpensive,
+      'rating': sortRating
+    };
+
+
+    // Methods of the Class
+
+    this.getGoods = function () {
       return this.goods;
-    }
+    };
 
-    this.getItem = function(id) {
+    this.getItem = function (id) {
       var result = this.getGoods().filter(function (commodity) {
         return commodity.id.toString() === id.toString();
       });
       return result[0];
-    }
+    };
 
-    this.getAmount = function(id) {
+    this.getAmount = function (id) {
       return this.getItem(id).amount;
     };
 
-    function getCategoryCount(category) {
+    this.getCategoryCount = function (category) {
       return this.getGoods().reduce(function (accu, item) {
         return item.kind === category ? ++accu : accu;
       }, 0);
-    }
+    };
 
-    function getUnfilteredCount() {
+    this.getUnfilteredCount = function () {
       var filteredCount = this.getGoods().reduce(function (accu, item) {
         return item.filtered ? ++accu : accu;
       }, 0);
       return this.getCount() - filteredCount;
-    }
+    };
 
-    function getIngredientsCount(ingredient) {
+    this.getIngredientsCount = function (ingredient) {
       return this.getGoods().reduce(function (accu, item) {
         if (
           (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) ||
@@ -56,49 +82,49 @@
         }
         return accu;
       }, 0);
-    }
+    };
 
-    function getFavoriteCount() {
+    this.getFavoriteCount = function () {
       return this.getGoods().reduce(function (accu, item) {
         return item.favorite ? ++accu : accu;
       }, 0);
-    }
+    };
 
-    function getCount() {
+    this.getCount = function () {
       return this.getGoods().length;
-    }
+    };
 
-    function getInStockCount() {
+    this.getInStockCount = function () {
       return this.getGoods().reduce(function (accu, item) {
         return item.amount > 0 ? ++accu : accu;
       }, 0);
-    }
+    };
 
-    function getFavoriteStatus(id) {
+    this.getFavoriteStatus = function (id) {
       return this.getItem(id).favorite;
-    }
+    };
 
-    function getPrices() {
+    this.getPrices = function () {
       return this.getGoods().map(function (item) {
         return item.price;
       });
-    }
+    };
 
-    function getMinPrice() {
+    this.getMinPrice = function () {
       var value = window.utils.getListMin(this.getPrices());
       return value;
-    }
+    };
 
-    function getMaxPrice() {
+    this.getMaxPrice = function () {
       var value = window.utils.getListMax(this.getPrices());
       return value;
-    }
+    };
 
-    function putItem(id, amount) {
+    this.putItem = function (id, amount) {
       this.getItem(id).amount += amount;
-    }
+    };
 
-    function takeItem(id, amount) {
+    this.takeItem = function (id, amount) {
       var actualAmount = amount;
       if (amount === undefined) {
         actualAmount = 1;
@@ -108,25 +134,25 @@
       }
       this.getItem(id).amount -= actualAmount;
       return actualAmount;
-    }
+    };
 
-    function toggleFavorite(id) {
+    this.toggleFavorite = function (id) {
       this.getItem(id).favorite = !this.getItem(id).favorite;
-    }
+    };
 
-    function filterItem(id) {
+    this.filterItem = function (id) {
       this.getItem(id).filtered = true;
-    }
+    };
 
-    function unfilterItem(id) {
+    this.unfilterItem = function (id) {
       this.getItem(id).filtered = false;
-    }
+    };
 
-    function isFiltered(id) {
+    this.isFiltered = function (id) {
       return this.getItem(id).filtered;
-    }
+    };
 
-    function canBeFiltered(id, categories, ingredients, favorite, inStock, min, max) {
+    this.canBeFiltered = function (id, categories, ingredients, favorite, inStock, min, max) {
       var item = this.getItem(id);
       if (
         inStock.includes('in-stock') && item.amount <= 0 ||
@@ -140,9 +166,9 @@
         return true;
       }
       return false;
-    }
+    };
 
-    function applyFilter(categories, ingredients, favorite, inStock, min, max, sortingType) {
+    this.applyFilter = function (categories, ingredients, favorite, inStock, min, max, sortingType) {
       this.sort(sortingType);
       for (var i = 0; i < this.getCount(); i++) {
         if (this.canBeFiltered(i, categories, ingredients, favorite, inStock, min, max)) {
@@ -151,9 +177,9 @@
           this.unfilterItem(i);
         }
       }
-    }
+    };
 
-    function sort(sortingType) {
+    this.sort = function (sortingType) {
       if (
         this.sortingType === sortingType ||
         !window.utils.isClassIncludesKey(Sorting, sortingType)
@@ -163,74 +189,22 @@
       this.sortingType = sortingType;
       var sortingFunction = Sorting[sortingType];
       this.goods.sort(sortingFunction);
-    }
+    };
 
-    function tuneData() {
+    this.tuneData = function () {
       this.goods.forEach(function (item, index) {
         item.picture = IMG_PATH + item.picture;
         item.id = index;
         item.filtered = false;
       });
-    }
-
-
-
-    // Initialization of the functions
-    this.getGoods = getGoods;
-    this.getItem = getItem;
-    this.getAmount = getAmount;
-    this.getCategoryCount = getCategoryCount;
-    this.getUnfilteredCount = getUnfilteredCount;
-    this.getIngredientsCount = getIngredientsCount;
-    this.getFavoriteCount = getFavoriteCount;
-    this.getCount = getCount;
-    this.getInStockCount = getInStockCount;
-    this.getFavoriteStatus = getFavoriteStatus;
-    this.getPrices = getPrices;
-    this.getMinPrice = getMinPrice;
-    this.getMaxPrice = getMaxPrice;
-    this.putItem = putItem;
-    this.takeItem = takeItem;
-    this.toggleFavorite = toggleFavorite;
-    this.filterItem = filterItem;
-    this.unfilterItem = unfilterItem;
-    this.isFiltered = isFiltered;
-    this.canBeFiltered = canBeFiltered;
-    this.applyFilter = applyFilter;
-    this.sort = sort;
-    this.tuneData = tuneData;
-
+    };
 
     // Beginning of the constructor
     this.goods = loadGoods();
     this.tuneData();
-    return;
     // End of the constructor
 
+  };
 
-  }; // End of the class
-
-
-  function sortDefault(first, second) {
-    return first.id - second.id;
-  }
-
-  function sortCheap(first, second) {
-    return first.price - second.price;
-  }
-
-  function sortExpensive(first, second) {
-    return second.price - first.price;
-  }
-
-  function sortRating(first, second) {
-    if (second.rating.value > first.rating.value) {
-      return 1;
-    }
-    if (first.rating.value > second.rating.value) {
-      return -1;
-    }
-    return second.rating.number - first.rating.number;
-  }
 
 })();
