@@ -45,7 +45,7 @@
     PHONE_MIN_LENGTH: 10,
     PHONE_MAX_LENGTH: 22,
 
-    EMAIL_SELECTOR: '#contact-data__email'
+    EMAIL_DOM_NODE: document.querySelector('#contact-data__email')
   };
 
   var Payment = {
@@ -322,7 +322,7 @@
         break;
       case (isEmailTyped() && !isEmailValid()):
         window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
-        window.utils.setDomValid(false, Contacts.EMAIL_SELECTOR);
+        window.utils.setDomNodeValidity(false, Contacts.EMAIL_DOM_NODE);
         break;
       default:
         resetContactsValidity();
@@ -335,27 +335,27 @@
     }
 
     function isEmailTyped() {
-      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
+      var value = Contacts.EMAIL_DOM_NODE.value;
       var trimmed = window.utils.trimSpaces(value);
       return trimmed.length > 0;
     }
 
     function isEmailValid() {
-      var email = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
-      return window.utils.isEmailValid(email);
+      var value = Contacts.EMAIL_DOM_NODE.value;
+      return window.utils.isEmailValid(value);
     }
   }
 
   function resetContactsValidity() {
     window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
     window.utils.setDomNodeValidity(true, Contacts.PHONE_DOM_NODE);
-    window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
+    window.utils.setDomNodeValidity(true, Contacts.EMAIL_DOM_NODE);
   }
 
   function resetContactsValues() {
     Contacts.NAME_DOM_NODE.value = '';
     Contacts.PHONE_DOM_NODE.value = '';
-    window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
+    Contacts.EMAIL_DOM_NODE.value = '';
   }
 
   function resetCardValidity() {
@@ -644,7 +644,7 @@
   function disableAllFormFields(shouldBeDisabled) {
     Contacts.NAME_DOM_NODE.disabled = shouldBeDisabled;
     Contacts.PHONE_DOM_NODE.disabled = shouldBeDisabled;
-    window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
+    Contacts.EMAIL_DOM_NODE.disabled = shouldBeDisabled;
 
     Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
     Payment.CARD_DATE_INPUT_DOM_NODE.disabled = shouldBeDisabled;
