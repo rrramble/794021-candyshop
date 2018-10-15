@@ -71,7 +71,7 @@
       trolley, trolleyHtmlTemplateSelector, trolleyParentHtmlSelector
   ) {
 
-    this.updateTrolleyCommodityAmount = updateTrolleyCommodityAmount;
+    this.updateTrolleyCommodityAmount = updateTrolleyCommodityAmount.bind(this);
     this.isCommodityDrawnInTrolley = isCommodityDrawnInTrolley;
     this.putToTrolley = putToTrolley;
     this.takeFromTrolley = takeFromTrolley;
