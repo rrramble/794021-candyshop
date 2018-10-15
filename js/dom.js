@@ -609,9 +609,9 @@
     var evtPath = evt.path || (evt.composedPath && evt.composedPath());
     var htmlId = evtPath.reduce(function (accu, path) {
       if (isCommodityHtmlId(path.id)) {
-        return convertCommodityHtmlIdToCommodityId(path.id)
+        return convertCommodityHtmlIdToCommodityId(path.id);
       } else if (isTrolleyHtmlId(path.id)) {
-        return convertTrolleyHtmlIdToCommodityId(path.id)
+        return convertTrolleyHtmlIdToCommodityId(path.id);
       } else {
         return accu;
       }
