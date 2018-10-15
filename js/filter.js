@@ -6,6 +6,13 @@
 
 (function () {
 
+  // Exported namespace
+
+  window.Filter = {};
+
+
+  // Private properties
+
   var Filter = {
     MAIN_SECTION_SELECTOR: '.catalog__filter.range',
 
@@ -36,54 +43,16 @@
     isMin: true
   };
 
-  window.Filter = {
-    Range: Range
+  var updateTextValue = function (isMinPin) {
+    var value = calculateSliderValue(isMinPin);
+    if (isMinPin) {
+      Filter.MIN_RANGE_TEXT_DOM_NODE.textContent = value;
+    } else {
+      Filter.MAX_RANGE_TEXT_DOM_NODE.textContent = value;
+    }
   };
 
-  var SLIDER_WIDTH = getSliderWidth() - Filter.PIN_WIDTH - Filter.PIN_WIDTH / 2;
-
-  function Range(minPrice, maxPrice) {
-    Price.min = minPrice;
-    Price.max = maxPrice;
-    updatePinAndSliderPosition(Pin.isMin);
-    updatePinAndSliderPosition(!Pin.isMin);
-
-    this.reset = resetRange;
-    this.mouseDownHandler = mouseDownHandler;
-  }
-
-  function resetRange() {
-    updatePinAndSliderPosition(true);
-    updatePinAndSliderPosition(false);
-  }
-
-  function mouseDownHandler(evt, funcCb) {
-    evt.preventDefault();
-    if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {
-      return;
-    }
-    Pin.isMin = isMinRangePinPressed(evt);
-    Pin.mouseStartX = evt.clientX;
-
-    document.addEventListener('mouseup', mouseUpHandler);
-    document.addEventListener('mousemove', mouseMoveHandler);
-
-    function mouseUpHandler(ownEvt) {
-      ownEvt.preventDefault();
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-      if (funcCb) {
-        funcCb(ownEvt);
-      }
-    }
-
-    function mouseMoveHandler(ownEvt) {
-      ownEvt.preventDefault();
-      updatePinAndSliderPosition(Pin.isMin, ownEvt);
-    }
-  } // mouseDownHandler
-
-  function updatePinAndSliderPosition(isMinPin, evt) {
+  var updatePinAndSliderPosition = function (isMinPin, evt) {
     if (evt) {
       var dX = evt.clientX - Pin.mouseStartX;
     } else {
@@ -95,7 +64,7 @@
 
     var minPinLeftShift = window.utils.getDomNodeLeftProperty(Filter.rangeMinPinDomNode);
     var maxPinRightShift = window.utils.getDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE);
-    var maxPinLeftShift = SLIDER_WIDTH - maxPinRightShift;
+    var maxPinLeftShift = Price.sliderWidth - maxPinRightShift;
 
     var newX;
     if (isMinPin) {
@@ -106,46 +75,80 @@
 
     } else {
       newX = maxPinRightShift - dX;
-      newX = window.utils.setWithinRange(newX, 0, SLIDER_WIDTH - minPinLeftShift);
+      newX = window.utils.setWithinRange(newX, 0, Price.sliderWidth - minPinLeftShift);
       window.utils.setDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE, newX);
       window.utils.setDomNodeRightProperty(Filter.SLIDER_DOM_NODE, newX);
     }
     Pin.mouseStartX += dX;
     updateTextValue(isMinPin);
-  }
+  }; // updatePinAndSliderPosition
 
-  function updateTextValue(isMinPin) {
-    var value = calculateSliderValue(isMinPin);
-    if (isMinPin) {
-      Filter.MIN_RANGE_TEXT_DOM_NODE.textContent = value;
-    } else {
-      Filter.MAX_RANGE_TEXT_DOM_NODE.textContent = value;
-    }
-  }
-
-  function calculateSliderValue(isMinPin) {
+  var calculateSliderValue = function (isMinPin) {
     if (isMinPin) {
       var leftDistance = window.utils.getDomNodeLeftProperty(Filter.RANGE_MIN_PIN_BTN_DOM_NODE);
     } else {
       var rightDistance = window.utils.getDomNodeRightProperty(Filter.RANGE_MAX_PIN_BTN_DOM_NODE);
-      leftDistance = SLIDER_WIDTH - rightDistance;
+      leftDistance = Price.sliderWidth - rightDistance;
     }
-    var percent = window.utils.calculateIntPercent(SLIDER_WIDTH, leftDistance);
+    var percent = window.utils.calculateIntPercent(Price.sliderWidth, leftDistance);
     return window.utils.convertPercentToIntWithinRange(percent, Price.min, Price.max);
-  }
+  };
 
-  function isMinRangePinPressed(evt) {
+  var isMinRangePinPressed = function (evt) {
     return evt.target.classList.contains(Filter.RANGE_MIN_BTN_CLASS);
-  }
+  };
 
-  function isMaxRangePinPressed(evt) {
+  var isMaxRangePinPressed = function (evt) {
     return evt.target.classList.contains(Filter.RANGE_MAX_BTN_CLASS);
-  }
+  };
 
-  function getSliderWidth() {
+  var getSliderWidth = function () {
     var resultPx = window.getComputedStyle(Filter.RANGE_BTN_PARENT_DOM_NODE).
       getPropertyValue('width');
     return window.utils.omitPx(resultPx);
-  }
+  };
+
+
+  // The Class
+
+  window.Filter.Range = function (minPrice, maxPrice) {
+    this.reset = function () {
+      updatePinAndSliderPosition(true);
+      updatePinAndSliderPosition(false);
+    };
+
+    this.mouseDownHandler = function (evt, funcCb) {
+      var mouseUpHandler = function (ownEvt) {
+        ownEvt.preventDefault();
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        if (funcCb) {
+          funcCb(ownEvt);
+        }
+      };
+
+      var mouseMoveHandler = function (ownEvt) {
+        ownEvt.preventDefault();
+        updatePinAndSliderPosition(Pin.isMin, ownEvt);
+      };
+
+      evt.preventDefault();
+      if (!isMinRangePinPressed(evt) && !isMaxRangePinPressed(evt)) {
+        return;
+      }
+      Pin.isMin = isMinRangePinPressed(evt);
+      Pin.mouseStartX = evt.clientX;
+
+      document.addEventListener('mouseup', mouseUpHandler);
+      document.addEventListener('mousemove', mouseMoveHandler);
+    }; // this.mouseDownHandler
+
+    Price.sliderWidth = getSliderWidth() - Filter.PIN_WIDTH - Filter.PIN_WIDTH / 2;
+    Price.min = minPrice;
+    Price.max = maxPrice;
+    updatePinAndSliderPosition(Pin.isMin);
+    updatePinAndSliderPosition(!Pin.isMin);
+
+  }; // End of the Class
 
 })();
