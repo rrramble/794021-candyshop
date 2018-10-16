@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Main module:
+ * Main module of the application
  */
 
 (function () {
@@ -27,24 +27,24 @@
 
 
   var Order = {
-    MAIN_SELECTOR: '.buy form',
-    SUBMIT_BTN_SELECTOR: '.buy__submit-btn',
-    MODAL_ERROR_SELECTOR: '.modal--error',
-    MODAL_SUCCESS_SELECTOR: '.modal--success',
+    MAIN_DOM_NODE: document.querySelector('.buy form'),
+    MODAL_ERROR_DOM_NODE: document.querySelector('.modal--error'),
+    MODAL_SUCCESS_DOM_NODE: document.querySelector('.modal--success'),
     MODAL_CLOSE_BUTTON_SELECTOR: '.modal__close',
     MODAL_HIDDEN_CLASS: 'modal--hidden'
   };
 
   var Contacts = {
     MAIN_SELECTOR: '.contact-data',
-    NAME_SELECTOR: '#contact-data__name',
+
+    NAME_DOM_NODE: document.querySelector('#contact-data__name'),
     NAME_MIN_LENGTH: 1,
 
-    PHONE_SELECTOR: '#contact-data__tel',
+    PHONE_DOM_NODE: document.querySelector('#contact-data__tel'),
     PHONE_MIN_LENGTH: 10,
     PHONE_MAX_LENGTH: 22,
 
-    EMAIL_SELECTOR: '#contact-data__email'
+    EMAIL_DOM_NODE: document.querySelector('#contact-data__email')
   };
 
   var Payment = {
@@ -60,20 +60,19 @@
     CASH_LABEL_SELECTOR: '.toggle-btn__input[value="cash"]',
     CARD_FORM_SELECTOR: '.payment__card-wrap',
 
-    CARD_NUMBER_INPUT_SELECTOR: '#payment__card-number',
-    CARD_NUMBER_INPUT_CLASS: 'text-input__input',
+    CARD_NUMBER_INPUT_DOM_NODE: document.querySelector('#payment__card-number'),
     CARD_NUMBER_MIN_LENGTH: 16,
     CARD_NUMBER_MAX_LENGTH: 16,
 
-    CARD_DATE_INPUT_SELECTOR: '#payment__card-date',
+    CARD_DATE_INPUT_DOM_NODE: document.querySelector('#payment__card-date'),
     CARD_DATE_MIN_LENGTH: 5,
     CARD_DATE_MAX_LENGTH: 5,
 
-    CARD_CVC_INPUT_SELECTOR: '#payment__card-cvc',
+    CARD_CVC_INPUT_DOM_NODE: document.querySelector('#payment__card-cvc'),
     CARD_CVC_MIN_LENGTH: 3,
     CARD_CVC_MAX_LENGTH: 3,
 
-    CARD_HOLDER_INPUT_SELECTOR: '#payment__cardholder',
+    CARD_HOLDER_INPUT_DOM_NODE: document.querySelector('#payment__cardholder'),
     CARD_HOLDER_MIN_WIDTH: 1,
 
     CASH_PAYMENT_MESSAGE_SELECTOR: '.payment__cash-wrap'
@@ -82,13 +81,13 @@
   var Delivery = {
     MAIN_SELECTOR: '.deliver',
     TYPE_SELECTOR: '.deliver__toggle',
-    SELF_TAKE_OUT_ID: 'deliver__store',
+    SELF_TAKE_OUT_DOM_NODE: document.querySelector('#deliver__store'),
     BY_COURIER_SELECTOR: '.toggle-btn__input[value="courier"]',
 
     Store: {
       MAIN_SELECTOR: '.deliver__store',
       LIST_OF_SUBWAYS_SELECTOR: '.deliver__stores',
-      MAP_SELECTOR: '.deliver__store-map-img'
+      MAP_DOM_NODE: document.querySelector('.deliver__store-map-img')
     },
     Map: {
       'store-academicheskaya': {
@@ -136,33 +135,480 @@
 
     Courier: {
       MAIN_SELECTOR: '.deliver__courier',
-      STREET_SELECTOR: '#deliver__street',
-      HOUSE_SELECTOR: '#deliver__house',
-      FLOOR_SELECTOR: '#deliver__floor',
-      ROOM_SELECTOR: '#deliver__room'
+
+      STREET_DOM_NODE: document.querySelector('#deliver__street'),
+      HOUSE_DOM_NODE: document.querySelector('#deliver__house'),
+      FLOOR_DOM_NODE: document.querySelector('#deliver__floor'),
+      ROOM_DOM_NODE: document.querySelector('#deliver__room')
     },
 
   };
 
 
-  /*
-   * Main code
-   */
-
-  window.Backend.get(onSuccessDownload, onErrorDownloadUpload);
-  return;
-
-  /*
-   * End of main code
-   */
-
+  // Variables for the namespace
 
   var catalog;
   var trolley;
   var dom;
   var filterRange;
 
-  function onSuccessDownload(data) {
+
+  var setInterfaceHandlers = function () {
+    setFieldsForCardPayment(true);
+    setContactsToBeRequired(true);
+    deliveryTypeChangeHandler();
+
+    document.querySelector(FilterForm.MAIN_SELECTOR).
+      addEventListener('change', filterInputChangeHandler);
+
+    document.querySelector(FilterForm.SHOW_ALL_HTML_SELECTOR).
+      addEventListener('click', filterShowAllHandler);
+
+    document.querySelector(FilterRange.MAIN_SELECTOR).
+      addEventListener('mousedown', filterPriceRangeHandler);
+
+    document.querySelector(Contacts.MAIN_SELECTOR).
+      addEventListener('change', contactsChangeHandler);
+
+    document.querySelector(Payment.METHOD_SELECTOR).
+      addEventListener('click', paymentTypeChangeHandler);
+
+    document.querySelector(Payment.MAIN_SELECTOR).
+      addEventListener('change', paymentInformationChangeHandler);
+
+    document.querySelector(Delivery.TYPE_SELECTOR).
+      addEventListener('change', deliveryTypeChangeHandler);
+
+    document.querySelector(Delivery.Store.MAIN_SELECTOR).
+      addEventListener('change', deliveryInformationChangeHandler);
+
+    Order.MAIN_DOM_NODE.addEventListener('submit', formSubmitHandler);
+  };
+
+
+  /*
+   * Overall order form checking
+   */
+
+  var filterInputChangeHandler = function (evt) {
+    window.utils.debounce(function () {
+      dom.filterFormHandler(evt);
+    }, DEBOUNCE_TIME);
+  };
+
+  var filterShowAllHandler = function (evt) {
+    evt.preventDefault();
+    dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
+  };
+
+  var filterPriceRangeHandler = function (evt) {
+    filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
+  };
+
+  var formSubmitHandler = function (evt) {
+    evt.preventDefault();
+    if (isTrolleyEmpty(trolley)) {
+      return;
+    }
+    checkContacts();
+    checkPaymentInformation();
+    checkDeliveryInformation();
+    window.Backend.put(getFormData(), uploadSuccessHandler, downloadUploadErrorHandler);
+  };
+
+  var getFormData = function () {
+    return Order.MAIN_DOM_NODE;
+  };
+
+  var uploadSuccessHandler = function () {
+    resetOrderForm();
+    showModal(Order.MODAL_SUCCESS_DOM_NODE);
+  };
+
+  var downloadUploadErrorHandler = function () {
+    showModal(Order.MODAL_ERROR_DOM_NODE);
+  };
+
+  var showModal = function (modalNode) {
+    var closeModal = function (evt) {
+      if (evt.type === 'keydown' && evt.keyCode !== ESC_KEY_CODE) {
+        return;
+      }
+      if (!evt.type === 'click') {
+        return;
+      }
+      modalNode.classList.add(Order.MODAL_HIDDEN_CLASS);
+      closeButtonNode.removeEventListener('click', closeModal);
+      document.removeEventListener('keydown', closeModal);
+    };
+
+    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
+    var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
+    closeButtonNode.addEventListener('click', closeModal);
+    document.addEventListener('keydown', closeModal);
+  };
+
+  /*
+   * Trolley contains goods checking
+   */
+
+  var isTrolleyEmpty = function (trolleyObject) {
+    return trolleyObject.getCount() <= 0;
+  };
+
+
+  /*
+   * Contacts handler and checking
+   */
+
+  var contactsChangeHandler = function (evt) {
+    evt.preventDefault();
+    checkContacts();
+  };
+
+  var checkContacts = function () {
+    switch (true) {
+      case (!isNameValid()):
+        window.utils.setDomNodeValidity(false, Contacts.NAME_DOM_NODE);
+        break;
+      case (isEmailTyped() && !isEmailValid()):
+        window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Contacts.EMAIL_DOM_NODE);
+        break;
+      default:
+        resetContactsValidity();
+    }
+  };
+
+  var isNameValid = function () {
+    var value = Contacts.NAME_DOM_NODE.value;
+    var trimmed = window.utils.trimAll(value);
+    return trimmed.length > 0;
+  };
+
+  var isEmailTyped = function () {
+    var value = Contacts.EMAIL_DOM_NODE.value;
+    var trimmed = window.utils.trimSpaces(value);
+    return trimmed.length > 0;
+  };
+
+  var isEmailValid = function () {
+    var value = Contacts.EMAIL_DOM_NODE.value;
+    return window.utils.isEmailValid(value);
+  };
+
+  var resetContactsValidity = function () {
+    window.utils.setDomNodeValidity(true, Contacts.NAME_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Contacts.PHONE_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Contacts.EMAIL_DOM_NODE);
+  };
+
+  var resetContactsValues = function () {
+    Contacts.NAME_DOM_NODE.value = '';
+    Contacts.PHONE_DOM_NODE.value = '';
+    Contacts.EMAIL_DOM_NODE.value = '';
+  };
+
+  var resetCardValidity = function () {
+    window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Payment.CARD_CVC_INPUT_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Payment.CARD_HOLDER_INPUT_DOM_NODE);
+  };
+
+  var resetCardValues = function () {
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.value = '';
+    Payment.CARD_DATE_INPUT_DOM_NODE.value = '';
+    Payment.CARD_CVC_INPUT_DOM_NODE.value = '';
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.value = '';
+  };
+
+  var resetDeliveryValues = function () {
+    Delivery.Courier.STREET_DOM_NODE.value = '';
+    Delivery.Courier.HOUSE_DOM_NODE.value = '';
+    Delivery.Courier.FLOOR_DOM_NODE.value = '';
+    Delivery.Courier.ROOM_DOM_NODE.value = '';
+  };
+
+  var resetDeliveryValidity = function () {
+    window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.FLOOR_DOM_NODE);
+    window.utils.setDomNodeValidity(true, Delivery.Courier.ROOM_DOM_NODE);
+  };
+
+  var resetOrderForm = function () {
+    resetContactsValidity();
+    resetContactsValues();
+    resetCardValidity();
+    resetCardValues();
+    resetDeliveryValues();
+    resetDeliveryValidity();
+  };
+
+
+  /*
+   * Payment handler and checking
+   */
+
+  var paymentTypeChangeHandler = function () {
+    switch (true) {
+      case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
+        adjustFormForPaymentByCard(true);
+        break;
+      case (window.utils.isChecked(Payment.CASH_LABEL_SELECTOR)):
+        adjustFormForPaymentByCard(false);
+        break;
+    }
+  };
+
+  var adjustFormForPaymentByCard = function (byCard) {
+    if (!byCard) {
+      window.utils.hideHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
+      window.utils.showHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(false);
+      resetCardValidity();
+    } else {
+      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
+      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
+      setFieldsForCardPayment(true);
+    }
+  };
+
+  var setFieldsForCardPayment = function (isToBeSet) {
+    if (isToBeSet && trolley.getCount() <= 0) {
+      return;
+    }
+
+    // Setup card number
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH,
+        Payment.CARD_NUMBER_INPUT_DOM_NODE
+    );
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH,
+        Payment.CARD_NUMBER_INPUT_DOM_NODE
+    );
+
+    // Setup card date
+    Payment.CARD_DATE_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_DATE_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_DATE_MIN_LENGTH,
+        Payment.CARD_DATE_INPUT_DOM_NODE
+    );
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_DATE_MAX_LENGTH,
+        Payment.CARD_DATE_INPUT_DOM_NODE
+    );
+
+    // Setup card CVC
+    Payment.CARD_CVC_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_CVC_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH,
+        Payment.CARD_CVC_INPUT_DOM_NODE
+    );
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Payment.CARD_CVC_MAX_LENGTH,
+        Payment.CARD_CVC_INPUT_DOM_NODE
+    );
+
+    // Setup cardholder name
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.required = isToBeSet;
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.disabled = !isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Payment.CARD_HOLDER_MIN_WIDTH,
+        Payment.CARD_HOLDER_INPUT_DOM_NODE
+    );
+  }; // setFieldsForCardPayment
+
+  var paymentInformationChangeHandler = function () {
+    checkPaymentInformation();
+  };
+
+  var checkPaymentInformation = function () {
+    switch (true) {
+      case (!window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
+        resetCardValidity();
+        break;
+      case (!isCardNumberValid()):
+        window.utils.setDomNodeValidity(false, Payment.CARD_NUMBER_INPUT_DOM_NODE);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
+        break;
+      case (!isCardDateValid()):
+        window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Payment.CARD_DATE_INPUT_DOM_NODE);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
+        break;
+      case (!isCardCvcValid()):
+        window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Payment.CARD_CVC_INPUT_DOM_NODE);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
+        break;
+      case (!isCardholderNameValid()):
+        window.utils.setDomNodeValidity(true, Payment.CARD_NUMBER_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(true, Payment.CARD_DATE_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(true, Payment.CARD_CVC_INPUT_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Payment.CARD_HOLDER_INPUT_DOM_NODE);
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
+        break;
+      default:
+        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_VALID_MESSAGE);
+        resetCardValidity();
+    }
+  };
+
+  var isCardNumberValid = function () {
+    var cardNumber = Payment.CARD_NUMBER_INPUT_DOM_NODE.value;
+    return window.utils.isLuhnChecked(cardNumber);
+  };
+
+  var isCardDateValid = function () {
+    var cardDate = Payment.CARD_DATE_INPUT_DOM_NODE.value;
+    return window.utils.isCardDateChecked(cardDate);
+  };
+
+  var isCardCvcValid = function () {
+    var cvc = Payment.CARD_CVC_INPUT_DOM_NODE.value;
+    return window.utils.isCvcChecked(cvc);
+  };
+
+  var isCardholderNameValid = function () {
+    var cardholder = Payment.CARD_HOLDER_INPUT_DOM_NODE.value;
+    return window.utils.isCardholderNameChecked(cardholder);
+  };
+
+  var setContactsToBeRequired = function (isToBeSet) {
+    Contacts.NAME_DOM_NODE.required = isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_DOM_NODE);
+
+    Contacts.PHONE_DOM_NODE.required = isToBeSet;
+    window.utils.setDomNodeAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_DOM_NODE);
+    window.utils.setDomNodeAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_DOM_NODE);
+  };
+
+
+  /*
+   * Delivery handler and checking
+   */
+
+  var deliveryTypeChangeHandler = function () {
+    switch (true) {
+      case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
+        adjustFormForDeliveryByCourier(true);
+        break;
+      case (isTakeoutSelected()):
+        adjustFormForDeliveryByCourier(false);
+        break;
+    }
+  };
+
+  var adjustFormForDeliveryByCourier = function (byCourier) {
+    Delivery.Courier.STREET_DOM_NODE.required = byCourier;
+    Delivery.Courier.HOUSE_DOM_NODE.required = byCourier;
+    Delivery.Courier.ROOM_DOM_NODE.required = byCourier;
+
+    if (byCourier) {
+      window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
+      window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+    } else {
+      window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
+      window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
+      resetDeliveryValidity();
+    }
+
+    if (byCourier && trolley.getCount() <= 0) {
+      return;
+    }
+    Delivery.Courier.STREET_DOM_NODE.disabled = !byCourier;
+    Delivery.Courier.HOUSE_DOM_NODE.disabled = !byCourier;
+    Delivery.Courier.ROOM_DOM_NODE.disabled = !byCourier;
+  };
+
+  var deliveryInformationChangeHandler = function (evt) {
+    evt.preventDefault();
+    checkDeliveryInformation(evt);
+  };
+
+  var checkDeliveryInformation = function (evt) {
+    switch (true) {
+      case (!!evt && !!Delivery.Map[evt.srcElement.id]):
+        setSubwayMap(evt);
+        break;
+      case (!isStreetValid()):
+        window.utils.setDomNodeValidity(false, Delivery.Courier.STREET_DOM_NODE);
+        break;
+      case (!isHouseValid()):
+        window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Delivery.Courier.HOUSE_DOM_NODE);
+        break;
+      case (isFloorTyped() && !isFloorValid()):
+        window.utils.setDomNodeValidity(true, Delivery.Courier.STREET_DOM_NODE);
+        window.utils.setDomNodeValidity(true, Delivery.Courier.HOUSE_DOM_NODE);
+        window.utils.setDomNodeValidity(false, Delivery.Courier.FLOOR_DOM_NODE);
+        break;
+      default:
+        resetDeliveryValidity();
+    }
+  };
+
+  var isStreetValid = function () {
+    var value = Delivery.Courier.STREET_DOM_NODE.value;
+    var noFillings = window.utils.trimSpaces(value);
+    return noFillings.length > 0;
+  };
+
+  var isHouseValid = function () {
+    var value = Delivery.Courier.HOUSE_DOM_NODE.value;
+    var noFillings = window.utils.trimSpaces(value);
+    return noFillings.length > 0;
+  };
+
+  var isFloorTyped = function () {
+    var value = Delivery.Courier.FLOOR_DOM_NODE.value;
+    return value.length > 0;
+  };
+
+  var isFloorValid = function () {
+    var value = Delivery.Courier.FLOOR_DOM_NODE.value;
+    return window.utils.isNumber(value);
+  };
+
+  var isTakeoutSelected = function () {
+    return Delivery.SELF_TAKE_OUT_DOM_NODE.checked;
+  };
+
+  var setSubwayMap = function (evt) {
+    var htmlId = evt.srcElement.id;
+    var altText = Delivery.Map[htmlId].name;
+    var fileName = Delivery.Map[htmlId].filename;
+    var mapFullUrl = Delivery.MAP_PATH + fileName;
+    window.utils.setDomNodeImage(Delivery.Store.MAP_DOM_NODE, mapFullUrl, altText);
+  };
+
+  var blockAllFormFields = function () {
+    disableAllFormFields(true);
+  };
+
+  var unblockAllFormFields = function () {
+    disableAllFormFields(false);
+    paymentTypeChangeHandler();
+  };
+
+  var disableAllFormFields = function (shouldBeDisabled) {
+    Contacts.NAME_DOM_NODE.disabled = shouldBeDisabled;
+    Contacts.PHONE_DOM_NODE.disabled = shouldBeDisabled;
+    Contacts.EMAIL_DOM_NODE.disabled = shouldBeDisabled;
+
+    Payment.CARD_NUMBER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
+    Payment.CARD_DATE_INPUT_DOM_NODE.disabled = shouldBeDisabled;
+    Payment.CARD_CVC_INPUT_DOM_NODE.disabled = shouldBeDisabled;
+    Payment.CARD_HOLDER_INPUT_DOM_NODE.disabled = shouldBeDisabled;
+
+    Delivery.Courier.STREET_DOM_NODE.disabled = shouldBeDisabled;
+    Delivery.Courier.HOUSE_DOM_NODE.disabled = shouldBeDisabled;
+    Delivery.Courier.FLOOR_DOM_NODE.disabled = shouldBeDisabled;
+    Delivery.Courier.ROOM_DOM_NODE.disabled = shouldBeDisabled;
+  };
+
+  var downloadSuccessHandler = function (data) {
     catalog = new window.Catalog(function () {
       return data;
     });
@@ -177,440 +623,14 @@
 
     filterRange = new window.Filter.Range(catalog.getMinPrice(), catalog.getMaxPrice());
     setInterfaceHandlers();
-  }
+  };
 
-  function setInterfaceHandlers() {
-    setFieldsForCardPayment(true);
-    setContactsToBeRequired(true);
-    deliveryTypeHandler();
 
-    window.utils.setDomEventHandler(
-        document, FilterForm.MAIN_SELECTOR,
-        filterInputHandler,
-        'change'
-    );
+  // Beginning of the main code
 
-    window.utils.setDomEventHandler(
-        document, FilterForm.SHOW_ALL_HTML_SELECTOR,
-        filterSubmitHandler,
-        'click'
-    );
+  window.Backend.get(downloadSuccessHandler, downloadUploadErrorHandler);
+  return;
 
-    window.utils.setDomEventHandler(
-        document, FilterRange.MAIN_SELECTOR,
-        filterFormRangeHandler,
-        'mousedown'
-    );
-
-    document.querySelector(Contacts.MAIN_SELECTOR).
-      addEventListener('change', contactsCheckHandler);
-
-    window.utils.setDomEventHandler(
-        document, Payment.METHOD_SELECTOR,
-        paymentTypeHandler,
-        'click'
-    );
-
-    window.utils.setDomEventHandler(
-        document, Payment.MAIN_SELECTOR,
-        paymentCheckHandler,
-        'change'
-    );
-
-    window.utils.setDomEventHandler(
-        document, Delivery.TYPE_SELECTOR,
-        deliveryTypeHandler,
-        'change'
-    );
-
-    window.utils.setDomEventHandler(
-        document, Delivery.Store.MAIN_SELECTOR,
-        deliveryChangeAndCheck,
-        'change'
-    );
-
-    document.querySelector(Order.MAIN_SELECTOR).
-      addEventListener('submit', onSubmitOrder);
-  }
-
-
-  /*
-   * Overall order form checking
-   */
-
-  function filterInputHandler(evt) {
-    window.utils.debounce(function () {
-      dom.filterFormHandler(evt);
-    }, DEBOUNCE_TIME);
-  }
-
-  function filterSubmitHandler(evt) {
-    evt.preventDefault();
-    dom.filterFormHandler(evt, filterRange.reset.bind(filterRange));
-  }
-
-  function filterFormRangeHandler(evt) {
-    filterRange.mouseDownHandler(evt, dom.filterFormHandler.bind(dom));
-  }
-
-  function onSubmitOrder(evt) {
-    evt.preventDefault();
-    if (isTrolleyEmpty(trolley)) {
-      return;
-    }
-    contactsCheckHandler();
-    paymentCheckHandler();
-    deliveryChangeAndCheck();
-
-    window.Backend.put(makeOrderFormData(), onSuccessUpload, onErrorDownloadUpload);
-  }
-
-  function makeOrderFormData() {
-    return document.querySelector(Order.MAIN_SELECTOR);
-  }
-
-  function onSuccessUpload() {
-    resetOrderForm();
-    showModal(Order.MODAL_SUCCESS_SELECTOR);
-  }
-
-  function onErrorDownloadUpload() {
-    showModal(Order.MODAL_ERROR_SELECTOR);
-  }
-
-  function showModal(modalSelector) {
-    var modalNode = document.querySelector(modalSelector);
-    modalNode.classList.remove(Order.MODAL_HIDDEN_CLASS);
-    var closeButtonNode = modalNode.querySelector(Order.MODAL_CLOSE_BUTTON_SELECTOR);
-    closeButtonNode.addEventListener('click', closeModal);
-    document.addEventListener('keydown', closeModal);
-
-    function closeModal(evt) {
-      if (evt.type === 'keydown' && evt.keyCode !== ESC_KEY_CODE) {
-        return;
-      }
-      if (!evt.type === 'click') {
-        return;
-      }
-      modalNode.classList.add(Order.MODAL_HIDDEN_CLASS);
-      closeButtonNode.removeEventListener('click', closeModal);
-      document.removeEventListener('keydown', closeModal);
-    }
-  }
-
-  /*
-   * Trolley contains goods checking
-   */
-
-  function isTrolleyEmpty(trolleyObject) {
-    return trolleyObject.getCount() <= 0;
-  }
-
-  /*
-   * Contacts handler and checking
-   */
-
-  function contactsCheckHandler() {
-    switch (true) {
-      case (!isNameValid()):
-        window.utils.setDomValid(false, Contacts.NAME_SELECTOR);
-        break;
-      case (isEmailTyped() && !isEmailValid()):
-        window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
-        window.utils.setDomValid(false, Contacts.EMAIL_SELECTOR);
-        break;
-      default:
-        resetContactsValidity();
-    }
-
-    function isNameValid() {
-      var value = window.utils.getDomValue(document, Contacts.NAME_SELECTOR);
-      var trimmed = window.utils.trimAll(value);
-      return trimmed.length > 0;
-    }
-
-    function isEmailTyped() {
-      var value = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
-      var trimmed = window.utils.trimSpaces(value);
-      return trimmed.length > 0;
-    }
-
-    function isEmailValid() {
-      var email = window.utils.getDomValue(document, Contacts.EMAIL_SELECTOR);
-      return window.utils.isEmailValid(email);
-    }
-  }
-
-  function resetContactsValidity() {
-    window.utils.setDomValid(true, Contacts.NAME_SELECTOR);
-    window.utils.setDomValid(true, Contacts.PHONE_SELECTOR);
-    window.utils.setDomValid(true, Contacts.EMAIL_SELECTOR);
-  }
-
-  function resetOrderForm() {
-    window.utils.setDomValue(document, Contacts.NAME_SELECTOR, '');
-    window.utils.setDomValue(document, Contacts.PHONE_SELECTOR, '');
-    window.utils.setDomValue(document, Contacts.EMAIL_SELECTOR, '');
-
-    window.utils.setDomValue(document, Payment.CARD_NUMBER_INPUT_SELECTOR, '');
-    window.utils.setDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR, '');
-    window.utils.setDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR, '');
-    window.utils.setDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR, '');
-
-    window.utils.setDomValue(document, Delivery.Courier.STREET_SELECTOR, '');
-    window.utils.setDomValue(document, Delivery.Courier.HOUSE_SELECTOR, '');
-    window.utils.setDomValue(document, Delivery.Courier.FLOOR_SELECTOR, '');
-    window.utils.setDomValue(document, Delivery.Courier.ROOM_SELECTOR, '');
-
-    resetContactsValidity();
-  }
-
-
-  /*
-   * Payment handler and checking
-   */
-
-  function paymentTypeHandler() {
-    switch (true) {
-      case (window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
-        adjustFormForPaymentByCard(true);
-        break;
-      case (window.utils.isChecked(Payment.CASH_LABEL_SELECTOR)):
-        adjustFormForPaymentByCard(false);
-        break;
-    }
-  }
-
-  function adjustFormForPaymentByCard(byCard) {
-    if (!byCard) {
-      window.utils.hideHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
-      window.utils.showHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
-      setFieldsForCardPayment(false);
-      resetCardValidity();
-    } else {
-      window.utils.showHtmlSelector(document, Payment.CARD_FORM_SELECTOR);
-      window.utils.hideHtmlSelector(document, Payment.CASH_PAYMENT_MESSAGE_SELECTOR);
-      setFieldsForCardPayment(true);
-    }
-  }
-
-  function setFieldsForCardPayment(isToBeSet) {
-    if (isToBeSet && trolley.getCount() <= 0) {
-      return;
-    }
-
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_NUMBER_MIN_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_NUMBER_MAX_LENGTH, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_NUMBER_INPUT_SELECTOR);
-
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_DATE_MIN_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_DATE_MAX_LENGTH, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_DATE_INPUT_SELECTOR);
-
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_CVC_MIN_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Payment.CARD_CVC_MAX_LENGTH, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_CVC_INPUT_SELECTOR);
-
-    window.utils.setInputToBeRequired(isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Payment.CARD_HOLDER_MIN_WIDTH, Payment.CARD_HOLDER_INPUT_SELECTOR);
-    window.utils.blockInput(!isToBeSet, Payment.CARD_HOLDER_INPUT_SELECTOR);
-  }
-
-  function paymentCheckHandler() {
-    switch (true) {
-      case (!window.utils.isChecked(Payment.CARD_LABEL_SELECTOR)):
-        resetCardValidity();
-        break;
-      case (!isCardNumberValid()):
-        window.utils.setDomValid(false, Payment.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
-        break;
-      case (!isCardDateValid()):
-        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(false, Payment.CARD_DATE_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
-        break;
-      case (!isCardCvcValid()):
-        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
-        window.utils.setDomValid(false, Payment.CARD_CVC_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
-        break;
-      case (!isCardholderNameValid()):
-        window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
-        window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
-        window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
-        window.utils.setDomValid(false, Payment.CARD_HOLDER_INPUT_SELECTOR);
-        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_INVALID_MESSAGE);
-        break;
-      default:
-        window.utils.setDomTextContent(document, Payment.CARD_VALIDITY_SELECTOR, Payment.CARD_VALID_MESSAGE);
-        resetCardValidity();
-    }
-
-    function isCardNumberValid() {
-      var cardNumber = window.utils.getDomValue(document, Payment.CARD_NUMBER_INPUT_SELECTOR);
-      return window.utils.isLuhnChecked(cardNumber);
-    }
-
-    function isCardDateValid() {
-      var cardDate = window.utils.getDomValue(document, Payment.CARD_DATE_INPUT_SELECTOR);
-      return window.utils.isCardDateChecked(cardDate);
-    }
-
-    function isCardCvcValid() {
-      var cvc = window.utils.getDomValue(document, Payment.CARD_CVC_INPUT_SELECTOR);
-      return window.utils.isCvcChecked(cvc);
-    }
-
-    function isCardholderNameValid() {
-      var cardholder = window.utils.getDomValue(document, Payment.CARD_HOLDER_INPUT_SELECTOR);
-      return window.utils.isCacrdholderNameChecked(cardholder);
-    }
-  }
-
-  function resetCardValidity() {
-    window.utils.setDomValid(true, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.setDomValid(true, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.setDomValid(true, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.setDomValid(true, Payment.CARD_HOLDER_INPUT_SELECTOR);
-  }
-
-  function setContactsToBeRequired(isToBeSet) {
-    window.utils.setInputToBeRequired(isToBeSet, Contacts.NAME_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.NAME_MIN_LENGTH, Contacts.NAME_SELECTOR);
-
-    window.utils.setInputToBeRequired(isToBeSet, Contacts.PHONE_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'minlength', Contacts.PHONE_MIN_LENGTH, Contacts.PHONE_SELECTOR);
-    window.utils.setHtmlTagAttribute(isToBeSet, 'maxlength', Contacts.PHONE_MAX_LENGTH, Contacts.PHONE_SELECTOR);
-  }
-
-
-  /*
-   * Delivery handler and checking
-   */
-
-  function deliveryTypeHandler() {
-    switch (true) {
-      case (window.utils.isChecked(Delivery.BY_COURIER_SELECTOR)):
-        adjustFormForDeliveryByCourier(true);
-        break;
-      case (isTakeoutSelected()):
-        adjustFormForDeliveryByCourier(false);
-        break;
-    }
-  }
-
-  function adjustFormForDeliveryByCourier(byCourier) {
-    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.STREET_SELECTOR);
-    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.setInputToBeRequired(byCourier, Delivery.Courier.ROOM_SELECTOR);
-
-    if (byCourier) {
-      window.utils.hideHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
-      window.utils.showHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
-    } else {
-      window.utils.hideHtmlSelector(document, Delivery.Courier.MAIN_SELECTOR);
-      window.utils.showHtmlSelector(document, Delivery.Store.MAIN_SELECTOR);
-      resetDeliveryValidity();
-    }
-
-    if (byCourier && trolley.getCount() <= 0) {
-      return;
-    }
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.STREET_SELECTOR);
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.disableHtmlSelector(!byCourier, Delivery.Courier.ROOM_SELECTOR);
-  }
-
-  function deliveryChangeAndCheck(evt) {
-    switch (true) {
-      case (!!evt && !!Delivery.Map[evt.srcElement.id]):
-        setSubwayMap(evt);
-        break;
-      case (!isStreetValid()):
-        window.utils.setDomValid(false, Delivery.Courier.STREET_SELECTOR);
-        break;
-      case (!isHouseValid()):
-        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
-        window.utils.setDomValid(false, Delivery.Courier.HOUSE_SELECTOR);
-        break;
-      case (isFloorTyped() && !isFloorValid()):
-        window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
-        window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
-        window.utils.setDomValid(false, Delivery.Courier.FLOOR_SELECTOR);
-        break;
-      default:
-        resetDeliveryValidity();
-    }
-
-    function isStreetValid() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.STREET_SELECTOR);
-      var noFillings = window.utils.trimSpaces(value);
-      return noFillings.length > 0;
-    }
-
-    function isHouseValid() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.HOUSE_SELECTOR);
-      var noFillings = window.utils.trimSpaces(value);
-      return noFillings.length > 0;
-    }
-
-    function isFloorTyped() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
-      return value.length > 0;
-    }
-
-    function isFloorValid() {
-      var value = window.utils.getDomValue(document, Delivery.Courier.FLOOR_SELECTOR);
-      return window.utils.isNumber(value);
-    }
-  }
-
-  function isTakeoutSelected() {
-    return window.utils.isHtmlIdChecked(Delivery.SELF_TAKE_OUT_ID);
-  }
-
-  function resetDeliveryValidity() {
-    window.utils.setDomValid(true, Delivery.Courier.STREET_SELECTOR);
-    window.utils.setDomValid(true, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.setDomValid(true, Delivery.Courier.FLOOR_SELECTOR);
-    window.utils.setDomValid(true, Delivery.Courier.ROOM_SELECTOR);
-  }
-
-  function setSubwayMap(evt) {
-    var htmlId = evt.srcElement.id;
-    var altText = Delivery.Map[htmlId].name;
-    var fileName = Delivery.Map[htmlId].filename;
-    var mapFullUrl = Delivery.MAP_PATH + fileName;
-    window.utils.setDomImage(document, Delivery.Store.MAP_SELECTOR, mapFullUrl, altText);
-  }
-
-  function blockAllFormFields() {
-    disableAllFormFields(true);
-  }
-
-  function unblockAllFormFields() {
-    disableAllFormFields(false);
-  }
-
-  function disableAllFormFields(shouldBeDisabled) {
-    window.utils.blockInput(shouldBeDisabled, Contacts.NAME_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Contacts.PHONE_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Contacts.EMAIL_SELECTOR);
-
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_NUMBER_INPUT_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_DATE_INPUT_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_CVC_INPUT_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Payment.CARD_HOLDER_INPUT_SELECTOR);
-
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.STREET_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.HOUSE_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.FLOOR_SELECTOR);
-    window.utils.blockInput(shouldBeDisabled, Delivery.Courier.ROOM_SELECTOR);
-  }
+  // End of the main code
 
 })();

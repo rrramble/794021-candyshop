@@ -20,30 +20,25 @@
     }
   };
 
-  window.Backend = {
-    get: get,
-    put: put
+  var processResult = function (result, onLoadCb, onErrorCb) {
+    if (window.utils.HttpCode.isSuccess(result.status)) {
+      onLoadCb(result.response);
+    } else {
+      onErrorCb(result.status + '. ' + result.statusText);
+    }
   };
 
-  function get(onLoad, onError) {
-    processXhr(Host.Download, onLoad, onError);
-  }
-
-  function put(data, onLoad, onError) {
-    processXhr(Host.Upload, onLoad, onError, data);
-  }
-
-  function processXhr(connection, onLoad, onError, data) {
+  var processXhr = function (connection, onLoadCb, onErrorCb, data) {
     var xhr = new XMLHttpRequest();
 
     xhr.addEventListener('load', function () {
-      processResult(xhr, onLoad, onError);
+      processResult(xhr, onLoadCb, onErrorCb);
     });
     xhr.addEventListener('error', function () {
-      processResult(xhr, onLoad, onError);
+      processResult(xhr, onLoadCb, onErrorCb);
     });
     xhr.addEventListener('timeout', function () {
-      processResult(xhr, onLoad, onError);
+      processResult(xhr, onLoadCb, onErrorCb);
     });
 
     if (connection.RESPONSE_TYPE) {
@@ -58,17 +53,21 @@
       var formData = data ? new FormData(data) : undefined;
       xhr.send(formData);
     } catch (err) {
-      onError(err.name + ' ' + err.message);
+      onErrorCb(err.name + ' ' + err.message);
     }
+  };
 
-  }
+  var get = function (onLoadCb, onErrorCb) {
+    processXhr(Host.Download, onLoadCb, onErrorCb);
+  };
 
-  function processResult(result, onLoad, onError) {
-    if (window.utils.HttpCode.isSuccess(result.status)) {
-      onLoad(result.response);
-    } else {
-      onError(result.status + '. ' + result.statusText);
-    }
-  }
+  var put = function (data, onLoadCb, onErrorCb) {
+    processXhr(Host.Upload, onLoadCb, onErrorCb, data);
+  };
+
+  window.Backend = {
+    get: get,
+    put: put
+  };
 
 })();

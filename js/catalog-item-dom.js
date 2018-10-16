@@ -17,48 +17,35 @@
   };
 
   window.CatalogItemDom = function (commodity, templateNode) {
-    // Constructor body
-    var baseNode = templateNode.content.cloneNode(true);
-    setId(baseNode, commodity.id);
-    setName(baseNode, commodity.name);
-    setImage(baseNode, commodity.picture, commodity.name);
-    setPrice(baseNode, commodity.price);
-    setWeight(baseNode, commodity.weight);
-    setStockAmount(baseNode, commodity.amount);
-    setRating(baseNode, commodity.rating, commodity.number);
-    setNutritionFacts(baseNode, commodity.nutritionFacts);
-    setFavorite(baseNode, commodity.favorite);
-    return baseNode;
-    // End of constructor body
 
-    function setId(node, commodityId) {
+    var setId = function (node, commodityId) {
       var subNode = window.utils.querySelectorIncludingSelf(node, Selector.MAIN_SELECTOR);
       subNode.id = COMMODITY_HTML_ID_HEAD + commodityId;
-    }
+    };
 
-    function setName(node, name) {
+    var setName = function (node, name) {
       window.utils.setDomTextContent(node, Selector.NAME, name);
-    }
+    };
 
-    function setImage(node, url, alt) {
+    var setImage = function (node, url, alt) {
       window.utils.setDomImage(node, Selector.IMAGE, url, alt);
-    }
+    };
 
-    function setPrice(node, price) {
+    var setPrice = function (node, price) {
       var priceNode = node.querySelector(Selector.PRICE);
       var currencyNode = node.querySelector(Selector.CURRENCY);
       var weightNode = node.querySelector(Selector.WEIGHT);
       priceNode.textContent = price + ' ';
       priceNode.appendChild(currencyNode);
       priceNode.appendChild(weightNode);
-    }
+    };
 
-    function setWeight(node, weight) {
+    var setWeight = function (node, weight) {
       var weightFormatted = '/ ' + weight + ' Г';
       window.utils.setDomTextContent(node, Selector.WEIGHT, weightFormatted);
-    }
+    };
 
-    function setStockAmount(node, amount) {
+    var setStockAmount = function (node, amount) {
       var htmlClass = 'card--in-stock';
       if (amount >= 1 && amount <= 5) {
         htmlClass = 'card--little';
@@ -70,9 +57,9 @@
       subNode.classList.remove('card--little');
       subNode.classList.remove('card--soon');
       subNode.classList.add(htmlClass);
-    }
+    };
 
-    function setRating(node, rating) {
+    var setRating = function (node, rating) {
       var htmlClass = 'stars__rating--zero';
       var textRating = 'Рейтинг: ноль звёзд';
       switch (true) {
@@ -102,24 +89,36 @@
       element.classList.add(htmlClass);
       window.utils.setDomTextContent(node, '.stars__rating', textRating);
       window.utils.setDomTextContent(node, '.star__count', fortmattedNumber);
-    }
+    };
 
-    function setNutritionFacts(node, nutrition) {
+    var setNutritionFacts = function (node, nutrition) {
       window.utils.setDomTextContent(node, '.card__composition-list', nutrition.contents);
       var sugarAndEnergy = (nutrition.sugar ? 'С сахаром.' : 'Без сахара.') +
         nutrition.energy + ' ккал';
       window.utils.setDomTextContent(node, '.card__characteristic', sugarAndEnergy);
-    }
+    };
 
-    function setFavorite(node, isFavorite) {
+    var setFavorite = function (node, isFavorite) {
       var favorite = node.querySelector('.card__btn-favorite');
       if (isFavorite) {
         favorite.classList.add('card__btn-favorite--selected');
       } else {
         favorite.classList.remove('card__btn-favorite--selected');
       }
-    }
+    };
 
+    // Beginning of the Constructor
+    var baseNode = templateNode.content.cloneNode(true);
+    setId(baseNode, commodity.id);
+    setName(baseNode, commodity.name);
+    setImage(baseNode, commodity.picture, commodity.name);
+    setPrice(baseNode, commodity.price);
+    setWeight(baseNode, commodity.weight);
+    setStockAmount(baseNode, commodity.amount);
+    setRating(baseNode, commodity.rating, commodity.number);
+    setNutritionFacts(baseNode, commodity.nutritionFacts);
+    setFavorite(baseNode, commodity.favorite);
+    return baseNode;
   };
 
 })();

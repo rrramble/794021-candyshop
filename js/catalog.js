@@ -8,14 +8,40 @@
 (function () {
 
   var IMG_PATH = 'img/cards/';
-  var Sorting = {
-    'popular': sortDefault,
-    'cheap': sortCheap,
-    'expensive': sortExpensive,
-    'rating': sortRating
-  };
 
   window.Catalog = function (loadGoods) {
+
+    var sortDefault = function (first, second) {
+      return first.id - second.id;
+    };
+
+    var sortCheap = function (first, second) {
+      return first.price - second.price;
+    };
+
+    var sortExpensive = function (first, second) {
+      return second.price - first.price;
+    };
+
+    var sortRating = function (first, second) {
+      if (second.rating.value > first.rating.value) {
+        return 1;
+      }
+      if (first.rating.value > second.rating.value) {
+        return -1;
+      }
+      return second.rating.number - first.rating.number;
+    };
+
+    var Sorting = {
+      'popular': sortDefault,
+      'cheap': sortCheap,
+      'expensive': sortExpensive,
+      'rating': sortRating
+    };
+
+
+    // Methods of the Class
 
     this.getGoods = function () {
       return this.goods;
@@ -47,13 +73,11 @@
 
     this.getIngredientsCount = function (ingredient) {
       return this.getGoods().reduce(function (accu, item) {
-        if (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) {
-          accu++;
-        }
-        if (ingredient === 'gluten-free' && !item.nutritionFacts.gluten) {
-          accu++;
-        }
-        if (ingredient === 'vegetarian' && item.nutritionFacts.vegetarian) {
+        if (
+          (ingredient === 'sugar-free' && !item.nutritionFacts.sugar) ||
+          (ingredient === 'gluten-free' && !item.nutritionFacts.gluten) ||
+          (ingredient === 'vegetarian' && item.nutritionFacts.vegetarian)
+        ) {
           accu++;
         }
         return accu;
@@ -87,12 +111,12 @@
     };
 
     this.getMinPrice = function () {
-      var value = window.utils.listMin(this.getPrices());
+      var value = window.utils.getListMin(this.getPrices());
       return value;
     };
 
     this.getMaxPrice = function () {
-      var value = window.utils.listMax(this.getPrices());
+      var value = window.utils.getListMax(this.getPrices());
       return value;
     };
 
@@ -162,7 +186,6 @@
       ) {
         return;
       }
-
       this.sortingType = sortingType;
       var sortingFunction = Sorting[sortingType];
       this.goods.sort(sortingFunction);
@@ -176,33 +199,11 @@
       });
     };
 
-
-    // Costructor of the class
+    // Beginning of the constructor
     this.goods = loadGoods();
     this.tuneData();
-    return;
+    // End of the constructor
+
   };
-
-  function sortDefault(first, second) {
-    return first.id - second.id;
-  }
-
-  function sortCheap(first, second) {
-    return first.price - second.price;
-  }
-
-  function sortExpensive(first, second) {
-    return second.price - first.price;
-  }
-
-  function sortRating(first, second) {
-    if (second.rating.value > first.rating.value) {
-      return 1;
-    }
-    if (first.rating.value > second.rating.value) {
-      return -1;
-    }
-    return second.rating.number - first.rating.number;
-  }
 
 })();
