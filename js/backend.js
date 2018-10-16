@@ -20,25 +20,25 @@
     }
   };
 
-  var processResult = function (result, onLoad, onError) {
+  var processResult = function (result, onLoadCb, onErrorCb) {
     if (window.utils.HttpCode.isSuccess(result.status)) {
-      onLoad(result.response);
+      onLoadCb(result.response);
     } else {
-      onError(result.status + '. ' + result.statusText);
+      onErrorCb(result.status + '. ' + result.statusText);
     }
   };
 
-  var processXhr = function (connection, onLoad, onError, data) {
+  var processXhr = function (connection, onLoadCb, onErrorCb, data) {
     var xhr = new XMLHttpRequest();
 
     xhr.addEventListener('load', function () {
-      processResult(xhr, onLoad, onError);
+      processResult(xhr, onLoadCb, onErrorCb);
     });
     xhr.addEventListener('error', function () {
-      processResult(xhr, onLoad, onError);
+      processResult(xhr, onLoadCb, onErrorCb);
     });
     xhr.addEventListener('timeout', function () {
-      processResult(xhr, onLoad, onError);
+      processResult(xhr, onLoadCb, onErrorCb);
     });
 
     if (connection.RESPONSE_TYPE) {
@@ -53,16 +53,16 @@
       var formData = data ? new FormData(data) : undefined;
       xhr.send(formData);
     } catch (err) {
-      onError(err.name + ' ' + err.message);
+      onErrorCb(err.name + ' ' + err.message);
     }
   };
 
-  var get = function (onLoad, onError) {
-    processXhr(Host.Download, onLoad, onError);
+  var get = function (onLoadCb, onErrorCb) {
+    processXhr(Host.Download, onLoadCb, onErrorCb);
   };
 
-  var put = function (data, onLoad, onError) {
-    processXhr(Host.Upload, onLoad, onError, data);
+  var put = function (data, onLoadCb, onErrorCb) {
+    processXhr(Host.Upload, onLoadCb, onErrorCb, data);
   };
 
   window.Backend = {
