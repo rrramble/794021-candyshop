@@ -1,13 +1,18 @@
 'use strict';
 
-
 /*
- * Trolley with goods
+ * Trolley of goods
  */
 
 (function () {
 
   window.Trolley = function (catalog) {
+
+    this.fillItem = function (commodityItem) {
+      var item = Object.assign({}, commodityItem);
+      item.amount = 0;
+      return item;
+    };
 
     this.getGoods = function () {
       return this.goods;
@@ -19,10 +24,6 @@
 
     this.getAmount = function (id) {
       return this.getItem(id).amount;
-    };
-
-    this.getPrice = function (id) {
-      return this.getItem(id).price;
     };
 
     this.getCount = function () {
@@ -68,18 +69,9 @@
       });
     };
 
-    // Constructor
-
-    this.goods = catalog.getGoods().map(fillItem);
-
-
-    // Miscelaneous functions
-
-    function fillItem(commodityItem) {
-      var item = Object.assign({}, commodityItem);
-      item.amount = 0;
-      return item;
-    }
-
+    // Beginning of the Constructor
+    this.goods = catalog.getGoods().map(this.fillItem);
+    return;
   };
+
 })();

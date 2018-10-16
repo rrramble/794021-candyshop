@@ -1,12 +1,31 @@
 'use strict';
 
 /*
- * Miscelaneous non-task-oriented functions
+ * Miscelaneous not task-oriented functions
  */
 
 (function () {
 
-  var SELECTOR_HIDDEN = '.visually-hidden';
+  var VISUALLY_HIDDEN_HTML_CLASS = 'visually-hidden';
+
+  var Card = {
+    NUMBER_LENGTHS: [16, 17, 18, 19],
+    MIN_YEAR: 18,
+    MAX_YEAR: 99,
+    MIN_MONTH: 1,
+    MAX_MONTH: 12,
+    MIN_CVC: 100,
+    MAX_CVC: 999,
+    HOLDER_MIN_LENGTH: 1,
+    HOLDER_MAX_LENGTH: 200
+  };
+
+  var Text = {
+    INCORRECT_DATA: 'Некорректные данные'
+  };
+
+  // Thanks to https://emailregex.com/
+  var EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   var HttpCode = {
     successCodes: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226],
@@ -15,379 +34,293 @@
     }
   };
 
-  window.utils = {
-    getDomObjectsByClassName: getDomObjectsByClassName,
-    removeCssClass: removeCssClass,
-    addCssClass: addCssClass,
-    randomInRange: randomInRange,
-    randomInRangeUpTo: randomInRangeUpTo,
-    getRandomItemFromList: getRandomItemFromList,
-    getRandomListFromList: getRandomListFromList,
-    htmlClassFromSelector: htmlClassFromSelector,
-    showHtmlSelector: showHtmlSelector,
-    hideHtmlSelector: hideHtmlSelector,
-    htmlClassToSelector: htmlClassToSelector,
-    querySelectorIncludingSelf: querySelectorIncludingSelf,
-    htmlSelectorToClass: htmlSelectorToClass,
-    isNumber: isNumber,
-    isChecked: isChecked,
-    htmlIdToHtmlSelector: htmlIdToHtmlSelector,
-    isInRange: isInRange,
-    isInRangeUpTo: isInRangeUpTo,
-    setWithinRange: setWithinRange,
-
-    setDomId: setDomId,
-    setDomTextContent: setDomTextContent,
-    setDomImage: setDomImage,
-    setDomValue: setDomValue,
-    getDomValue: getDomValue,
-    setDomName: setDomName,
-    replaceDomItem: replaceDomItem,
-    setDomEventHandler: setDomEventHandler,
-    removeDomEventHandler: removeDomEventHandler,
-
-    isLuhnChecked: isLuhnChecked,
-    isCardDateChecked: isCardDateChecked,
-    isCvcChecked: isCvcChecked,
-    isCacrdholderNameChecked: isCacrdholderNameChecked,
-    isEven: isEven,
-    sum: sum,
-    trimAll: trimAll,
-    trimSpaces: trimSpaces,
-    omitPx: omitPx,
-
-    getHtmlSelectorProperty: getHtmlSelectorProperty,
-    getHtmlSelectorWidth: getHtmlSelectorWidth,
-    getHtmlClassLeftProperty: getHtmlClassLeftProperty,
-    setHtmlClassLeftProperty: setHtmlClassLeftProperty,
-    getHtmlClassRightProperty: getHtmlClassRightProperty,
-    setHtmlClassRightProperty: setHtmlClassRightProperty,
-
-    intPercent: intPercent,
-    percentToIntValue: percentToIntValue,
-    disableButton: disableButton,
-    enableButton: enableButton,
-    setInputToBeRequired: setInputToBeRequired,
-    setDomValid: setDomValid,
-    setHtmlTagAttribute: setHtmlTagAttribute,
-    blockInput: blockInput,
-    listMin: listMin,
-    listMax: listMax,
-    getMovementX: getMovementX,
-
-    HttpCode: HttpCode
+  var isEven = function (a) {
+    return a % 2 === 0;
   };
 
-  function getDomObjectsByClassName(objectClass) {
-    var domId = window.utils.htmlClassToSelector(objectClass);
+  var sum = function (a, b) {
+    return b ? a + b : a;
+  };
+
+  var getDomObjectsByClassName = function (objectClass) {
+    var domId = window.utils.convertHtmlClassToHtmlSelector(objectClass);
     var domObjects = document.querySelectorAll(domId);
     return domObjects;
-  }
+  };
 
-  function removeCssClass(objectClass, classToBeRemoved) {
+  var removeCssClass = function (objectClass, classToBeRemoved) {
     var domObjects = window.utils.getDomObjectsByClassName(objectClass);
-    for (var i = 0; i < domObjects.length; i++) {
-      domObjects[i].classList.remove(classToBeRemoved);
-    }
-  }
-
-  function addCssClass(objectClass, classToBeAdded) {
-    var domObjects = window.utils.getDomObjectsByClassName(objectClass);
-    for (var i = 0; i < domObjects.length; i++) {
-      domObjects[i].classList.add(classToBeAdded);
-    }
-  }
-
-  function randomInRange(from, to) {
-    var result = Math.floor(Math.random(to - from) * to + from);
-    if (result < from) {
-      result = from;
-    } else if (result >= to) {
-      result = to - 1;
-    }
-    return result;
-  }
-
-  function randomInRangeUpTo(from, upTo) {
-    var to = upTo + 1;
-    return window.utils.randomInRange(from, to);
-  }
-
-  function getRandomItemFromList(list) {
-    if (list.length === 0) {
-      return list;
-    }
-    var index = window.utils.randomInRange(0, list.length);
-    return list[index];
-  }
-
-  function getRandomListFromList(list) {
-    if (list.length === 0) {
-      return list;
-    }
-
-    var newList = list.filter(function () {
-      return window.utils.randomInRangeUpTo(0, 1) === 0;
+    domObjects.forEach(function (domObject) {
+      domObject.classList.remove(classToBeRemoved);
     });
+  };
 
-    if (newList.length === 0) {
-      newList = list[0];
-    }
-    return newList;
-  }
+  var addCssClass = function (objectClass, classToBeAdded) {
+    var domObjects = window.utils.getDomObjectsByClassName(objectClass);
+    domObjects.forEach(function (domObject) {
+      domObject.classList.add(classToBeAdded);
+    });
+  };
 
-  function htmlClassFromSelector(htmlSelector) {
-    var firstChar = htmlSelector[0];
-    if (firstChar === '.') {
-      return htmlSelector.slice(1);
-    }
-    return undefined;
-  }
-
-  function showHtmlSelector(node, htmlSelector) {
+  var showHtmlSelector = function (node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
-    el.classList.remove(className);
-  }
+    el.classList.remove(VISUALLY_HIDDEN_HTML_CLASS);
+  };
 
-  function hideHtmlSelector(node, htmlSelector) {
+  var showDomNodeVisually = function (baseNode) {
+    baseNode.classList.remove(VISUALLY_HIDDEN_HTML_CLASS);
+  };
+
+  var hideHtmlSelector = function (node, htmlSelector) {
     var el = window.utils.querySelectorIncludingSelf(node, htmlSelector);
-    var className = window.utils.htmlClassFromSelector(SELECTOR_HIDDEN);
-    el.classList.add(className);
-  }
+    el.classList.add(VISUALLY_HIDDEN_HTML_CLASS);
+  };
 
-  function htmlClassToSelector(htmlClass) {
+  var hideDomNodeVisually = function (baseNode) {
+    baseNode.classList.add(VISUALLY_HIDDEN_HTML_CLASS);
+  };
+
+  var convertHtmlClassToHtmlSelector = function (htmlClass) {
     return '.' + htmlClass;
-  }
+  };
 
-  function querySelectorIncludingSelf(dom, selector) {
+  var convertHtmlSelectorToHtmlClass = function (htmlSelector) {
+    return htmlSelector.slice(1);
+  };
+
+  var querySelectorIncludingSelf = function (dom, selector) {
     var classes = dom.classList;
     if (classes) {
-      var className = window.utils.htmlSelectorToClass(selector);
+      var className = window.utils.convertHtmlSelectorToHtmlClass(selector);
       if (classes.contains(className)) {
         return dom;
       }
     }
     return dom.querySelector(selector);
-  }
+  };
 
-  function htmlSelectorToClass(htmlSelector) {
-    return htmlSelector.slice(1);
-  }
-
-  function isNumber(n) {
-    if (isNaN(n)) {
-      return false;
-    }
+  var isNumber = function (n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
-  }
+  };
 
-  function isChecked(htmlSelector, node) {
+  var isChecked = function (htmlSelector, node) {
     var baseNode = node ? node : document;
     var result = baseNode.querySelector(htmlSelector).checked;
     return result;
-  }
+  };
 
-  function htmlIdToHtmlSelector(id) {
+  var isHtmlIdChecked = function (htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
+    var result = baseNode.querySelector(selector).checked;
+    return result;
+  };
+
+  var setInputHtmlIdCheck = function (htmlId, shouldBeSet) {
+    var htmlSelector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
+    document.querySelector(htmlSelector).checked = shouldBeSet;
+  };
+
+  var convertHtmlIdToHtmlSelector = function (id) {
     return '#' + id;
-  }
+  };
 
-  function isInRange(value, from, to) {
+  var isInRange = function (value, from, to) {
     return (value >= from && value < to);
-  }
+  };
 
-  function isInRangeUpTo(value, from, to) {
+  var isInRangeUpTo = function (value, from, to) {
     return (value >= from && value <= to);
-  }
+  };
 
-  function setWithinRange(value, from, upTo) {
+  var setWithinRange = function (value, from, upTo) {
     if (value < from) {
       return from;
     }
     return value > upTo ? upTo : value;
-  }
+  };
 
-  function setDomId(node, htmlSelector, data) {
+  var setDomId = function (node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.id = data;
-  }
+  };
 
-  function setDomTextContent(node, htmlSelector, data) {
+  var setDomTextContent = function (node, htmlSelector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.textContent = data;
-  }
+  };
 
-  function setDomImage(node, htmlSelector, imageUrl, imageAlt) {
+  var getDomTextContent = function (node, htmlSelector) {
+    var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
+    return subNode.textContent;
+  };
+
+  var setDomImage = function (node, htmlSelector, imageUrl, imageAlt) {
     var subNode = window.utils.querySelectorIncludingSelf(node, htmlSelector);
     subNode.src = imageUrl ? imageUrl : '';
     subNode.alt = imageAlt ? imageAlt : '';
-  }
+  };
 
-  function setDomValue(node, selector, data) {
+  var setDomNodeImage = function (baseNode, imageUrl, imageAlt) {
+    baseNode.src = imageUrl ? imageUrl : '';
+    baseNode.alt = imageAlt ? imageAlt : '';
+  };
+
+  var setDomValue = function (node, selector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     subNode.value = data;
-  }
+  };
 
-  function getDomValue(node, selector) {
+  var getDomValue = function (node, selector) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     return subNode.value;
-  }
+  };
 
-  function setDomName(node, selector, data) {
+  var setDomName = function (node, selector, data) {
     var subNode = window.utils.querySelectorIncludingSelf(node, selector);
     subNode.name = data;
-  }
+  };
 
-  function replaceDomItem(mainDomObject, oldChildSelector, newChildNode) {
-    var startDomObject = mainDomObject;
-    if (!mainDomObject) {
-      startDomObject = document;
+  var replaceDomItem = function (mainDomObject, oldChildSelector, newChildNode) {
+    var baseNode = mainDomObject ? mainDomObject : document;
+    var oldChildNode = baseNode.querySelector(oldChildSelector);
+    if (!oldChildNode) {
+      return;
     }
-    var parentNode = startDomObject.querySelector(oldChildSelector).parentNode;
-    var oldChildNode = parentNode.querySelector(oldChildSelector);
+    var parentNode = oldChildNode.parentNode;
     parentNode.replaceChild(newChildNode, oldChildNode);
-  }
+  };
 
-  function setDomEventHandler(domNode, htmlSelector, cb, type) {
+  var setDomEventHandler = function (domNode, htmlSelector, cb, type) {
     var node = domNode.querySelector(htmlSelector);
     node.addEventListener(type, cb);
-  }
+  };
 
-  function removeDomEventHandler(domNode, htmlSelector, cb, type) {
-    var node = domNode.querySelector(htmlSelector);
-    node.removeEventListener(type, cb);
-  }
+  var removeFirstDomSelector = function (selector, domNode) {
+    var baseNode = domNode ? domNode : document;
+    var node = baseNode.querySelector(selector);
+    if (node) {
+      node.remove();
+    }
+  };
 
-  function isLuhnChecked(cardNumber) {
+  var isLuhnChecked = function (cardNumber) {
     var noSpaces = window.utils.trimAll(cardNumber.toString());
-    if (noSpaces.length !== 16) {
+    if (!Card.NUMBER_LENGTHS.includes(noSpaces.length)) {
       return false;
     }
     var numbers = noSpaces.split('');
-    var semiDoubled = numbers.map(semiDouble);
+    var semiDoubled = numbers.map(calculateLuhnSemiDouble);
     var total = semiDoubled.reduce(window.utils.sum, 0);
     return (total % 10 === 0);
+  };
 
-    function semiDouble(char, index) {
-      var digit = parseInt(char, 10);
-      if (window.utils.isEven(index)) {
-        var digitDoubled = digit * 2;
-        digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
-      }
-      return digit;
+  var calculateLuhnSemiDouble = function (char, index) {
+    var digit = parseInt(char, 10);
+    if (window.utils.isEven(index)) {
+      var digitDoubled = digit * 2;
+      digit = digitDoubled > 9 ? digitDoubled - 9 : digitDoubled;
     }
-  }
+    return digit;
+  };
 
-  function isCardDateChecked(cardDate) {
+  var isCardDateChecked = function (cardDate) {
     var noFillings = window.utils.trimSpaces(cardDate);
     var month = noFillings.slice(0, 2);
     var divider = noFillings.slice(2, 3);
     var year = noFillings.slice(3);
-    return window.utils.isInRangeUpTo(month, 1, 12) &&
-      window.utils.isInRangeUpTo(year, 18, 50) &&
+    return window.utils.isInRangeUpTo(month, Card.MIN_MONTH, Card.MAX_MONTH) &&
+      window.utils.isInRangeUpTo(year, Card.MIN_YEAR, Card.MAX_YEAR) &&
       !window.utils.isNumber(divider);
-  }
+  };
 
-  function isCvcChecked(cvc) {
+  var isCvcChecked = function (cvc) {
     var noFillings = window.utils.trimAll(cvc) / 1;
     var number = noFillings.toFixed(0);
-    var result = window.utils.isInRangeUpTo(number, 0, 999) &&
-      number.length === 3;
-    return result;
-  }
+    return window.utils.isInRangeUpTo(number, Card.MIN_CVC, Card.MAX_CVC);
+  };
 
-  function isCacrdholderNameChecked(fullName) {
+  var isCardholderNameChecked = function (fullName) {
     var noFillings = window.utils.trimAll(fullName);
-    return noFillings.length > 0;
-  }
+    return window.utils.isInRangeUpTo(noFillings.length,
+        Card.HOLDER_MIN_LENGTH, Card.HOLDER_MAX_LENGTH
+    );
+  };
 
-  function isEven(a) {
-    return a % 2 === 0;
-  }
-
-  function sum(a, b) {
-    return b ? a + b : a;
-  }
-
-  function trimAll(s) {
+  var trimAll = function (s) {
     var noSpaces = s.replace(/\s/g, '');
     var noFillings = noSpaces.replace('.', '').replace('-', '').replace('_', '');
     return noFillings;
-  }
+  };
 
-  function trimSpaces(s) {
+  var trimSpaces = function (s) {
     var noSpaces = s.replace(/\s/g, '');
     return noSpaces;
-  }
+  };
 
-  function omitPx(px) {
+  var omitPx = function (px) {
     return parseFloat(px.toString());
-  }
+  };
 
-  function getHtmlSelectorProperty(property, htmlSelector, node) {
-    var baseNode = node ? node : document;
-    var childNode = baseNode.querySelector(htmlSelector);
-    var result = window.getComputedStyle(childNode).getPropertyValue(property);
-    return result;
-  }
+  var getDomNodeLeftProperty = function (domNode) {
+    var propertyPx = window.getComputedStyle(domNode).getPropertyValue('left');
+    return window.utils.omitPx(propertyPx);
+  };
 
-  function getHtmlSelectorWidth(htmlSelector, node) {
-    var resultPx = window.utils.getHtmlSelectorProperty('width', htmlSelector, node);
-    return window.utils.omitPx(resultPx);
-  }
+  var getDomNodeRightProperty = function (domNode) {
+    var propertyPx = window.getComputedStyle(domNode).getPropertyValue('right');
+    return window.utils.omitPx(propertyPx);
+  };
 
-  function getHtmlClassLeftProperty(htmlClass, node) {
-    var selector = window.utils.htmlClassToSelector(htmlClass);
-    var leftPx = window.utils.getHtmlSelectorProperty('left', selector, node);
-    return window.utils.omitPx(leftPx);
-  }
+  var setDomNodeLeftProperty = function (node, value) {
+    node.style.left = value + 'px';
+  };
 
-  function setHtmlClassLeftProperty(value, htmlClass, node) {
-    var baseNode = node ? node : document;
-    var selector = window.utils.htmlClassToSelector(htmlClass);
-    baseNode.querySelector(selector).style.left = value + 'px';
-  }
+  var setDomNodeRightProperty = function (node, value) {
+    node.style.right = value + 'px';
+  };
 
-  function getHtmlClassRightProperty(htmlClass, node) {
-    var selector = window.utils.htmlClassToSelector(htmlClass);
-    var rightPx = window.utils.getHtmlSelectorProperty('right', selector, node);
-    return window.utils.omitPx(rightPx);
-  }
-
-  function setHtmlClassRightProperty(value, htmlClass, node) {
-    var baseNode = node ? node : document;
-    var selector = window.utils.htmlClassToSelector(htmlClass);
-    baseNode.querySelector(selector).style.right = value + 'px';
-  }
-
-  function intPercent(base, part) {
+  var calculateIntPercent = function (base, part) {
     var percent = base === 0 ? 0 : part / base * 100;
     percent = window.utils.setWithinRange(percent, 0, 100);
     return percent.toFixed(0);
-  }
+  };
 
-  function percentToIntValue(percent, min, max) {
+  var convertPercentToIntWithinRange = function (percent, min, max) {
     var value = (max - min) * percent / 100 + min;
     value = window.utils.setWithinRange(value, min, max);
     return value.toFixed(0);
-  }
+  };
 
-  function disableButton(selector, node) {
+  var disableHtmlSelector = function (shoudBeDisabled, selector, node) {
     var baseNode = node ? node : document;
-    baseNode.querySelector(selector).disabled = true;
-  }
+    baseNode.querySelector(selector).disabled = shoudBeDisabled;
+  };
 
-  function enableButton(selector, node) {
+  var disableHtmlId = function (shouldBeBlocked, htmlId, node) {
     var baseNode = node ? node : document;
-    baseNode.querySelector(selector).disabled = false;
-  }
+    var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
+    var childNode = baseNode.querySelector(selector);
+    childNode.disabled = shouldBeBlocked;
+  };
 
-  function setInputToBeRequired(isToBeRequired, selector, node) {
+  var isHtmlIdInputDisabled = function (htmlId, node) {
+    var baseNode = node ? node : document;
+    var selector = window.utils.convertHtmlIdToHtmlSelector(htmlId);
+    return baseNode.querySelector(selector).disabled;
+  };
+
+  var isHtmlSelectorDisabled = function (htmlSelector, node) {
+    var baseNode = node ? node : document;
+    return baseNode.querySelector(htmlSelector).disabled;
+  };
+
+  var setInputToBeRequired = function (isToBeRequired, selector, node) {
     var baseNode = node ? node : document;
     baseNode.querySelector(selector).required = isToBeRequired;
-  }
+  };
 
-  function setDomValid(shouldBeValid, selector, node) {
+  var setDomValid = function (shouldBeValid, selector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
     if (shouldBeValid) {
@@ -395,37 +328,138 @@
     } else {
       childNode.setCustomValidity('Некорретные данные');
     }
-  }
+  };
 
-  function setHtmlTagAttribute(shouldBeSet, parameter, value, selector, node) {
-    var baseNode = node ? node : document;
-    var childNode = baseNode.querySelector(selector);
+  var setDomNodeValidity = function (shouldBeValid, baseNode) {
+    var text = shouldBeValid ? '' : Text.INCORRECT_DATA;
+    baseNode.setCustomValidity(text);
+  };
+
+  var setDomNodeAttribute = function (shouldBeSet, parameter, value, baseNode) {
     if (shouldBeSet) {
-      childNode.setAttribute(parameter, value);
+      baseNode.setAttribute(parameter, value);
     } else {
-      childNode.removeAttribute(parameter);
+      baseNode.removeAttribute(parameter);
     }
-  }
+  };
 
-  function blockInput(shouldBeBlocked, selector, node) {
+  var blockInput = function (shouldBeBlocked, selector, node) {
     var baseNode = node ? node : document;
     var childNode = baseNode.querySelector(selector);
     childNode.disabled = shouldBeBlocked;
-  }
+  };
 
-  function listMin(list) {
+  var getListMin = function (list) {
     var result = Math.min.apply(null, list);
     return result;
-  }
+  };
 
-  function listMax(list) {
+  var getListMax = function (list) {
     var result = Math.max.apply(null, list);
     return result;
-  }
+  };
 
-  function getMovementX(begin, end) {
-    var value = end.x - begin.x;
-    return value;
-  }
+  var isKeyInObjectOfList = function (key, list) {
+    return list.some(function (item) {
+      return key in item;
+    });
+  };
+
+  var isClassIncludesKey = function (aClass, searchedKey) {
+    return aClass.hasOwnProperty ?
+      aClass.hasOwnProperty(searchedKey) :
+      aClass.prototype.hasOwnProperty(searchedKey);
+  };
+
+  var isEmailValid = function (email) {
+    return EMAIL_REGEX.test(email);
+  };
+
+  var _lastTimeout;
+  var debounce = function (func, arg, intervalMilliseconds) {
+    if (_lastTimeout) {
+      window.clearTimeout(_lastTimeout);
+    }
+    _lastTimeout = window.setTimeout(func, arg, intervalMilliseconds);
+  };
+
+
+  // Exporting the functions
+
+  window.utils = {
+    getDomObjectsByClassName: getDomObjectsByClassName,
+    removeCssClass: removeCssClass,
+    addCssClass: addCssClass,
+    convertHtmlSelectorToHtmlClass: convertHtmlSelectorToHtmlClass,
+    showHtmlSelector: showHtmlSelector,
+    hideHtmlSelector: hideHtmlSelector,
+    showDomNodeVisually: showDomNodeVisually,
+    hideDomNodeVisually: hideDomNodeVisually,
+
+    convertHtmlClassToHtmlSelector: convertHtmlClassToHtmlSelector,
+    querySelectorIncludingSelf: querySelectorIncludingSelf,
+    isNumber: isNumber,
+
+    isChecked: isChecked,
+    isHtmlIdChecked: isHtmlIdChecked,
+    setInputHtmlIdCheck: setInputHtmlIdCheck,
+    convertHtmlIdToHtmlSelector: convertHtmlIdToHtmlSelector,
+    isInRange: isInRange,
+    isInRangeUpTo: isInRangeUpTo,
+    setWithinRange: setWithinRange,
+
+    setDomId: setDomId,
+    setDomTextContent: setDomTextContent,
+    getDomTextContent: getDomTextContent,
+
+    setDomImage: setDomImage,
+    setDomNodeImage: setDomNodeImage,
+    setDomValue: setDomValue,
+    getDomValue: getDomValue,
+
+    setDomName: setDomName,
+    replaceDomItem: replaceDomItem,
+    setDomEventHandler: setDomEventHandler,
+    removeFirstDomSelector: removeFirstDomSelector,
+
+    isLuhnChecked: isLuhnChecked,
+    isCardDateChecked: isCardDateChecked,
+    isCvcChecked: isCvcChecked,
+    isCardholderNameChecked: isCardholderNameChecked,
+    isEven: isEven,
+    sum: sum,
+    trimAll: trimAll,
+    trimSpaces: trimSpaces,
+    omitPx: omitPx,
+
+    getDomNodeLeftProperty: getDomNodeLeftProperty,
+    getDomNodeRightProperty: getDomNodeRightProperty,
+    setDomNodeLeftProperty: setDomNodeLeftProperty,
+    setDomNodeRightProperty: setDomNodeRightProperty,
+
+    calculateIntPercent: calculateIntPercent,
+    convertPercentToIntWithinRange: convertPercentToIntWithinRange,
+
+    disableHtmlSelector: disableHtmlSelector,
+    isHtmlIdInputDisabled: isHtmlIdInputDisabled,
+    isHtmlSelectorDisabled: isHtmlSelectorDisabled,
+    disableHtmlId: disableHtmlId,
+
+    setInputToBeRequired: setInputToBeRequired,
+    setDomValid: setDomValid,
+    setDomNodeValidity: setDomNodeValidity,
+    setDomNodeAttribute: setDomNodeAttribute,
+
+    blockInput: blockInput,
+    getListMin: getListMin,
+    getListMax: getListMax,
+    isKeyInObjectOfList: isKeyInObjectOfList,
+
+    debounce: debounce,
+    isClassIncludesKey: isClassIncludesKey,
+    isEmailValid: isEmailValid,
+
+    HttpCode: HttpCode
+  };
 
 })();
