@@ -327,7 +327,6 @@
     Delivery.Courier.STREET_DOM_NODE.value = '';
     Delivery.Courier.HOUSE_DOM_NODE.value = '';
     Delivery.Courier.FLOOR_DOM_NODE.value = '';
-    Delivery.Courier.FLOOR_DOM_NODE.type = 'number';
     Delivery.Courier.ROOM_DOM_NODE.value = '';
   };
 
@@ -630,7 +629,6 @@
   // Beginning of the main code
 
   window.Backend.get(downloadSuccessHandler, downloadUploadErrorHandler);
-  Delivery.Courier.FLOOR_DOM_NODE.type = 'number';
   return;
 
   // End of the main code
